@@ -10,7 +10,8 @@
     android:layout_marginTop="@dimen/mtrl_card_spacing"
     android:layout_marginRight="@dimen/mtrl_card_spacing"
     android:minHeight="80dp"
-    app:cardElevation="2dp">
+    app:cardElevation="2dp"
+    tools:context=".TopicViewHolder">
 
     <RelativeLayout
         android:layout_width="match_parent"

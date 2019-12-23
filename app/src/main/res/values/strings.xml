@@ -21,7 +21,7 @@
         ]]>
     </string>
     <string name="placeholder_emoji" translatable="false">🏭</string>
-    <string name="placeholder_date" translatable="false">10.13.2015</string>
+    <string name="placeholder_date" translatable="false">Today 15:16</string>
     <string name="placeholder_number_short" translatable="false">1</string>
     <string name="placeholder_number_long" translatable="false">65536</string>
     <string name="placeholder_link" translatable="false">Link: www.example.com</string>
@@ -31,4 +31,5 @@
     <string name="replies_prefix">Replies:</string>
     <string name="views_prefix">Views:</string>
     <string name="topic_pinned">Topic pinned</string>
+    <string name="message_index">Message index</string>
 </resources>
