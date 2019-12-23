@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/forum_list_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/mtrl_card_spacing"
+    android:layout_marginTop="@dimen/mtrl_card_spacing"
+    android:layout_marginRight="@dimen/mtrl_card_spacing"
+    android:minHeight="80dp"
+    app:cardElevation="2dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/topic_sticky"
+            android:layout_height="28dp"
+            android:layout_width="28dp"
+            android:layout_alignParentEnd="true"
+            android:padding="8dp"
+            android:src="@drawable/pin"
+            android:tint="@color/colorPrimary"
+            android:visibility="invisible"
+            android:contentDescription="@string/topic_pinned"/>
+
+        <TextView
+            android:id="@+id/topic_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="28dp"
+            android:layout_alignParentStart="true"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textColor="@color/colorPrimary"
+            android:minEms="10"
+            android:text="@string/placeholder_long"/>
+
+        <TextView
+            android:id="@+id/topic_reply_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/topic_name"
+            android:textSize="@dimen/small_text_unnecessary_content"
+            android:paddingEnd="2dp"
+            android:paddingStart="2dp"
+            android:text="@string/replies_prefix"/>
+
+        <TextView
+            android:id="@+id/topic_reply_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/topic_reply_label"
+            android:layout_alignBaseline="@+id/topic_reply_label"
+            android:textSize="@dimen/small_text_unnecessary_content"
+            android:minEms="10"
+            android:maxEms="20"
+            android:ellipsize="end"
+            android:text="@string/placeholder_long"/>
+
+        <TextView
+            android:id="@+id/topic_views_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/topic_reply_label"
+            android:textSize="@dimen/small_text_unnecessary_content"
+            android:paddingEnd="2dp"
+            android:paddingStart="2dp"
+            android:text="@string/views_prefix"/>
+
+        <TextView
+            android:id="@+id/topic_view_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/topic_views_label"
+            android:layout_alignBaseline="@+id/topic_views_label"
+            android:textSize="@dimen/small_text_unnecessary_content"
+            android:maxEms="20"
+            android:ellipsize="end"
+            android:text="@string/placeholder_long"/>
+
+        <TextView
+            android:id="@+id/topic_last_message_topic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/topic_view_count"
+            android:textAppearance="@android:style/TextAppearance.Material.Small"
+            android:textColor="@color/colorPrimary"
+            android:gravity="center_vertical"
+            android:drawableEnd="@drawable/arrow_right"
+            android:drawableTint="@color/colorPrimary"
+            android:drawablePadding="8dp"
+            android:maxEms="20"
+            android:ellipsize="end"
+            android:text="@string/placeholder_long"/>
+
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>

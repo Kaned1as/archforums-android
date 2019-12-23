@@ -1,3 +1,34 @@
 <resources>
-    <string name="app_name">HolywarSoo</string>
+    <string name="app_name">Холиварка</string>
+
+
+    <!-- placeholders -->
+    <string name="placeholder_long" translatable="false">Sample placeholder text</string>
+    <string name="placeholder_short" translatable="false">Placeholder</string>
+    <string name="placeholder_tags_huge" translatable="false">
+        <![CDATA[
+            #Seven #for #the #days #and #seven #for #the
+            #nights #seven #for #the #heaven #and #the #tunnel
+            #and #the #lights
+        ]]>
+    </string>
+    <string name="placeholder_huge" translatable="false">
+        <![CDATA[
+            All eyes see the figure of the wizard\n
+            As he climbs to the top of the world\n
+            No sound as he falls instead of rising\n
+            Time&apos;s standing still, then there&apos;s blood on the sand\n
+        ]]>
+    </string>
+    <string name="placeholder_emoji" translatable="false">🏭</string>
+    <string name="placeholder_date" translatable="false">10.13.2015</string>
+    <string name="placeholder_number_short" translatable="false">1</string>
+    <string name="placeholder_number_long" translatable="false">65536</string>
+    <string name="placeholder_link" translatable="false">Link: www.example.com</string>
+
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="replies_prefix">Replies:</string>
+    <string name="views_prefix">Views:</string>
+    <string name="topic_pinned">Topic pinned</string>
 </resources>
