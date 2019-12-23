@@ -1,13 +1,10 @@
 image: openjdk:8-jdk
 
 variables:
-  ANDROID_COMPILE_SDK: "27"
-  ANDROID_TEST_SDK: "16"
-  ANDROID_BUILD_TOOLS: "27.0.3"
+  ANDROID_COMPILE_SDK: "29"
+  ANDROID_TEST_SDK: "21"
   ANDROID_SDK_TOOLS: "4333796" # 26.1.1
-
-  GIT_STRATEGY: clone
-
+  GIT_STRATEGY: fetch
   GOOGLE_PUBLISH_JSON: app/misc/android-publisher-account.json
 
 before_script:
@@ -16,7 +13,6 @@ before_script:
   - unzip -q android-sdk-linux.zip -d android-sdk-linux
   - echo y | android-sdk-linux/tools/bin/sdkmanager --install "platforms;android-${ANDROID_COMPILE_SDK}" &> /dev/null
   - echo y | android-sdk-linux/tools/bin/sdkmanager --install "platform-tools" &> /dev/null
-  - echo y | android-sdk-linux/tools/bin/sdkmanager --install "build-tools;${ANDROID_BUILD_TOOLS}" &> /dev/null
   - echo y | android-sdk-linux/tools/bin/sdkmanager --install "extras;android;m2repository" &> /dev/null
   - echo y | android-sdk-linux/tools/bin/sdkmanager --install "extras;google;m2repository" &> /dev/null
   - export ANDROID_HOME=$PWD/android-sdk-linux/
