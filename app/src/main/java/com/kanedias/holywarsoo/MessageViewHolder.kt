@@ -5,9 +5,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.google.android.material.card.MaterialCardView
 import com.kanedias.holywarsoo.dto.ForumMessage
+import com.kanedias.holywarsoo.markdown.handleMarkdown
 
 class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
+
+    @BindView(R.id.message_area)
+    lateinit var messageArea: MaterialCardView
 
     @BindView(R.id.message_author_name)
     lateinit var messageAuthorName: TextView
@@ -26,10 +31,14 @@ class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
     }
 
     fun setup(message: ForumMessage) {
+        if (message.index == 1) {
+            messageArea.cardElevation *= 4
+        }
+
         messageAuthorName.text = message.author
         messageDate.text = message.createdDate
         messageIndex.text = "#${message.index}"
-        messageBody.text = message.content
+        messageBody.handleMarkdown(message.content)
     }
 
 }

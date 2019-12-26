@@ -10,10 +10,23 @@ import com.kanedias.holywarsoo.misc.trySanitizeInt
 import okhttp3.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import java.lang.IllegalStateException
+import org.jsoup.nodes.Element
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 /**
+ * The singleton responsible for performing all network-related operations for the application,
+ * such as:
+ * * Retrieving forums, topics, messages
+ * * Creating messages, topics
+ * * Editing messages, topics
+ * * Reporting messages
+ * * Reporting errors of loading back
+ *
+ * All methods in here must be thread-safe.
+ *
+ * All methods here *may* throw [IOException]
+ *
  * @author Kanedias
  *
  * Created on 17.12.19
@@ -43,6 +56,14 @@ object Network {
             .build()
     }
 
+    fun resolve(url: String) = MAIN_HOLYWARSOO_URL.resolve(url)
+
+    /**
+     * Load forum list from the main page
+     *
+     * @return list of parsed forums. It has the same ordering as it had on the actual page.
+     */
+    @Throws(IOException::class)
     fun loadForumList(): List<Forum> {
         val req = Request.Builder().url(MAIN_HOLYWARSOO_URL).get().build()
         val resp = httpClient.newCall(req).execute()
@@ -56,13 +77,15 @@ object Network {
     }
 
     /**
-     * Loads forum page completely, with all the supporting browsing info.
+     * Loads forum page completely, with all the supporting browsing info, enriching the existing
+     * object. The returned value is a copy of the original.
      *
      * @param forumBase base forum object to enrich, which may have no subforums or topics available
      *                  at the moment of loading
      *
      * @return fully enriched forum instance
      */
+    @Throws(IOException::class)
     fun loadForumContents(forumBase: Forum): Forum {
         val req = Request.Builder().url(forumBase.anchor.url).get().build()
         val resp = httpClient.newCall(req).execute()
@@ -89,6 +112,14 @@ object Network {
         )
     }
 
+    /**
+     * Loads topic page completely, with all the supporting browsing info, enriching the existing
+     * object. The returned value is a copy of the original.
+     *
+     * @param topic base topic object to enrich, which may have no messages or pages available
+     *                  at the moment of loading
+     */
+    @Throws(IOException::class)
     fun loadTopicContents(topic: ForumTopic): ForumTopic {
         val req = Request.Builder().url(topic.anchor.url).get().build()
         val resp = httpClient.newCall(req).execute()
@@ -113,27 +144,69 @@ object Network {
         )
     }
 
+    /**
+     * Parses message list page of the topic and creates a structured list of all messages on the page.
+     *
+     * @param doc fully parsed document containing page with message list (topic)
+     * @return list of parsed messages. It has the same ordering as it had on the actual page.
+     */
     private fun parseMessages(doc: Document): List<ForumMessage> {
         val messages = mutableListOf<ForumMessage>()
         for (message in doc.select("div#brdmain div.blockpost")) {
             val msgDateLink = message.select("h2 > span > a")
+            val msgIndex = message.select("h2 > span > span.conr").text()
             val msgAuthor = message.select("div.postleft > dl > dt > strong:last-child").text()
-            val msgBody = message.select("div.postright > div.postmsg").outerHtml()
+            val msgBody = message.select("div.postright > div.postmsg").first()
             val msgDate = msgDateLink.text()
 
             val msgUrl = MAIN_HOLYWARSOO_URL.resolve(msgDateLink.attr("href"))!!
 
             messages.add(ForumMessage(
                 id = msgUrl.queryParameter("pid")!!.toInt(),
+                index = msgIndex.replace("#", "").toInt(),
                 author = msgAuthor,
                 createdDate = msgDate,
-                content = msgBody
+                content = postProcessMessage(msgBody)
             ))
         }
 
         return messages
     }
 
+    /**
+     * Post-processes the message, replaces all JS-based spoiler tags with standard HTML
+     * `<details>` + `<summary>` tags that were meant to be actual spoilers, without requiring JS.
+     *
+     * @param msgBody element representing message body, usually `div.postmsg` in the document
+     * @return HTML string after postprocessing
+     */
+    private fun postProcessMessage(msgBody: Element): String {
+        // need to detect all expandable spoiler tags and replace them with
+        // standard `details` + `summary`
+        for (spoilerTag in msgBody.select("div[onclick*=▼]")) {
+            spoilerTag.parent().apply {
+                tagName("details") // replace quotebox `div` with `details` tag
+                clearAttributes()          // clear all attributes it might have
+            }
+
+            spoilerTag.apply {
+                tagName("summary") // replace spoiler text `div` with `summary` tag
+                clearAttributes()          // clear all attributes it might have
+                html(this.ownText())       // we don't need a span with down/up arrow, just spoiler text
+            }
+        }
+
+        // other post-processing steps may follow, leaving this vacant...
+
+        return msgBody.outerHtml()
+    }
+
+    /**
+     * Parses topic list page of the forum and creates a structured list of all topics on the page.
+     *
+     * @param doc fully parsed document containing page with topic list (forum/favorites/active etc.)
+     * @return list of parsed forum topics. It has the same ordering as it had on the actual page.
+     */
     private fun parseTopics(doc: Document): List<ForumTopic> {
         val topics = mutableListOf<ForumTopic>()
         for (topic in doc.select("div#vf div.inbox table tr[class^=row]")) {
@@ -167,6 +240,13 @@ object Network {
         return topics
     }
 
+    /**
+     * Parses forum list page of the site and creates a structured list of
+     * all forums encountered on the page.
+     *
+     * @param doc fully parsed document containing page with forum list (main)
+     * @return list of parsed forums. It has the same ordering as it had on the actual page.
+     */
     private fun parseForums(doc: Document): List<Forum> {
         val forums = mutableListOf<Forum>()
 

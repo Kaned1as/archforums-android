@@ -32,4 +32,8 @@
     <string name="views_prefix">Views:</string>
     <string name="topic_pinned">Topic pinned</string>
     <string name="message_index">Message index</string>
+    <string name="share_link_using">Share link using…</string>
+    <string name="share_image_using">Share image using…</string>
+    <string name="downloading_image">Downloading image…</string>
+    <string name="image_saved_as">Image saved as</string>
 </resources>

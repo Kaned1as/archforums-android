@@ -1,6 +1,7 @@
 import com.android.build.VariantOutput.FilterType
 import com.palantir.gradle.gitversion.VersionDetails
 import com.android.build.gradle.internal.api.ApkVariantOutputImpl
+import java.net.URI
 
 plugins {
     id("com.android.application")
@@ -17,6 +18,8 @@ repositories {
     mavenCentral()
     google()
     jcenter()
+    maven { url = URI.create("https://jitpack.io") }
+    maven { url = URI.create("https://oss.sonatype.org/content/repositories/snapshots/") }
 }
 
 fun versionDetails() = (extra["versionDetails"] as groovy.lang.Closure<*>)() as VersionDetails
@@ -116,15 +119,23 @@ play {
 dependencies {
     implementation(kotlin("stdlib-jdk8", "1.3.61"))
     implementation("androidx.appcompat:appcompat:1.1.0")
-    implementation("androidx.core:core-ktx:1.1.0")
-    implementation("androidx.constraintlayout:constraintlayout:1.1.3")
+    implementation("androidx.core:core-ktx:1.1.0")                               // kotlin support for androidx
+    implementation("androidx.constraintlayout:constraintlayout:1.1.3")           // constaint layout view
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")       // swipe-to-refresh layout view
     implementation("androidx.cardview:cardview:1.0.0")                           // snappy cardview for lists
-    implementation("android.arch.lifecycle:extensions:1.1.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0-alpha01")
-    implementation("com.google.android.material:material:1.2.0-alpha02")         // Material design support lib
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0-rc03")        // coroutines lifecycle scopes
+    implementation("androidx.preference:preference:1.1.0")                       // preference fragment compatibility
+    implementation("androidx.lifecycle:lifecycle-extensions:2.1.0")              // view-model providers
+    implementation("com.google.android.material:material:1.2.0-alpha03")         // Material design support lib
     implementation("com.jakewharton:butterknife:10.2.0")                         // Annotation processor
     implementation("com.squareup.okhttp3:okhttp:3.14.0")                         // android http client
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")       // swipe-to-refresh layout
+    implementation("com.github.stfalcon:stfalcon-imageviewer:0.1.0")             // embedded image viewer
+
+    implementation("io.noties.markwon:core:${rootProject.extra["markwonVersion"]}")                     // markdown rendering
+    implementation("io.noties.markwon:image-glide:${rootProject.extra["markwonVersion"]}")
+    implementation("io.noties.markwon:html:${rootProject.extra["markwonVersion"]}")
+    implementation("io.noties.markwon:ext-tables:${rootProject.extra["markwonVersion"]}")
+    implementation("io.noties.markwon:ext-strikethrough:${rootProject.extra["markwonVersion"]}")
 
     implementation("org.jsoup:jsoup:1.12.1")                                          // HTML parser
 
