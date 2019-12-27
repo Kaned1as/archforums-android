@@ -1,5 +1,9 @@
 package com.kanedias.holywarsoo.service
 
+import android.content.Context
+import com.franmontiel.persistentcookiejar.PersistentCookieJar
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.kanedias.holywarsoo.BuildConfig
 import com.kanedias.holywarsoo.dto.Forum
 import com.kanedias.holywarsoo.dto.ForumMessage
@@ -43,9 +47,13 @@ object Network {
             .build())
     }
 
-    private var httpClient: OkHttpClient
+    private lateinit var httpClient: OkHttpClient
+    private lateinit var cookieJar: PersistentCookieJar
+    private lateinit var cookiePersistor: SharedPrefsCookiePersistor
 
-    init {
+    fun init(ctx: Context) {
+        cookiePersistor = SharedPrefsCookiePersistor(ctx)
+        cookieJar = PersistentCookieJar(SetCookieCache(), cookiePersistor)
         httpClient = OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
@@ -53,10 +61,21 @@ object Network {
             .connectionPool(ConnectionPool())
             .dispatcher(Dispatcher())
             .addInterceptor(userAgent)
+            .cookieJar(cookieJar)
             .build()
     }
 
+    private fun authCookie() = cookiePersistor.loadAll().firstOrNull { it.name().startsWith("pun_cookie") }
+
     fun resolve(url: String) = MAIN_HOLYWARSOO_URL.resolve(url)
+
+    fun daysToAuthExpiration() = authCookie()
+        ?.let { it.expiresAt() - System.currentTimeMillis() / 1000 / 60 / 60 / 24 }
+        ?: 0
+
+    fun isLoggedIn() = cookiePersistor.loadAll()
+        .filter { it.name().startsWith("pun_cookie") }
+        .any { it.expiresAt() < System.currentTimeMillis() }
 
     /**
      * Load forum list from the main page
@@ -171,6 +190,48 @@ object Network {
         }
 
         return messages
+    }
+
+    fun login(username: String, password: String) {
+        // clear previous login information
+        cookieJar.clear()
+
+        // login page contains CSRF tokens and other form parameters that should be
+        // present in the request for it to be valid. We need to extract this data prior to logging in
+        val loginPageUrl = MAIN_HOLYWARSOO_URL.resolve("login.php")!!
+        val loginPageReq = Request.Builder().url(loginPageUrl).get().build()
+        val loginPageResp = httpClient.newCall(loginPageReq).execute()
+        if (!loginPageResp.isSuccessful)
+            throw IllegalStateException("Can't load login page")
+
+        val loginPageHtml = loginPageResp.body()!!.string()
+        val loginPageDoc = Jsoup.parse(loginPageHtml)
+
+        val loginFormInputs =  loginPageDoc.select("form#login input[type=hidden]")
+
+        val loginReqUrl = loginPageUrl.newBuilder()
+            .addQueryParameter("action", "in")
+
+        val reqBody = FormBody.Builder()
+            .add("req_username", username)
+            .add("req_password", password)
+            .add("save_pass", "1")
+
+        for (input in loginFormInputs) {
+            reqBody.add(input.attr("name"), input.attr("value"))
+        }
+
+        val loginReq = Request.Builder()
+            .url(loginReqUrl.build())
+            .post(reqBody.build())
+            .build()
+
+        val loginResp = httpClient.newCall(loginReq).execute()
+        if (!loginResp.isSuccessful)
+            throw IllegalStateException("Can't authenticate")
+
+        if (authCookie() == null)
+            throw IllegalStateException("Authentication failed, invalid login/password")
     }
 
     /**

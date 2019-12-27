@@ -129,7 +129,11 @@ dependencies {
     implementation("com.google.android.material:material:1.2.0-alpha03")         // Material design support lib
     implementation("com.jakewharton:butterknife:10.2.0")                         // Annotation processor
     implementation("com.squareup.okhttp3:okhttp:3.14.0")                         // android http client
+    implementation("com.github.franmontiel:PersistentCookieJar:v1.0.1")          // cookie support
     implementation("com.github.stfalcon:stfalcon-imageviewer:0.1.0")             // embedded image viewer
+
+    implementation("ch.acra:acra-mail:${rootProject.extra["acraVersion"]}")                             // crash handler
+    implementation("ch.acra:acra-dialog:${rootProject.extra["acraVersion"]}")
 
     implementation("io.noties.markwon:core:${rootProject.extra["markwonVersion"]}")                     // markdown rendering
     implementation("io.noties.markwon:image-glide:${rootProject.extra["markwonVersion"]}")

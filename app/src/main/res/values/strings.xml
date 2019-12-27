@@ -36,4 +36,7 @@
     <string name="share_image_using">Share image using…</string>
     <string name="downloading_image">Downloading image…</string>
     <string name="image_saved_as">Image saved as</string>
+    <string name="app_crashed">Sorry, app just crashed</string>
+    <string name="app_crash_report">Fair crash report</string>
+    <string name="leave_crash_comment">Please describe your last performed action before the crash</string>
 </resources>
