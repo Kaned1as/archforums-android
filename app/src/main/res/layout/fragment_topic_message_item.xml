@@ -24,15 +24,14 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:textAppearance="@android:style/TextAppearance.Material.Small"
-            android:textColor="@color/colorPrimary"
-            android:minEms="10"
+            android:textColor="@color/colorAccent"
             android:text="@string/placeholder_long"/>
 
         <TextView
             android:id="@+id/message_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/message_author_name"
+            android:layout_alignBaseline="@+id/message_author_name"
             android:layout_toStartOf="@+id/message_index"
             android:layout_marginEnd="14dp"
             android:layout_marginStart="14dp"
@@ -45,7 +44,9 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_alignParentEnd="true"
+            android:layout_alignBaseline="@+id/message_author_name"
             android:textSize="@dimen/small_text_unnecessary_content"
+            android:minEms="3"
             android:text="@string/placeholder_number_long"/>
 
         <TextView

@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.kanedias.holywarsoo.dto.ForumTopic
+import com.kanedias.holywarsoo.misc.sanitizeInt
+import com.kanedias.holywarsoo.misc.showFullscreenFragment
 import com.kanedias.holywarsoo.misc.visibilityBool
 
 class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
@@ -17,8 +19,14 @@ class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
     @BindView(R.id.topic_name)
     lateinit var topicName: TextView
 
-    @BindView(R.id.topic_reply_count)
+    @BindView(R.id.topic_replies_label)
+    lateinit var topicRepliesLabel: TextView
+
+    @BindView(R.id.topic_replies_count)
     lateinit var topicReplies: TextView
+
+    @BindView(R.id.topic_views_label)
+    lateinit var topicViewsLabel: TextView
 
     @BindView(R.id.topic_view_count)
     lateinit var topicViews: TextView
@@ -35,9 +43,26 @@ class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 
     fun setup(topic: ForumTopic) {
         stickyMarker.visibilityBool = topic.sticky
-        topicName.text = topic.anchor.name
-        topicReplies.text = topic.replyCount.toString()
-        topicViews.text = topic.viewCount.toString()
+        topicName.text = topic.name
+
+        if (topic.replyCount < 0) {
+            topicRepliesLabel.visibility = View.GONE
+            topicReplies.visibility = View.GONE
+        } else {
+            topicReplies.visibility = View.VISIBLE
+            topicRepliesLabel.visibility = View.VISIBLE
+            topicReplies.text = topic.replyCount.toString()
+        }
+
+        if (topic.viewCount < 0) {
+            topicViewsLabel.visibility = View.GONE
+            topicViews.visibility = View.GONE
+        } else {
+            topicViewsLabel.visibility = View.VISIBLE
+            topicViews.visibility = View.VISIBLE
+            topicViews.text = topic.viewCount.toString()
+        }
+
         lastMessage.text = topic.lastMessageDate
 
         itemView.setOnClickListener {
@@ -47,12 +72,18 @@ class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
                 }
             }
 
-            val fm = (itemView.context as AppCompatActivity).supportFragmentManager
-            fm.beginTransaction()
-                .addToBackStack("showing topic contents")
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .replace(R.id.main_content_area, fragment)
-                .commit()
+            (itemView.context as AppCompatActivity).showFullscreenFragment(fragment)
+        }
+
+        lastMessage.setOnClickListener {
+            val fragment = TopicContentsFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable(TopicContentsFragment.TOPIC_ARG, topic)
+                    putBoolean(TopicContentsFragment.LAST_MESSAGE_ARG, true)
+                }
+            }
+
+            (itemView.context as AppCompatActivity).showFullscreenFragment(fragment)
         }
     }
 

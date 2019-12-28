@@ -10,13 +10,16 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.kanedias.holywarsoo.dto.Forum
+import com.kanedias.holywarsoo.dto.ForumTopic
 import com.kanedias.holywarsoo.model.ForumContentsModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 
 /**
  * @author Kanedias
@@ -29,6 +32,9 @@ class ForumContentsFragment: Fragment() {
         const val FORUM_ARG = "FORUM_ARG"
     }
 
+    @BindView(R.id.topic_list_scroll_area)
+    lateinit var forumViewRefresher: SwipeRefreshLayout
+
     @BindView(R.id.topic_list)
     lateinit var forumView: RecyclerView
 
@@ -40,16 +46,30 @@ class ForumContentsFragment: Fragment() {
 
         forumView.layoutManager = LinearLayoutManager(context)
 
+        forumViewRefresher.setOnRefreshListener { refreshContent() }
+
         contents = ViewModelProviders.of(this).get(ForumContentsModel::class.java)
         contents.forum.observe(this, Observer { forumView.adapter = ForumContentsAdapter(it) })
 
-        lifecycleScope.launchWhenResumed {
-            val forum = requireArguments().getSerializable(FORUM_ARG) as Forum
-            val loaded = withContext(Dispatchers.IO) { Network.loadForumContents(forum) }
-            contents.forum.value = loaded
-        }
+        refreshContent()
 
         return view
+    }
+
+    private fun refreshContent() {
+        lifecycleScope.launchWhenResumed {
+            forumViewRefresher.isRefreshing = true
+
+            try {
+                val forum = requireArguments().getSerializable(FORUM_ARG) as Forum
+                val loaded = withContext(Dispatchers.IO) { Network.loadForumContents(forum) }
+                contents.forum.value = loaded
+            } catch (ex: Exception) {
+                context?.let { Network.reportErrors(it, ex) }
+            }
+
+            forumViewRefresher.isRefreshing = false
+        }
     }
 
     class ForumContentsAdapter(forum: Forum) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {

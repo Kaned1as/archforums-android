@@ -8,7 +8,7 @@ import okhttp3.HttpUrl
  * Created on 22.12.19
  */
 data class ForumMessage(
-    val id: Int,
+    val id: Int = -1,  // set after page is loaded
 
     // info
     val author: String,

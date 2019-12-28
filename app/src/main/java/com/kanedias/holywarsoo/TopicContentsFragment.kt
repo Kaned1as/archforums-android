@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.kanedias.holywarsoo.dto.ForumTopic
@@ -17,6 +18,7 @@ import com.kanedias.holywarsoo.model.TopicContentsModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 
 /**
  * @author Kanedias
@@ -27,7 +29,12 @@ class TopicContentsFragment: Fragment() {
 
     companion object {
         const val TOPIC_ARG = "TOPIC_ARG"
+        const val NEW_MESSAGE_ARG = "NEW_MESSAGE_ARG"
+        const val LAST_MESSAGE_ARG = "LAST_MESSAGE_ARG"
     }
+
+    @BindView(R.id.message_list_scroll_area)
+    lateinit var topicViewRefresher: SwipeRefreshLayout
 
     @BindView(R.id.message_list)
     lateinit var topicView: RecyclerView
@@ -40,18 +47,32 @@ class TopicContentsFragment: Fragment() {
 
         topicView.layoutManager = LinearLayoutManager(context)
 
+        topicViewRefresher.setOnRefreshListener { refreshContent() }
+
         contents = ViewModelProviders.of(this).get(TopicContentsModel::class.java)
         contents.topic.observe(this, Observer { topicView.adapter =
             TopicContentsAdapter(it)
         })
 
-        lifecycleScope.launchWhenResumed {
-            val topic = requireArguments().getSerializable(TOPIC_ARG) as ForumTopic
-            val loaded = withContext(Dispatchers.IO) { Network.loadTopicContents(topic) }
-            contents.topic.value = loaded
-        }
+        refreshContent()
 
         return view
+    }
+
+    private fun refreshContent() {
+        lifecycleScope.launchWhenResumed {
+            topicViewRefresher.isRefreshing = true
+
+            try {
+                val topic = requireArguments().getSerializable(TOPIC_ARG) as ForumTopic
+                val loaded = withContext(Dispatchers.IO) { Network.loadTopicContents(topic) }
+                contents.topic.value = loaded
+            } catch (ex: Exception) {
+                context?.let { Network.reportErrors(it, ex) }
+            }
+
+            topicViewRefresher.isRefreshing = false
+        }
     }
 
     class TopicContentsAdapter(topic: ForumTopic) : RecyclerView.Adapter<MessageViewHolder>() {

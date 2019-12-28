@@ -39,4 +39,17 @@
     <string name="app_crashed">Sorry, app just crashed</string>
     <string name="app_crash_report">Fair crash report</string>
     <string name="leave_crash_comment">Please describe your last performed action before the crash</string>
+    <string name="hello_plus_comma">Hello,</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="guest">Guest</string>
+    <string name="enter">Enter</string>
+    <string name="please_wait">Please wait</string>
+    <string name="logging_in">Logging in…</string>
+    <string name="login_successful">Login successful</string>
+    <string name="error_connecting">Error connecting</string>
+    <string name="favorite_topics">Favorites</string>
+    <string name="replies_topics">Replies</string>
+    <string name="recent_topics">Recent</string>
+    <string name="new_messages_topics">With new messages</string>
 </resources>

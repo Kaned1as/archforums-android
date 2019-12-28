@@ -52,4 +52,14 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/main_sidebar"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:layout_gravity="start"
+        app:itemIconTint="@color/colorAccent"
+        app:menu="@menu/main_sidebar_menu"
+        app:headerLayout="@layout/view_sidebar_header"/>
+
 </androidx.drawerlayout.widget.DrawerLayout>

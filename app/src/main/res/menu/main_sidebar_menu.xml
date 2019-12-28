@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_item_favorites"
+        android:title="@string/favorite_topics"
+        android:icon="@drawable/bookmark_list"/>
+
+    <item
+        android:id="@+id/menu_item_replies"
+        android:title="@string/replies_topics"
+        android:icon="@drawable/community"/>
+
+    <item
+        android:id="@+id/menu_item_recent"
+        android:title="@string/recent_topics"
+        android:icon="@drawable/recent"/>
+
+    <item
+        android:id="@+id/menu_item_new_messages"
+        android:title="@string/new_messages_topics"
+        android:icon="@drawable/with_new_messages"/>
+
+</menu>

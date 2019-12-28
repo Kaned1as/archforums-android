@@ -1,14 +1,15 @@
 package com.kanedias.holywarsoo.service
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.util.Log
+import android.widget.Toast
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.kanedias.holywarsoo.BuildConfig
-import com.kanedias.holywarsoo.dto.Forum
-import com.kanedias.holywarsoo.dto.ForumMessage
-import com.kanedias.holywarsoo.dto.ForumTopic
-import com.kanedias.holywarsoo.dto.NamedLink
+import com.kanedias.holywarsoo.R
+import com.kanedias.holywarsoo.dto.*
 import com.kanedias.holywarsoo.misc.sanitizeInt
 import com.kanedias.holywarsoo.misc.trySanitizeInt
 import okhttp3.*
@@ -36,8 +37,17 @@ import java.util.concurrent.TimeUnit
  * Created on 17.12.19
  */
 object Network {
+    private const val ACCOUNT_SHARED_PREFS = "account"
+    private const val PREF_USERNAME = "username"
+    private const val PREF_PASSWORD = "password"
+
     private const val USER_AGENT = "Holywarsoo Android ${BuildConfig.VERSION_NAME}"
     private val MAIN_HOLYWARSOO_URL = HttpUrl.parse("https://holywarsoo.net")!!
+
+    val FAVORITE_TOPICS_URL = MAIN_HOLYWARSOO_URL.resolve("search.php?action=show_favorites")!!
+    val REPLIES_TOPICS_URL = MAIN_HOLYWARSOO_URL.resolve("search.php?action=show_replies")!!
+    val NEW_MESSAGES_TOPICS_URL = MAIN_HOLYWARSOO_URL.resolve("search.php?action=show_new")!!
+    val RECENT_TOPICS_URL = MAIN_HOLYWARSOO_URL.resolve("search.php?action=show_recent")!!
 
     private val userAgent = Interceptor { chain ->
         chain.proceed(chain
@@ -48,11 +58,13 @@ object Network {
     }
 
     private lateinit var httpClient: OkHttpClient
+    private lateinit var accountInfo: SharedPreferences
     private lateinit var cookieJar: PersistentCookieJar
     private lateinit var cookiePersistor: SharedPrefsCookiePersistor
 
     fun init(ctx: Context) {
-        cookiePersistor = SharedPrefsCookiePersistor(ctx)
+        accountInfo = ctx.getSharedPreferences(ACCOUNT_SHARED_PREFS, Context.MODE_PRIVATE)
+        cookiePersistor = SharedPrefsCookiePersistor(accountInfo)
         cookieJar = PersistentCookieJar(SetCookieCache(), cookiePersistor)
         httpClient = OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -75,123 +87,31 @@ object Network {
 
     fun isLoggedIn() = cookiePersistor.loadAll()
         .filter { it.name().startsWith("pun_cookie") }
-        .any { it.expiresAt() < System.currentTimeMillis() }
+        .any { it.expiresAt() > System.currentTimeMillis() }
+
+    fun getUsername() = accountInfo.getString(PREF_USERNAME, null)
 
     /**
-     * Load forum list from the main page
-     *
-     * @return list of parsed forums. It has the same ordering as it had on the actual page.
+     * Only use if [isLoggedIn] returns true and username/password are populated
+     * in preferences
      */
-    @Throws(IOException::class)
-    fun loadForumList(): List<Forum> {
-        val req = Request.Builder().url(MAIN_HOLYWARSOO_URL).get().build()
-        val resp = httpClient.newCall(req).execute()
-        if (!resp.isSuccessful)
-            throw IllegalStateException("Can't load main page")
+    fun refreshLogin() = login(
+        accountInfo.getString(PREF_USERNAME, null)!!,
+        accountInfo.getString(PREF_PASSWORD, null)!!
+    )
 
-        val html = resp.body()!!.string()
-        val doc = Jsoup.parse(html)
-
-        return parseForums(doc)
+    /**
+     * Clears cookies in http client, clears saved username and password
+     */
+    fun logout() {
+        cookieJar.clear()
+        accountInfo.edit().clear().apply()
     }
 
     /**
-     * Loads forum page completely, with all the supporting browsing info, enriching the existing
-     * object. The returned value is a copy of the original.
-     *
-     * @param forumBase base forum object to enrich, which may have no subforums or topics available
-     *                  at the moment of loading
-     *
-     * @return fully enriched forum instance
+     * Login using specified username and password.
+     * Creates persistent cookies and account preferences.
      */
-    @Throws(IOException::class)
-    fun loadForumContents(forumBase: Forum): Forum {
-        val req = Request.Builder().url(forumBase.anchor.url).get().build()
-        val resp = httpClient.newCall(req).execute()
-        if (!resp.isSuccessful)
-            throw IllegalStateException("Can't load forum contents")
-
-        val html = resp.body()!!.string()
-        val doc = Jsoup.parse(html)
-
-        val subforums = parseForums(doc)
-        val topics = parseTopics(doc)
-
-        val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
-        val currentPage = pageLinks.select("strong").text()
-        val pageCount = pageLinks.first().children()
-            .mapNotNull { it.ownText().trySanitizeInt() }
-            .max()
-
-        return forumBase.copy(
-            pageCount = pageCount!!,
-            currentPage = currentPage.sanitizeInt(),
-            subforums = subforums,
-            topics = topics
-        )
-    }
-
-    /**
-     * Loads topic page completely, with all the supporting browsing info, enriching the existing
-     * object. The returned value is a copy of the original.
-     *
-     * @param topic base topic object to enrich, which may have no messages or pages available
-     *                  at the moment of loading
-     */
-    @Throws(IOException::class)
-    fun loadTopicContents(topic: ForumTopic): ForumTopic {
-        val req = Request.Builder().url(topic.anchor.url).get().build()
-        val resp = httpClient.newCall(req).execute()
-        if (!resp.isSuccessful)
-            throw IllegalStateException("Can't load topic contents")
-
-        val html = resp.body()!!.string()
-        val doc = Jsoup.parse(html)
-
-        val messages = parseMessages(doc)
-
-        val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
-        val currentPage = pageLinks.select("strong").text()
-        val pageCount = pageLinks.first().children()
-            .mapNotNull { it.ownText().trySanitizeInt() }
-            .max()
-
-        return topic.copy(
-            pageCount = pageCount!!,
-            currentPage = currentPage.sanitizeInt(),
-            messages = messages
-        )
-    }
-
-    /**
-     * Parses message list page of the topic and creates a structured list of all messages on the page.
-     *
-     * @param doc fully parsed document containing page with message list (topic)
-     * @return list of parsed messages. It has the same ordering as it had on the actual page.
-     */
-    private fun parseMessages(doc: Document): List<ForumMessage> {
-        val messages = mutableListOf<ForumMessage>()
-        for (message in doc.select("div#brdmain div.blockpost")) {
-            val msgDateLink = message.select("h2 > span > a")
-            val msgIndex = message.select("h2 > span > span.conr").text()
-            val msgAuthor = message.select("div.postleft > dl > dt > strong:last-child").text()
-            val msgBody = message.select("div.postright > div.postmsg").first()
-            val msgDate = msgDateLink.text()
-
-            val msgUrl = MAIN_HOLYWARSOO_URL.resolve(msgDateLink.attr("href"))!!
-
-            messages.add(ForumMessage(
-                id = msgUrl.queryParameter("pid")!!.toInt(),
-                index = msgIndex.replace("#", "").toInt(),
-                author = msgAuthor,
-                createdDate = msgDate,
-                content = postProcessMessage(msgBody)
-            ))
-        }
-
-        return messages
-    }
-
     fun login(username: String, password: String) {
         // clear previous login information
         cookieJar.clear()
@@ -232,6 +152,156 @@ object Network {
 
         if (authCookie() == null)
             throw IllegalStateException("Authentication failed, invalid login/password")
+
+        accountInfo.edit()
+            .putString(PREF_USERNAME, username)
+            .putString(PREF_PASSWORD, password)
+            .apply()
+    }
+
+    /**
+     * Load forum list from the main page
+     *
+     * @return list of parsed forums. It has the same ordering as it had on the actual page.
+     */
+    @Throws(IOException::class)
+    fun loadForumList(): List<Forum> {
+        val req = Request.Builder().url(MAIN_HOLYWARSOO_URL).get().build()
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IllegalStateException("Can't load main page")
+
+        val html = resp.body()!!.string()
+        val doc = Jsoup.parse(html)
+
+        return parseForums(doc)
+    }
+
+    fun loadSearchPage(page: SearchPage): SearchPage {
+        val req = Request.Builder().url(page.link).get().build()
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IllegalStateException("Can't load forum contents")
+
+        val html = resp.body()!!.string()
+        val doc = Jsoup.parse(html)
+
+        val topics = parseTopics(doc)
+
+        val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
+        val currentPage = pageLinks.select("strong").text()
+        val pageCount = pageLinks.first().children()
+            .mapNotNull { it.ownText().trySanitizeInt() }
+            .max()
+
+        return page.copy(
+            pageCount = pageCount!!,
+            currentPage = currentPage.sanitizeInt(),
+            topics = topics
+        )
+    }
+
+    /**
+     * Loads forum page completely, with all the supporting browsing info, enriching the existing
+     * object. The returned value is a copy of the original.
+     *
+     * @param forumBase base forum object to enrich, which may have no subforums or topics available
+     *                  at the moment of loading
+     *
+     * @return fully enriched forum instance
+     */
+    @Throws(IOException::class)
+    fun loadForumContents(forumBase: Forum): Forum {
+        val req = Request.Builder().url(forumBase.link).get().build()
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IllegalStateException("Can't load forum contents")
+
+        val html = resp.body()!!.string()
+        val doc = Jsoup.parse(html)
+
+        val subforums = parseForums(doc)
+        val topics = parseTopics(doc)
+
+        val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
+        val currentPage = pageLinks.select("strong").text()
+        val pageCount = pageLinks.first().children()
+            .mapNotNull { it.ownText().trySanitizeInt() }
+            .max()
+
+        return forumBase.copy(
+            pageCount = pageCount!!,
+            currentPage = currentPage.sanitizeInt(),
+            subforums = subforums,
+            topics = topics
+        )
+    }
+
+    /**
+     * Loads topic page completely, with all the supporting browsing info, enriching the existing
+     * object. The returned value is a copy of the original.
+     *
+     * @param topic base topic object to enrich, which may have no messages or pages available
+     *                  at the moment of loading
+     */
+    @Throws(IOException::class)
+    fun loadTopicContents(topic: ForumTopic, page: Int = 1): ForumTopic {
+        val req = Request.Builder().url(topic.link).get().build()
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IllegalStateException("Can't load topic contents")
+
+        val html = resp.body()!!.string()
+        val doc = Jsoup.parse(html)
+
+        val messages = parseMessages(doc)
+
+        val topicRef = doc.select("head link[rel=canonical]").attr("href")
+        val topicLink = resolve(topicRef)!!.queryParameter("id")!!
+        val topicName = doc.select("head title").text()
+
+        val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
+        val currentPage = pageLinks.select("strong").text()
+        val pageCount = pageLinks.first().children()
+            .mapNotNull { it.ownText().trySanitizeInt() }
+            .max()
+
+        return topic.copy(
+            id = topicLink.sanitizeInt(),
+            name = topicName,
+            pageCount = pageCount!!,
+            currentPage = currentPage.sanitizeInt(),
+            messages = messages
+        )
+    }
+
+    /**
+     * Parses message list page of the topic and creates a structured list of all messages on the page.
+     *
+     * @param doc fully parsed document containing page with message list (topic)
+     * @return list of parsed messages. It has the same ordering as it had on the actual page.
+     */
+    private fun parseMessages(doc: Document): List<ForumMessage> {
+        val messages = mutableListOf<ForumMessage>()
+        for (message in doc.select("div#brdmain div.blockpost")) {
+            val msgDateLink = message.select("h2 > span > a")
+            val msgIndex = message.select("h2 > span > span.conr").text()
+            val msgAuthor = message.select("div.postleft > dl > dt > strong:last-child").text()
+            val msgBody = message.select("div.postright > div.postmsg").first()
+            val msgDate = msgDateLink.text()
+
+            val msgUrl = MAIN_HOLYWARSOO_URL.resolve(msgDateLink.attr("href"))!!
+
+            messages.add(ForumMessage(
+                id = msgUrl.queryParameter("pid")!!.toInt(),
+                index = msgIndex.replace("#", "").toInt(),
+                author = msgAuthor,
+                createdDate = msgDate,
+                content = postProcessMessage(msgBody)
+            ))
+        }
+
+        return messages
     }
 
     /**
@@ -269,13 +339,20 @@ object Network {
      * @return list of parsed forum topics. It has the same ordering as it had on the actual page.
      */
     private fun parseTopics(doc: Document): List<ForumTopic> {
+        val viewsClass = doc.select("div#vf div.inbox table thead tr th:containsOwn(Просмотров)").firstOrNull()
+        val repliesClass = doc.select("div#vf div.inbox table thead tr th:containsOwn(Ответов)").firstOrNull()
+
         val topics = mutableListOf<ForumTopic>()
         for (topic in doc.select("div#vf div.inbox table tr[class^=row]")) {
+
+
             val isSticky = topic.classNames().contains("isticky")
             val topicLink = topic.select("td.tcl > div.tclcon a").first()
             val topicPageCount = topic.select("td.tcl span.pagestext a:last-child").text()
-            val topicReplies = topic.select("td.tc2").text()
-            val topicViews = topic.select("td.tc3").text()
+
+            val topicReplies = repliesClass?.let { topic.select("td.${it.className()}").text() } ?: "-1"
+            val topicViews = viewsClass?.let { topic.select("td.${it.className()}").text() } ?: "-1"
+
             val lastMessageLink = topic.select("td.tcr > a")
 
             val topicUrl = MAIN_HOLYWARSOO_URL.resolve(topicLink.attr("href"))!!
@@ -285,10 +362,8 @@ object Network {
                 ForumTopic(
                     id = topicUrl.queryParameter("id")!!.toInt(),
                     sticky = isSticky,
-                    anchor = NamedLink(
-                        name = topicLink.text(),
-                        url = topicUrl
-                    ),
+                    name = topicLink.text(),
+                    link = topicUrl,
                     replyCount = topicReplies.sanitizeInt(),
                     viewCount = topicViews.sanitizeInt(),
                     pageCount = topicPageCount.toIntOrNull() ?: 1,
@@ -323,19 +398,32 @@ object Network {
             forums.add(
                 Forum(
                     id = forumUrl.queryParameter("id")!!.toInt(),
-                    anchor = NamedLink(
-                        name = forumLink.text(),
-                        url = forumUrl
-                    ),
+                    name = forumLink.text(),
+                    link = forumUrl,
                     subtext = forumSub.text(),
-                    lastMessage = NamedLink(
-                        name = lastMessageLink.text(),
-                        url = lastMessageUrl
-                    ),
+                    lastMessageName = lastMessageLink.text(),
+                    lastMessageLink = lastMessageUrl,
                     lastMessageDate = lastMessageDate.text()
                 )
             )
         }
         return forums
+    }
+
+    /**
+     * Handle typical network-related problems.
+     * @param ctx context to get error string from
+     * @param errMapping mapping of ids like `HttpUrlConnection.HTTP_NOT_FOUND -> R.string.not_found`
+     */
+    fun reportErrors(ctx: Context, ex: Exception) = when (ex) {
+
+        // generic connection-level error, show as-is
+        is IOException -> {
+            Log.w("Fair/Network", "Connection error", ex)
+            val errorText = ctx.getString(R.string.error_connecting)
+            Toast.makeText(ctx, "$errorText: ${ex.message}", Toast.LENGTH_SHORT).show()
+        }
+
+        else -> throw ex
     }
 }

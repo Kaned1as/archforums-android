@@ -6,19 +6,20 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+<!--        <item name="android:textColorPrimary">@color/colorAccent</item>-->
         <item name="toolbarStyle">@style/ToolBarStyle</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
     </style>
 
     <!-- ToolBar -->
     <style name="ToolBarStyle" parent="Widget.MaterialComponents.Toolbar">
-        <item name="titleTextColor">@android:color/white</item>
+        <item name="titleTextColor">@color/holywarsooForumContent</item>
     </style>
 
     <!-- Drawer menu -->
     <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>
-        <item name="color">@android:color/white</item>
+        <item name="color">@color/holywarsooForumContent</item>
     </style>
 
 </resources>

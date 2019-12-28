@@ -4,11 +4,12 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.kanedias.holywarsoo.dto.Forum
+import com.kanedias.holywarsoo.dto.ForumTopic
+import com.kanedias.holywarsoo.misc.showFullscreenFragment
 
 class ForumViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 
@@ -29,10 +30,10 @@ class ForumViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
     }
 
     fun setup(forum: Forum) {
-        forumName.text = forum.anchor.name
+        forumName.text = forum.name
         forumSubtext.text = forum.subtext
         lastMessageDate.text = forum.lastMessageDate
-        lastMessageTopic.text = forum.lastMessage.name
+        lastMessageTopic.text = forum.lastMessageName
 
         itemView.setOnClickListener {
             val fragment = ForumContentsFragment().apply {
@@ -41,12 +42,25 @@ class ForumViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
                 }
             }
 
-            val fm = (itemView.context as AppCompatActivity).supportFragmentManager
-            fm.beginTransaction()
-                .addToBackStack("showing forum contents")
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .replace(R.id.main_content_area, fragment)
-                .commit()
+            (itemView.context as AppCompatActivity).showFullscreenFragment(fragment)
+        }
+
+        lastMessageTopic.setOnClickListener {
+            val topic = ForumTopic(
+                name = forum.lastMessageName,
+                link = forum.lastMessageLink,
+                lastMessageDate = forum.lastMessageDate,
+                lastMessageUrl = forum.lastMessageLink
+            )
+
+            val fragment = TopicContentsFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable(TopicContentsFragment.TOPIC_ARG, topic)
+                    putBoolean(TopicContentsFragment.LAST_MESSAGE_ARG, true)
+                }
+            }
+
+            (itemView.context as AppCompatActivity).showFullscreenFragment(fragment)
         }
     }
 

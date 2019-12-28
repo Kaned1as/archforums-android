@@ -1,5 +1,6 @@
 package com.kanedias.holywarsoo.dto
 
+import okhttp3.HttpUrl
 import java.io.Serializable
 
 /**
@@ -8,16 +9,18 @@ import java.io.Serializable
  * Created on 17.12.19
  */
 data class Forum(
-    val id: Int,
+    val id: Int, // set after page is loaded
 
     // info
-    val anchor: NamedLink,
+    val name: String,
+    val link: HttpUrl,
     val subtext: String,
-    val lastMessage: NamedLink,
+    val lastMessageName: String,
+    val lastMessageLink: HttpUrl,
     val lastMessageDate: String,
 
     // counters
-    val themeCount: Int = -1,
+    val topicCount: Int = -1,
     val commentsCount: Int = -1,
     val pageCount: Int = -1,
     val currentPage: Int = -1,
