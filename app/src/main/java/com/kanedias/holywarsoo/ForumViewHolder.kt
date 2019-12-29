@@ -36,9 +36,9 @@ class ForumViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
         lastMessageTopic.text = forum.lastMessageName
 
         itemView.setOnClickListener {
-            val fragment = ForumContentsFragment().apply {
+            val fragment = ForumContentFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(ForumContentsFragment.FORUM_ARG, forum)
+                    putSerializable(ForumContentFragment.FORUM_ARG, forum)
                 }
             }
 
@@ -53,10 +53,10 @@ class ForumViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
                 lastMessageUrl = forum.lastMessageLink
             )
 
-            val fragment = TopicContentsFragment().apply {
+            val fragment = TopicContentFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(TopicContentsFragment.TOPIC_ARG, topic)
-                    putString(TopicContentsFragment.URL_ARG, forum.lastMessageLink.toString())
+                    putSerializable(TopicContentFragment.TOPIC_ARG, topic)
+                    putString(TopicContentFragment.URL_ARG, forum.lastMessageLink.toString())
                 }
             }
 

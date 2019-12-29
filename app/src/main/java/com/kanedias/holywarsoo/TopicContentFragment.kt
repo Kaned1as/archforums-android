@@ -22,11 +22,14 @@ import okhttp3.HttpUrl
 import java.lang.Exception
 
 /**
+ * Fragment for showing contents of the topic, i.e. list of messages it contains.
+ * Also shows post button if the topic itself is writable.
+ *
  * @author Kanedias
  *
  * Created on 22.12.19
  */
-class TopicContentsFragment: Fragment() {
+class TopicContentFragment: ContentFragment() {
 
     companion object {
         const val TOPIC_ARG = "TOPIC_ARG"
@@ -50,13 +53,20 @@ class TopicContentsFragment: Fragment() {
         topicViewRefresher.setOnRefreshListener { refreshContent() }
 
         contents = ViewModelProviders.of(this).get(TopicContentsModel::class.java)
-        contents.topic.observe(this, Observer { topicView.adapter =
-            TopicContentsAdapter(it)
-        })
+        contents.topic.observe(this, Observer { topicView.adapter = TopicContentsAdapter(it) })
+        contents.topic.observe(this, Observer { refreshViews() })
+
 
         refreshContent()
 
         return view
+    }
+
+    override fun refreshViews() {
+        (activity as? MainActivity)?.toolbar?.apply {
+            title = contents.topic.value?.name
+            subtitle = "${contents.topic.value?.currentPage}"
+        }
     }
 
     private fun refreshContent() {

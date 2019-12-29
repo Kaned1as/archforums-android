@@ -5,12 +5,10 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.kanedias.holywarsoo.dto.ForumTopic
-import com.kanedias.holywarsoo.misc.sanitizeInt
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
 import com.kanedias.holywarsoo.misc.visibilityBool
 
@@ -71,9 +69,9 @@ class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
         }
 
         itemView.setOnClickListener {
-            val fragment = TopicContentsFragment().apply {
+            val fragment = TopicContentFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(TopicContentsFragment.TOPIC_ARG, topic)
+                    putSerializable(TopicContentFragment.TOPIC_ARG, topic)
                 }
             }
 
@@ -81,10 +79,10 @@ class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
         }
 
         lastMessage.setOnClickListener {
-            val fragment = TopicContentsFragment().apply {
+            val fragment = TopicContentFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(TopicContentsFragment.TOPIC_ARG, topic)
-                    putString(TopicContentsFragment.URL_ARG, topic.lastMessageUrl.toString())
+                    putSerializable(TopicContentFragment.TOPIC_ARG, topic)
+                    putString(TopicContentFragment.URL_ARG, topic.lastMessageUrl.toString())
                 }
             }
 

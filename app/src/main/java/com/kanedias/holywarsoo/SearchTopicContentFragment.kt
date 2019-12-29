@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
@@ -13,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import butterknife.ButterKnife
-import com.kanedias.holywarsoo.dto.SearchResults
+import com.kanedias.holywarsoo.dto.SearchTopicResults
 import com.kanedias.holywarsoo.model.SearchContentsModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +24,7 @@ import java.lang.Exception
  *
  * Created on 19.12.19
  */
-class SearchPageFragment: Fragment() {
+class SearchTopicContentFragment: ContentFragment() {
 
     companion object {
         const val SEARCH_ARG = "SEARCH_ARG"
@@ -49,6 +48,7 @@ class SearchPageFragment: Fragment() {
 
         contents = ViewModelProviders.of(this).get(SearchContentsModel::class.java)
         contents.page.observe(this, Observer { searchView.adapter = SearchPageContentsAdapter(it) })
+        contents.page.observe(this, Observer { refreshViews() })
 
         refreshContent()
 
@@ -60,7 +60,7 @@ class SearchPageFragment: Fragment() {
             searchViewRefresher.isRefreshing = true
 
             try {
-                val page = requireArguments().getSerializable(SEARCH_ARG) as SearchResults
+                val page = requireArguments().getSerializable(SEARCH_ARG) as SearchTopicResults
                 val loaded = withContext(Dispatchers.IO) { Network.loadSearchResults(page) }
                 contents.page.value = loaded
             } catch (ex: Exception) {
@@ -71,7 +71,14 @@ class SearchPageFragment: Fragment() {
         }
     }
 
-    class SearchPageContentsAdapter(results: SearchResults) : RecyclerView.Adapter<TopicViewHolder>() {
+    override fun refreshViews() {
+        (activity as? MainActivity)?.toolbar?.apply {
+            title = contents.page.value?.name
+            subtitle = "${contents.page.value?.currentPage}"
+        }
+    }
+
+    class SearchPageContentsAdapter(results: SearchTopicResults) : RecyclerView.Adapter<TopicViewHolder>() {
 
         val topics = results.topics
 

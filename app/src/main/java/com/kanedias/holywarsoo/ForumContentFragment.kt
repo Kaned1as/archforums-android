@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
@@ -14,7 +13,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.kanedias.holywarsoo.dto.Forum
-import com.kanedias.holywarsoo.dto.ForumTopic
 import com.kanedias.holywarsoo.model.ForumContentsModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +24,7 @@ import java.lang.Exception
  *
  * Created on 19.12.19
  */
-class ForumContentsFragment: Fragment() {
+class ForumContentFragment: ContentFragment() {
 
     companion object {
         const val FORUM_ARG = "FORUM_ARG"
@@ -50,10 +48,18 @@ class ForumContentsFragment: Fragment() {
 
         contents = ViewModelProviders.of(this).get(ForumContentsModel::class.java)
         contents.forum.observe(this, Observer { forumView.adapter = ForumContentsAdapter(it) })
+        contents.forum.observe(this, Observer { refreshViews() })
 
         refreshContent()
 
         return view
+    }
+
+    override fun refreshViews() {
+        (activity as? MainActivity)?.toolbar?.apply {
+            title = contents.forum.value?.name
+            subtitle = contents.forum.value?.subtext
+        }
     }
 
     private fun refreshContent() {

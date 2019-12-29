@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit
 /**
  * The singleton responsible for performing all network-related operations for the application,
  * such as:
+ * * Logging in
  * * Retrieving forums, topics, messages
  * * Creating messages, topics
  * * Editing messages, topics
@@ -112,6 +113,7 @@ object Network {
      * Login using specified username and password.
      * Creates persistent cookies and account preferences.
      */
+    @Throws(IOException::class)
     fun login(username: String, password: String) {
         // clear previous login information
         cookieJar.clear()
@@ -148,10 +150,10 @@ object Network {
 
         val loginResp = httpClient.newCall(loginReq).execute()
         if (!loginResp.isSuccessful)
-            throw IllegalStateException("Can't authenticate")
+            throw IOException("Can't authenticate")
 
         if (authCookie() == null)
-            throw IllegalStateException("Authentication failed, invalid login/password")
+            throw IOException("Authentication failed, invalid login/password")
 
         accountInfo.edit()
             .putString(PREF_USERNAME, username)
@@ -160,7 +162,7 @@ object Network {
     }
 
     /**
-     * Load forum list from the main page
+     * Load forum list from the main page.
      *
      * @return list of parsed forums. It has the same ordering as it had on the actual page.
      */
@@ -169,7 +171,7 @@ object Network {
         val req = Request.Builder().url(MAIN_HOLYWARSOO_URL).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
-            throw IllegalStateException("Can't load main page")
+            throw IOException("Can't load main page")
 
         val html = resp.body()!!.string()
         val doc = Jsoup.parse(html)
@@ -177,13 +179,23 @@ object Network {
         return parseForums(doc)
     }
 
-    fun loadSearchResults(results: SearchResults, page: Int = 1): SearchResults {
-        val pageUrl = results.link.newBuilder().addQueryParameter("p", page.toString()).build()
+    /**
+     * Loads search page completely, with all the supporting browsing info, enriching the existing
+     * object. The returned value is a copy of the original.
+     *
+     * @param resultsBase base search results object to enrich, which may have no topics available
+     *                    at the moment of loading
+     *
+     * @return fully enriched search page instance. Topics have the same ordering as they had on the actual page.
+     */
+    @Throws(IOException::class)
+    fun loadSearchResults(resultsBase: SearchTopicResults, page: Int = 1): SearchTopicResults {
+        val pageUrl = resultsBase.link.newBuilder().addQueryParameter("p", page.toString()).build()
 
         val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
-            throw IllegalStateException("Can't load forum contents")
+            throw IOException("Can't load forum contents")
 
         val html = resp.body()!!.string()
         val doc = Jsoup.parse(html)
@@ -196,7 +208,7 @@ object Network {
             .mapNotNull { it.ownText().trySanitizeInt() }
             .max()
 
-        return results.copy(
+        return resultsBase.copy(
             pageCount = pageCount!!,
             currentPage = currentPage.sanitizeInt(),
             topics = topics
@@ -210,7 +222,7 @@ object Network {
      * @param forumBase base forum object to enrich, which may have no subforums or topics available
      *                  at the moment of loading
      *
-     * @return fully enriched forum instance
+     * @return fully enriched forum instance. Topics have the same ordering as they had on the actual page.
      */
     @Throws(IOException::class)
     fun loadForumContents(forumBase: Forum, page: Int = 1): Forum {
@@ -219,7 +231,7 @@ object Network {
         val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
-            throw IllegalStateException("Can't load forum contents")
+            throw IOException("Can't load forum contents")
 
         val html = resp.body()!!.string()
         val doc = Jsoup.parse(html)
@@ -247,6 +259,8 @@ object Network {
      *
      * @param topic base topic object to enrich, which may have no messages or pages available
      *                  at the moment of loading
+     *
+     * @return fully enriched topic instance. Messages have the same ordering as they had on the actual page.
      */
     @Throws(IOException::class)
     fun loadTopicContents(topic: ForumTopic, link: HttpUrl? = null, page: Int = 1): ForumTopic {
@@ -255,16 +269,17 @@ object Network {
         val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
-            throw IllegalStateException("Can't load topic contents")
+            throw IOException("Can't load topic contents")
 
         val html = resp.body()!!.string()
         val doc = Jsoup.parse(html)
 
-        val messages = parseMessages(doc)
-
+        // topic link is in the page header, topic id can be derived from it
+        // topic name is page title and writable bit is derived from the presence of answer button
         val topicRef = doc.select("head link[rel=canonical]").attr("href")
         val topicId = resolve(topicRef)!!.queryParameter("id")!!
         val topicName = doc.select("head title").text()
+        val topicWritable = doc.select("div#brdmain div.postlinksb a[href^=post.php]:containsOwn(Ответить)")
 
         val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
         val currentPage = pageLinks.select("strong").text()
@@ -272,13 +287,48 @@ object Network {
             .mapNotNull { it.ownText().trySanitizeInt() }
             .max()
 
+        val messages = parseMessages(doc)
+
         return topic.copy(
             id = topicId.sanitizeInt(),
             name = topicName,
+            writable = topicWritable.isNotEmpty(),
             pageCount = pageCount!!,
             currentPage = currentPage.sanitizeInt(),
             messages = messages
         )
+    }
+
+
+    @Throws(IOException::class)
+    fun postMessage(topic: ForumTopic, message: String) {
+        val postUrl = resolve("post.php")!!.newBuilder().addQueryParameter("tid", topic.id.toString()).build()
+
+        val req = Request.Builder().url(postUrl).get().build()
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IOException("Can't load topic reply page")
+
+        val replyPageHtml = resp.body()!!.string()
+        val replyPageDoc = Jsoup.parse(replyPageHtml)
+
+        val replyPageInputs = replyPageDoc.select("form#post input[type=hidden]")
+
+        val reqBody = FormBody.Builder()
+            .add("req_message", message)
+
+        for (input in replyPageInputs) {
+            reqBody.add(input.attr("name"), input.attr("value"))
+        }
+
+        val postMessageReq = Request.Builder()
+            .url(postUrl)
+            .post(reqBody.build())
+            .build()
+
+        val postMessageResp = httpClient.newCall(postMessageReq).execute()
+        if (!postMessageResp.isSuccessful)
+            throw IOException("Unexpected failure")
     }
 
     /**
@@ -290,6 +340,7 @@ object Network {
     private fun parseMessages(doc: Document): List<ForumMessage> {
         val messages = mutableListOf<ForumMessage>()
         for (message in doc.select("div#brdmain div.blockpost")) {
+            // all message info is self-contained in the message box
             val msgDateLink = message.select("h2 > span > a")
             val msgIndex = message.select("h2 > span > span.conr").text()
             val msgAuthor = message.select("div.postleft > dl > dt > strong:last-child").text()
@@ -351,7 +402,8 @@ object Network {
         val topics = mutableListOf<ForumTopic>()
         for (topic in doc.select("div#vf div.inbox table tr[class^=row]")) {
 
-
+            // topic list page may have different layouts depending on whether it's search page
+            // or forum page, so we should be smart about it, detecting row meanings by their names
             val isSticky = topic.classNames().contains("isticky")
             val topicLink = topic.select("td.tcl > div.tclcon a").first()
             val topicPageCount = topic.select("td.tcl span.pagestext a:last-child").text()
@@ -393,6 +445,8 @@ object Network {
         val forums = mutableListOf<Forum>()
 
         for (forum in doc.select("div#brdmain div.inbox table tr[id^=forum]")) {
+            // forums can be found in main page and in forum page as well, as a subforums
+            // all the info is fortunately self-contained and same across all kinds of pages
             val forumLink = forum.select("td.tcl div > h3 > a")
             val forumSub = forum.select("td.tcl div.forumdesc")
             val lastMessageLink = forum.select("td.tcr > a")

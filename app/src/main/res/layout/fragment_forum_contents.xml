@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/design_default_color_background"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".ForumContentsFragment">
+    tools:context=".ForumContentFragment">
 
     <FrameLayout
         android:layout_width="match_parent"

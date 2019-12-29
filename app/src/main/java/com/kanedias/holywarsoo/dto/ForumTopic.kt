@@ -17,6 +17,7 @@ data class ForumTopic(
     val lastMessageUrl: HttpUrl,
     val lastMessageDate: String,
     val sticky: Boolean = false,
+    val writable: Boolean = true,
 
     // counters
     val pageCount: Int = -1,

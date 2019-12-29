@@ -36,19 +36,22 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                android:id="@+id/main_forum_list_scroll_area"
+            <fragment
+                android:tag="main page content"
+                android:name="com.kanedias.holywarsoo.MainPageContentFragment"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/main_forum_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
-
-            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+                android:layout_height="match_parent"/>
 
         </FrameLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/main_reply_button"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_behavior="com.kanedias.holywarsoo.misc.ScrollAwareFabBehavior"
+            android:src="@drawable/add"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
