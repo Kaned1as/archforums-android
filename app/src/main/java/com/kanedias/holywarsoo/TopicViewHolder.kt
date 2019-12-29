@@ -63,7 +63,12 @@ class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
             topicViews.text = topic.viewCount.toString()
         }
 
-        lastMessage.text = topic.lastMessageDate
+        if (topic.lastMessageDate.isEmpty()) {
+            lastMessage.visibility = View.GONE
+        } else {
+            lastMessage.visibility = View.VISIBLE
+            lastMessage.text = topic.lastMessageDate
+        }
 
         itemView.setOnClickListener {
             val fragment = TopicContentsFragment().apply {
@@ -79,7 +84,7 @@ class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
             val fragment = TopicContentsFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(TopicContentsFragment.TOPIC_ARG, topic)
-                    putBoolean(TopicContentsFragment.LAST_MESSAGE_ARG, true)
+                    putString(TopicContentsFragment.URL_ARG, topic.lastMessageUrl.toString())
                 }
             }
 

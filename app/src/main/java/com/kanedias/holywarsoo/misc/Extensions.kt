@@ -17,6 +17,7 @@ var View.visibilityBool: Boolean
 fun String.sanitizeInt(): Int {
     return this
         .replace(UNNEEDED_INT_CHARS, "")
+        .replace(Regex("^-$"), "-1")
         .replace(Regex("-{2,}"), "-1")
         .toInt()
 }
@@ -24,6 +25,7 @@ fun String.sanitizeInt(): Int {
 fun String.trySanitizeInt(): Int? {
     return this
         .replace(UNNEEDED_INT_CHARS, "")
+        .replace(Regex("^-$"), "-1")
         .replace(Regex("-{2,}"), "-1")
         .toIntOrNull()
 }

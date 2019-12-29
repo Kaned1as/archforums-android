@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import butterknife.ButterKnife
-import com.kanedias.holywarsoo.dto.SearchPage
+import com.kanedias.holywarsoo.dto.SearchResults
 import com.kanedias.holywarsoo.model.SearchContentsModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
@@ -60,8 +60,8 @@ class SearchPageFragment: Fragment() {
             searchViewRefresher.isRefreshing = true
 
             try {
-                val page = requireArguments().getSerializable(SEARCH_ARG) as SearchPage
-                val loaded = withContext(Dispatchers.IO) { Network.loadSearchPage(page) }
+                val page = requireArguments().getSerializable(SEARCH_ARG) as SearchResults
+                val loaded = withContext(Dispatchers.IO) { Network.loadSearchResults(page) }
                 contents.page.value = loaded
             } catch (ex: Exception) {
                 context?.let { Network.reportErrors(it, ex) }
@@ -71,9 +71,9 @@ class SearchPageFragment: Fragment() {
         }
     }
 
-    class SearchPageContentsAdapter(page: SearchPage) : RecyclerView.Adapter<TopicViewHolder>() {
+    class SearchPageContentsAdapter(results: SearchResults) : RecyclerView.Adapter<TopicViewHolder>() {
 
-        val topics = page.topics
+        val topics = results.topics
 
         override fun getItemCount() = topics.size
 

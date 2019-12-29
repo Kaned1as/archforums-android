@@ -20,7 +20,7 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.navigation.NavigationView
 import com.kanedias.holywarsoo.dto.Forum
-import com.kanedias.holywarsoo.dto.SearchPage
+import com.kanedias.holywarsoo.dto.SearchResults
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
 import com.kanedias.holywarsoo.model.MainPageModel
 import com.kanedias.holywarsoo.service.Network
@@ -114,19 +114,19 @@ class MainActivity : AppCompatActivity() {
         val page = when (item.itemId) {
             R.id.menu_item_favorites -> {
                 val name = getString(R.string.favorite_topics)
-                SearchPage(name = name, link = Network.FAVORITE_TOPICS_URL)
+                SearchResults(name = name, link = Network.FAVORITE_TOPICS_URL)
             }
             R.id.menu_item_replies -> {
                 val name = getString(R.string.replies_topics)
-                SearchPage(name = name, link = Network.REPLIES_TOPICS_URL)
+                SearchResults(name = name, link = Network.REPLIES_TOPICS_URL)
             }
             R.id.menu_item_new_messages -> {
                 val name = getString(R.string.new_messages_topics)
-                SearchPage(name = name, link = Network.NEW_MESSAGES_TOPICS_URL)
+                SearchResults(name = name, link = Network.NEW_MESSAGES_TOPICS_URL)
             }
             R.id.menu_item_recent -> {
                 val name = getString(R.string.recent_topics)
-                SearchPage(name = name, link = Network.RECENT_TOPICS_URL)
+                SearchResults(name = name, link = Network.RECENT_TOPICS_URL)
             }
             else -> throw IllegalStateException("No such page!")
         }

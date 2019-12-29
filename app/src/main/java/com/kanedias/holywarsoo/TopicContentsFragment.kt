@@ -18,6 +18,7 @@ import com.kanedias.holywarsoo.model.TopicContentsModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.HttpUrl
 import java.lang.Exception
 
 /**
@@ -29,8 +30,7 @@ class TopicContentsFragment: Fragment() {
 
     companion object {
         const val TOPIC_ARG = "TOPIC_ARG"
-        const val NEW_MESSAGE_ARG = "NEW_MESSAGE_ARG"
-        const val LAST_MESSAGE_ARG = "LAST_MESSAGE_ARG"
+        const val URL_ARG = "URL_ARG"
     }
 
     @BindView(R.id.message_list_scroll_area)
@@ -65,7 +65,8 @@ class TopicContentsFragment: Fragment() {
 
             try {
                 val topic = requireArguments().getSerializable(TOPIC_ARG) as ForumTopic
-                val loaded = withContext(Dispatchers.IO) { Network.loadTopicContents(topic) }
+                val customUrl = HttpUrl.parse(requireArguments().getString(URL_ARG, ""))
+                val loaded = withContext(Dispatchers.IO) { Network.loadTopicContents(topic, link = customUrl) }
                 contents.topic.value = loaded
             } catch (ex: Exception) {
                 context?.let { Network.reportErrors(it, ex) }

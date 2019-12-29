@@ -56,7 +56,7 @@ class ForumViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
             val fragment = TopicContentsFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(TopicContentsFragment.TOPIC_ARG, topic)
-                    putBoolean(TopicContentsFragment.LAST_MESSAGE_ARG, true)
+                    putString(TopicContentsFragment.URL_ARG, forum.lastMessageLink.toString())
                 }
             }
 

@@ -8,7 +8,7 @@ import java.io.Serializable
  *
  * Created on 17.12.19
  */
-data class SearchPage(
+data class SearchResults(
     // info
     val name: String,
     val link: HttpUrl,

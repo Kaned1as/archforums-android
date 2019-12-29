@@ -177,8 +177,10 @@ object Network {
         return parseForums(doc)
     }
 
-    fun loadSearchPage(page: SearchPage): SearchPage {
-        val req = Request.Builder().url(page.link).get().build()
+    fun loadSearchResults(results: SearchResults, page: Int = 1): SearchResults {
+        val pageUrl = results.link.newBuilder().addQueryParameter("p", page.toString()).build()
+
+        val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
             throw IllegalStateException("Can't load forum contents")
@@ -194,7 +196,7 @@ object Network {
             .mapNotNull { it.ownText().trySanitizeInt() }
             .max()
 
-        return page.copy(
+        return results.copy(
             pageCount = pageCount!!,
             currentPage = currentPage.sanitizeInt(),
             topics = topics
@@ -211,8 +213,10 @@ object Network {
      * @return fully enriched forum instance
      */
     @Throws(IOException::class)
-    fun loadForumContents(forumBase: Forum): Forum {
-        val req = Request.Builder().url(forumBase.link).get().build()
+    fun loadForumContents(forumBase: Forum, page: Int = 1): Forum {
+        val pageUrl = forumBase.link.newBuilder().addQueryParameter("p", page.toString()).build()
+
+        val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
             throw IllegalStateException("Can't load forum contents")
@@ -245,8 +249,10 @@ object Network {
      *                  at the moment of loading
      */
     @Throws(IOException::class)
-    fun loadTopicContents(topic: ForumTopic, page: Int = 1): ForumTopic {
-        val req = Request.Builder().url(topic.link).get().build()
+    fun loadTopicContents(topic: ForumTopic, link: HttpUrl? = null, page: Int = 1): ForumTopic {
+        val pageUrl = link ?: topic.link.newBuilder().addQueryParameter("p", page.toString()).build()
+
+        val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
             throw IllegalStateException("Can't load topic contents")
@@ -257,7 +263,7 @@ object Network {
         val messages = parseMessages(doc)
 
         val topicRef = doc.select("head link[rel=canonical]").attr("href")
-        val topicLink = resolve(topicRef)!!.queryParameter("id")!!
+        val topicId = resolve(topicRef)!!.queryParameter("id")!!
         val topicName = doc.select("head title").text()
 
         val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
@@ -267,7 +273,7 @@ object Network {
             .max()
 
         return topic.copy(
-            id = topicLink.sanitizeInt(),
+            id = topicId.sanitizeInt(),
             name = topicName,
             pageCount = pageCount!!,
             currentPage = currentPage.sanitizeInt(),
