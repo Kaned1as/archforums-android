@@ -1,6 +1,6 @@
 package com.kanedias.holywarsoo.dto
 
-import okhttp3.HttpUrl
+import java.io.Serializable
 
 /**
  * @author Kanedias
@@ -12,10 +12,10 @@ data class ForumMessage(
 
     // info
     val author: String,
-    val authorAvatarUrl: HttpUrl? = null,
+    val authorAvatarUrl: String? = null,
     val createdDate: String,
     val content: String,
 
     // counters
     val index: Int = -1
-)
+) : Serializable

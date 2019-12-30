@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.*
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.kanedias.holywarsoo.dto.SearchTopicResults
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
@@ -31,6 +32,9 @@ class MainActivity : AppCompatActivity() {
 
     @BindView(R.id.main_toolbar)
     lateinit var toolbar: Toolbar
+
+    @BindView(R.id.main_reply_button)
+    lateinit var addButton: FloatingActionButton
 
     lateinit var sidebarHeader: SidebarHeaderViewHolder
 

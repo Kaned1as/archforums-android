@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="small_text_unnecessary_content">10sp</dimen>
+    <dimen name="small_text_unnecessary_content">12sp</dimen>
+    <dimen name="text_message_content">14sp</dimen>
     <!-- Material Design's dimension for a standard toolbar -->
     <dimen name="standard_toolbar_height">56dp</dimen>
 

@@ -47,6 +47,7 @@ class SearchTopicContentFragment: ContentFragment() {
         searchViewRefresher.setOnRefreshListener { refreshContent() }
 
         contents = ViewModelProviders.of(this).get(SearchContentsModel::class.java)
+        contents.page.value = requireArguments().getSerializable(SEARCH_ARG) as SearchTopicResults
         contents.page.observe(this, Observer { searchView.adapter = SearchPageContentsAdapter(it) })
         contents.page.observe(this, Observer { refreshViews() })
 
@@ -55,13 +56,12 @@ class SearchTopicContentFragment: ContentFragment() {
         return view
     }
 
-    private fun refreshContent() {
+    override fun refreshContent() {
         lifecycleScope.launchWhenResumed {
             searchViewRefresher.isRefreshing = true
 
             try {
-                val page = requireArguments().getSerializable(SEARCH_ARG) as SearchTopicResults
-                val loaded = withContext(Dispatchers.IO) { Network.loadSearchResults(page) }
+                val loaded = withContext(Dispatchers.IO) { Network.loadSearchResults(contents.page.value!!) }
                 contents.page.value = loaded
             } catch (ex: Exception) {
                 context?.let { Network.reportErrors(it, ex) }
@@ -72,9 +72,14 @@ class SearchTopicContentFragment: ContentFragment() {
     }
 
     override fun refreshViews() {
-        (activity as? MainActivity)?.toolbar?.apply {
-            title = contents.page.value?.name
-            subtitle = "${contents.page.value?.currentPage}"
+        val searchResults = contents.page.value ?: return
+        val activity = activity as? MainActivity ?: return
+
+        activity.addButton.visibility = View.GONE
+
+        activity.toolbar.apply {
+            title = searchResults.name
+            subtitle = "${getString(R.string.page)} ${searchResults.currentPage}"
         }
     }
 

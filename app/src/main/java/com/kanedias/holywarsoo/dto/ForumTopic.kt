@@ -1,6 +1,5 @@
 package com.kanedias.holywarsoo.dto
 
-import okhttp3.HttpUrl
 import java.io.Serializable
 
 /**
@@ -13,8 +12,8 @@ data class ForumTopic(
 
     // info
     val name: String,
-    val link: HttpUrl,
-    val lastMessageUrl: HttpUrl,
+    val link: String,
+    val lastMessageUrl: String,
     val lastMessageDate: String,
     val sticky: Boolean = false,
     val writable: Boolean = true,

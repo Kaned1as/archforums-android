@@ -1,6 +1,5 @@
 package com.kanedias.holywarsoo.dto
 
-import okhttp3.HttpUrl
 import java.io.Serializable
 
 /**
@@ -13,10 +12,10 @@ data class Forum(
 
     // info
     val name: String,
-    val link: HttpUrl,
+    val link: String,
     val subtext: String,
     val lastMessageName: String,
-    val lastMessageLink: HttpUrl,
+    val lastMessageLink: String,
     val lastMessageDate: String,
 
     // counters

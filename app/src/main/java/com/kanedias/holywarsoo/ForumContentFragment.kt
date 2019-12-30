@@ -47,6 +47,7 @@ class ForumContentFragment: ContentFragment() {
         forumViewRefresher.setOnRefreshListener { refreshContent() }
 
         contents = ViewModelProviders.of(this).get(ForumContentsModel::class.java)
+        contents.forum.value = requireArguments().getSerializable(FORUM_ARG) as Forum
         contents.forum.observe(this, Observer { forumView.adapter = ForumContentsAdapter(it) })
         contents.forum.observe(this, Observer { refreshViews() })
 
@@ -56,19 +57,23 @@ class ForumContentFragment: ContentFragment() {
     }
 
     override fun refreshViews() {
-        (activity as? MainActivity)?.toolbar?.apply {
-            title = contents.forum.value?.name
-            subtitle = contents.forum.value?.subtext
+        val forum = contents.forum.value ?: return
+        val activity = activity as? MainActivity ?: return
+
+        activity.addButton.visibility = View.GONE
+
+        activity.toolbar.apply {
+            title = forum.name
+            subtitle = "${getString(R.string.page)} ${forum.currentPage}"
         }
     }
 
-    private fun refreshContent() {
+    override fun refreshContent() {
         lifecycleScope.launchWhenResumed {
             forumViewRefresher.isRefreshing = true
 
             try {
-                val forum = requireArguments().getSerializable(FORUM_ARG) as Forum
-                val loaded = withContext(Dispatchers.IO) { Network.loadForumContents(forum) }
+                val loaded = withContext(Dispatchers.IO) { Network.loadForumContents(contents.forum.value!!) }
                 contents.forum.value = loaded
             } catch (ex: Exception) {
                 context?.let { Network.reportErrors(it, ex) }

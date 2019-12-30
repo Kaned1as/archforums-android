@@ -11,7 +11,7 @@ import java.io.Serializable
 data class SearchTopicResults(
     // info
     val name: String,
-    val link: HttpUrl,
+    val link: String,
 
     // counters
     val pageCount: Int = -1,

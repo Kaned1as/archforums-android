@@ -5,7 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
+import android.graphics.*
 import android.net.Uri
 import android.os.Environment
 import android.text.SpannableStringBuilder
@@ -36,19 +36,20 @@ import com.kanedias.holywarsoo.R
 import com.kanedias.html2md.Html2Markdown
 import com.stfalcon.imageviewer.StfalconImageViewer
 import io.noties.markwon.Markwon
+import io.noties.markwon.MarkwonVisitor
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.html.HtmlPlugin
+import io.noties.markwon.html.HtmlTag
+import io.noties.markwon.html.MarkwonHtmlRenderer
+import io.noties.markwon.html.TagHandler
 import io.noties.markwon.image.AsyncDrawableScheduler
 import io.noties.markwon.image.AsyncDrawableSpan
 import io.noties.markwon.image.glide.GlideImagesPlugin
+import io.noties.markwon.utils.NoCopySpannableFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
-import org.commonmark.ext.gfm.tables.TablesExtension
-import org.commonmark.parser.Parser
-import org.commonmark.renderer.html.HtmlRenderer
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -74,7 +75,7 @@ fun mdRendererFrom(ctx: Context): Markwon {
  */
 fun mdRendererFrom(txt: TextView): Markwon {
     return Markwon.builder(txt.context)
-        .usePlugin(HtmlPlugin.create())
+        .usePlugin(HtmlPlugin.create().addHandler(DetailsTagHandler()))
         .usePlugin(GlideImagesPlugin.create(txt.context))
         .usePlugin(GlideImagesPlugin.create(
             Glide.with(txt.context)
@@ -94,6 +95,7 @@ fun mdRendererFrom(txt: TextView): Markwon {
  */
 infix fun TextView.handleMarkdown(html: String) {
     val label = this
+    label.setSpannableFactory(NoCopySpannableFactory())
 
     GlobalScope.launch(Dispatchers.Main) {
         // this is computation-intensive task, better do it smoothly
@@ -131,7 +133,6 @@ infix fun TextView.handleMarkdown(html: String) {
 fun postProcessSpans(spanned: SpannableStringBuilder, view: TextView) {
     postProcessDrawables(spanned, view)
     postProcessMore(spanned, view)
-
 }
 
 /**
@@ -179,53 +180,21 @@ fun postProcessDrawables(spanned: SpannableStringBuilder, view: TextView) {
     }
 }
 
-const val MORE_START_REGEX = "\\[MORE=(.+?)]"
-const val MORE_END_REGEX = "\\[/MORE]"
-
-// starting ,* is required to capture only inner MORE, see https://regex101.com/r/zbpWUK/1
-val MORE_FULL_REGEX = Regex(".*($MORE_START_REGEX(.*?)$MORE_END_REGEX)", RegexOption.DOT_MATCHES_ALL)
-
 /**
  * Post-process MORE statements in the text. They act like `<spoiler>` or `<cut>` tag in some websites
  * @param spanned text to be modified to cut out MORE tags and insert replacements instead of them
  * @param view resulting text view to accept the modified spanned string
  */
 fun postProcessMore(spanned: SpannableStringBuilder, view: TextView) {
-    while (true) {
-        // we need to process all MOREs in the text, start from inner ones, get back to outer in next loops
-        val match = MORE_FULL_REGEX.find(spanned) ?: break
-        // we have a match, make a replacement
+    val spans = spanned.getSpans(0, spanned.length, DetailsParsingSpan::class.java)
 
-        // get group content out of regex
-        val outerRange = match.groups[1]!!.range // from start of [MORE] to the end of [/MORE]
-        val moreText = match.groups[2]!!.value // content inside opening tag [MORE=...]
-        val innerRange = match.groups[3]!!.range // range between opening and closing tag of MORE
-        val innerText = match.groups[3]!!.value // content between opening and closing tag of MORE
-        val innerSpanned = spanned.subSequence(innerRange.first, innerRange.first + innerText.length) // contains all spans there
-
-        // content of opening tag may be HTML
-        val auxMd = Html2Markdown().parse(moreText)
-        val auxSpanned = mdRendererFrom(view).toMarkdown(auxMd)
-
-        spanned.replace(outerRange.first, outerRange.last + 1, auxSpanned) // replace it just with text
-        val wrapper = object : ClickableSpan() {
-
-            override fun onClick(widget: View) {
-                // replace wrappers with real previous spans
-
-                val start = spanned.getSpanStart(this)
-                val end = spanned.getSpanEnd(this)
-
-                auxSpanned.getSpans(0, auxSpanned.length, Any::class.java).forEach { spanned.removeSpan(it) }
-                spanned.removeSpan(this)
-                spanned.replace(start, end, innerSpanned)
-
-                view.text = spanned
-                AsyncDrawableScheduler.schedule(view)
-            }
-        }
-        spanned.setSpan(wrapper, outerRange.first, outerRange.first + auxSpanned.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    // if we have no details, proceed as usual (single text-view)
+    if (spans.isNullOrEmpty()) {
+        // no details
+        return
     }
+
+
 }
 
 /**
@@ -360,11 +329,39 @@ class ImageShowOverlay(ctx: Context,
     }
 }
 
-fun markdownToHtml(md: String): String {
-    var mdPreprocessed = md
+class DetailsTagHandler: TagHandler() {
 
-    val extensions = listOf(StrikethroughExtension.create(), TablesExtension.create())
-    val parser = Parser.builder().extensions(extensions).build()
-    val document = parser.parse(mdPreprocessed)
-    return HtmlRenderer.builder().extensions(extensions).build().render(document)
+    override fun handle(visitor: MarkwonVisitor, renderer: MarkwonHtmlRenderer, tag: HtmlTag) {
+        var summaryEnd = -1
+        var summaryStart = -1
+        for (child in tag.asBlock.children()) {
+
+            if (!child.isClosed) {
+                continue
+            }
+
+            if ("summary" == child.name()) {
+                summaryStart = child.start()
+                summaryEnd = child.end()
+            }
+
+            val tagHandler = renderer.tagHandler(child.name())
+            if (tagHandler != null) {
+                tagHandler.handle(visitor, renderer, child)
+            } else if (child.isBlock) {
+                visitChildren(visitor, renderer, child.asBlock)
+            }
+        }
+
+        if (summaryEnd > -1 && summaryStart > -1) {
+            visitor.builder().setSpan(DetailsParsingSpan(visitor.builder().subSequence(summaryStart, summaryEnd)),
+                tag.start(), tag.end())
+        }
+    }
+
+    override fun supportedTags(): Collection<String> {
+        return Collections.singleton("details")
+    }
 }
+
+data class DetailsParsingSpan(val summary: CharSequence)

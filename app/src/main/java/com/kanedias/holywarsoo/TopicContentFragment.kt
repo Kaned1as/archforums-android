@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
@@ -53,6 +52,7 @@ class TopicContentFragment: ContentFragment() {
         topicViewRefresher.setOnRefreshListener { refreshContent() }
 
         contents = ViewModelProviders.of(this).get(TopicContentsModel::class.java)
+        contents.topic.value = requireArguments().getSerializable(TOPIC_ARG) as ForumTopic
         contents.topic.observe(this, Observer { topicView.adapter = TopicContentsAdapter(it) })
         contents.topic.observe(this, Observer { refreshViews() })
 
@@ -63,21 +63,35 @@ class TopicContentFragment: ContentFragment() {
     }
 
     override fun refreshViews() {
-        (activity as? MainActivity)?.toolbar?.apply {
-            title = contents.topic.value?.name
-            subtitle = "${contents.topic.value?.currentPage}"
+        val topic = contents.topic.value ?: return
+        val activity = activity as? MainActivity ?: return
+
+        activity.toolbar.apply {
+            title = topic.name
+            subtitle = "${getString(R.string.page)} ${topic.currentPage}"
+        }
+
+        if (topic.writable) {
+            activity.addButton.visibility = View.VISIBLE
+            activity.addButton.setOnClickListener {
+                val frag = AddMessageFragment().apply {
+                    arguments = Bundle().apply { putSerializable(AddMessageFragment.TOPIC_ARG, topic) }
+                }
+                frag.show(fragmentManager!!, "reply fragment")
+            }
         }
     }
 
-    private fun refreshContent() {
+    override fun refreshContent() {
         lifecycleScope.launchWhenResumed {
             topicViewRefresher.isRefreshing = true
 
             try {
-                val topic = requireArguments().getSerializable(TOPIC_ARG) as ForumTopic
                 val customUrl = HttpUrl.parse(requireArguments().getString(URL_ARG, ""))
-                val loaded = withContext(Dispatchers.IO) { Network.loadTopicContents(topic, link = customUrl) }
+                val loaded = withContext(Dispatchers.IO) { Network.loadTopicContents(contents.topic.value!!, link = customUrl) }
                 contents.topic.value = loaded
+
+                requireArguments().remove(URL_ARG) // only load custom url once
             } catch (ex: Exception) {
                 context?.let { Network.reportErrors(it, ex) }
             }

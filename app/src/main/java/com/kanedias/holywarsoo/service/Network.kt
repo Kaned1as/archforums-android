@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit
  * Created on 17.12.19
  */
 object Network {
+    private const val COOKIES_SHARED_PREFS = "cookies"
     private const val ACCOUNT_SHARED_PREFS = "account"
     private const val PREF_USERNAME = "username"
     private const val PREF_PASSWORD = "password"
@@ -45,10 +46,10 @@ object Network {
     private const val USER_AGENT = "Holywarsoo Android ${BuildConfig.VERSION_NAME}"
     private val MAIN_HOLYWARSOO_URL = HttpUrl.parse("https://holywarsoo.net")!!
 
-    val FAVORITE_TOPICS_URL = MAIN_HOLYWARSOO_URL.resolve("search.php?action=show_favorites")!!
-    val REPLIES_TOPICS_URL = MAIN_HOLYWARSOO_URL.resolve("search.php?action=show_replies")!!
-    val NEW_MESSAGES_TOPICS_URL = MAIN_HOLYWARSOO_URL.resolve("search.php?action=show_new")!!
-    val RECENT_TOPICS_URL = MAIN_HOLYWARSOO_URL.resolve("search.php?action=show_recent")!!
+    val FAVORITE_TOPICS_URL = resolve("search.php?action=show_favorites")!!.toString()
+    val REPLIES_TOPICS_URL = resolve("search.php?action=show_replies")!!.toString()
+    val NEW_MESSAGES_TOPICS_URL = resolve("search.php?action=show_new")!!.toString()
+    val RECENT_TOPICS_URL = resolve("search.php?action=show_recent")!!.toString()
 
     private val userAgent = Interceptor { chain ->
         chain.proceed(chain
@@ -60,12 +61,14 @@ object Network {
 
     private lateinit var httpClient: OkHttpClient
     private lateinit var accountInfo: SharedPreferences
+    private lateinit var cookiesInfo: SharedPreferences
     private lateinit var cookieJar: PersistentCookieJar
     private lateinit var cookiePersistor: SharedPrefsCookiePersistor
 
     fun init(ctx: Context) {
         accountInfo = ctx.getSharedPreferences(ACCOUNT_SHARED_PREFS, Context.MODE_PRIVATE)
-        cookiePersistor = SharedPrefsCookiePersistor(accountInfo)
+        cookiesInfo = ctx.getSharedPreferences(COOKIES_SHARED_PREFS, Context.MODE_PRIVATE)
+        cookiePersistor = SharedPrefsCookiePersistor(cookiesInfo)
         cookieJar = PersistentCookieJar(SetCookieCache(), cookiePersistor)
         httpClient = OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -190,7 +193,7 @@ object Network {
      */
     @Throws(IOException::class)
     fun loadSearchResults(resultsBase: SearchTopicResults, page: Int = 1): SearchTopicResults {
-        val pageUrl = resultsBase.link.newBuilder().addQueryParameter("p", page.toString()).build()
+        val pageUrl = HttpUrl.parse(resultsBase.link)!!.newBuilder().addQueryParameter("p", page.toString()).build()
 
         val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
@@ -226,7 +229,7 @@ object Network {
      */
     @Throws(IOException::class)
     fun loadForumContents(forumBase: Forum, page: Int = 1): Forum {
-        val pageUrl = forumBase.link.newBuilder().addQueryParameter("p", page.toString()).build()
+        val pageUrl = HttpUrl.parse(forumBase.link)!!.newBuilder().addQueryParameter("p", page.toString()).build()
 
         val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
@@ -264,7 +267,7 @@ object Network {
      */
     @Throws(IOException::class)
     fun loadTopicContents(topic: ForumTopic, link: HttpUrl? = null, page: Int = 1): ForumTopic {
-        val pageUrl = link ?: topic.link.newBuilder().addQueryParameter("p", page.toString()).build()
+        val pageUrl = link ?: HttpUrl.parse(topic.link)!!.newBuilder().addQueryParameter("p", page.toString()).build()
 
         val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
@@ -301,7 +304,7 @@ object Network {
 
 
     @Throws(IOException::class)
-    fun postMessage(topic: ForumTopic, message: String) {
+    fun postMessage(topic: ForumTopic, message: String): HttpUrl {
         val postUrl = resolve("post.php")!!.newBuilder().addQueryParameter("tid", topic.id.toString()).build()
 
         val req = Request.Builder().url(postUrl).get().build()
@@ -326,9 +329,20 @@ object Network {
             .post(reqBody.build())
             .build()
 
+        // if we send reply too quickly website decides we are robots, need to wait a bit
+        Thread.sleep(2500)
+
         val postMessageResp = httpClient.newCall(postMessageReq).execute()
         if (!postMessageResp.isSuccessful)
             throw IOException("Unexpected failure")
+
+        // this is a redirect link page, such as "Message saved, please wait to be redirected"
+        val postMessageHtml = postMessageResp.body()!!.string()
+        val postMessageDoc = Jsoup.parse(postMessageHtml)
+
+        // we need to extract link from it
+        val link = postMessageDoc.select("div#brdmain div.box a").attr("href")
+        return resolve(link)!!
     }
 
     /**
@@ -413,19 +427,19 @@ object Network {
 
             val lastMessageLink = topic.select("td.tcr > a")
 
-            val topicUrl = MAIN_HOLYWARSOO_URL.resolve(topicLink.attr("href"))!!
-            val lastMessageUrl = MAIN_HOLYWARSOO_URL.resolve(lastMessageLink.attr("href"))!!
+            val topicUrl = resolve(topicLink.attr("href"))!!
+            val lastMessageUrl = resolve(lastMessageLink.attr("href"))!!
 
             topics.add(
                 ForumTopic(
                     id = topicUrl.queryParameter("id")!!.toInt(),
                     sticky = isSticky,
                     name = topicLink.text(),
-                    link = topicUrl,
+                    link = topicUrl.toString(),
                     replyCount = topicReplies.sanitizeInt(),
                     viewCount = topicViews.sanitizeInt(),
                     pageCount = topicPageCount.toIntOrNull() ?: 1,
-                    lastMessageUrl = lastMessageUrl,
+                    lastMessageUrl = lastMessageUrl.toString(),
                     lastMessageDate = lastMessageLink.text()
                 )
             )
@@ -452,17 +466,17 @@ object Network {
             val lastMessageLink = forum.select("td.tcr > a")
             val lastMessageDate = forum.select("td.tcr > span")
 
-            val forumUrl = MAIN_HOLYWARSOO_URL.resolve(forumLink.attr("href"))!!
-            val lastMessageUrl = MAIN_HOLYWARSOO_URL.resolve(lastMessageLink.attr("href"))!!
+            val forumUrl = resolve(forumLink.attr("href"))!!
+            val lastMessageUrl = resolve(lastMessageLink.attr("href"))!!
 
             forums.add(
                 Forum(
                     id = forumUrl.queryParameter("id")!!.toInt(),
                     name = forumLink.text(),
-                    link = forumUrl,
+                    link = forumUrl.toString(),
                     subtext = forumSub.text(),
                     lastMessageName = lastMessageLink.text(),
-                    lastMessageLink = lastMessageUrl,
+                    lastMessageLink = lastMessageUrl.toString(),
                     lastMessageDate = lastMessageDate.text()
                 )
             )
@@ -485,5 +499,9 @@ object Network {
         }
 
         else -> throw ex
+    }
+
+    fun uploadImage(readBytes: ByteArray): String {
+        return ""
     }
 }

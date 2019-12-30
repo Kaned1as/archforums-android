@@ -44,14 +44,16 @@
 
         </FrameLayout>
 
+        <!-- had to place FAB this way, see https://stackoverflow.com/questions/35255704 as to why -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/main_reply_button"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_behavior="com.kanedias.holywarsoo.misc.ScrollAwareFabBehavior"
-            android:src="@drawable/add"/>
+            android:src="@drawable/add"
+            android:visibility="gone"
+            app:layout_behavior="com.kanedias.holywarsoo.misc.ScrollAwareFabBehavior"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

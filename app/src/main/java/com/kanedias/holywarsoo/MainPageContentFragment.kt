@@ -13,7 +13,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.kanedias.holywarsoo.dto.Forum
-import com.kanedias.holywarsoo.model.ForumContentsModel
 import com.kanedias.holywarsoo.model.MainPageModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
@@ -53,13 +52,17 @@ class MainPageContentFragment: ContentFragment() {
     }
 
     override fun refreshViews() {
-        (activity as? MainActivity)?.toolbar?.apply {
+        val activity = activity as? MainActivity ?: return
+
+        activity.addButton.visibility = View.GONE
+
+        activity.toolbar.apply {
             title = getString(R.string.app_name)
             subtitle = ""
         }
     }
 
-    private fun refreshContent() {
+    override fun refreshContent() {
         lifecycleScope.launchWhenResumed {
             forumListRefresher.isRefreshing = true
             try {

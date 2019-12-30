@@ -12,4 +12,8 @@ open class ContentFragment: Fragment() {
     open fun refreshViews() {
 
     }
+
+    open fun refreshContent() {
+
+    }
 }

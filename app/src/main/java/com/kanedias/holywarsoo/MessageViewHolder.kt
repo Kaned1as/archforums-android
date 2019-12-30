@@ -8,6 +8,8 @@ import butterknife.ButterKnife
 import com.google.android.material.card.MaterialCardView
 import com.kanedias.holywarsoo.dto.ForumMessage
 import com.kanedias.holywarsoo.markdown.handleMarkdown
+import com.kanedias.holywarsoo.misc.dpToPixel
+import com.kanedias.holywarsoo.misc.pixelsToDp
 
 class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 
@@ -32,13 +34,21 @@ class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 
     fun setup(message: ForumMessage) {
         if (message.index == 1) {
-            messageArea.cardElevation *= 4
+            messageArea.cardElevation = dpToPixel(8f, messageArea.context)
+        } else {
+            messageArea.cardElevation = dpToPixel(2f, messageArea.context)
         }
 
         messageAuthorName.text = message.author
         messageDate.text = message.createdDate
         messageIndex.text = "#${message.index}"
         messageBody.handleMarkdown(message.content)
+
+        // make text selectable
+        // XXX: this is MAGIC: see https://stackoverflow.com/a/56224791/1696844
+        messageBody.setTextIsSelectable(false)
+        messageBody.measure(-1, -1)
+        messageBody.setTextIsSelectable(true)
     }
 
 }
