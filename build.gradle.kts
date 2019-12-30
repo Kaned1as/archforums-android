@@ -14,7 +14,7 @@ buildscript {
 
 val kotlinVersion: String by extra("1.3.61")
 val acraVersion: String by extra("5.5.0")
-val markwonVersion: String by extra("4.2.0")
+val markwonVersion: String by extra("4.2.1-SNAPSHOT")
 
 allprojects {
     repositories {

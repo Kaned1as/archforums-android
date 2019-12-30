@@ -5,11 +5,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.*
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Environment
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.TextPaint
 import android.text.style.CharacterStyle
 import android.text.style.ClickableSpan
 import android.util.AttributeSet
@@ -31,8 +32,8 @@ import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.bumptech.glide.request.transition.Transition
 import com.kanedias.holywarsoo.BuildConfig
-import com.kanedias.holywarsoo.service.Network
 import com.kanedias.holywarsoo.R
+import com.kanedias.holywarsoo.service.Network
 import com.kanedias.html2md.Html2Markdown
 import com.stfalcon.imageviewer.StfalconImageViewer
 import io.noties.markwon.Markwon
@@ -187,6 +188,7 @@ fun postProcessDrawables(spanned: SpannableStringBuilder, view: TextView) {
  */
 fun postProcessMore(spanned: SpannableStringBuilder, view: TextView) {
     val spans = spanned.getSpans(0, spanned.length, DetailsParsingSpan::class.java)
+    spans.sortBy { spanned.getSpanStart(it) }
 
     // if we have no details, proceed as usual (single text-view)
     if (spans.isNullOrEmpty()) {
@@ -194,7 +196,44 @@ fun postProcessMore(spanned: SpannableStringBuilder, view: TextView) {
         return
     }
 
+    for (span in spans) {
+        val startIdx = spanned.getSpanStart(span)
+        val endIdx = spanned.getSpanEnd(span)
 
+        // remove details span here so it won't populate innerSpanned
+        spanned.removeSpan(span)
+
+        // details tags can be nested, skip them if they were hidden
+        if (startIdx == -1 || endIdx == -1) {
+            continue
+        }
+
+        val innerSpanned = spanned.subSequence(startIdx, endIdx) as SpannableStringBuilder
+        spanned.replace(startIdx, endIdx, span.summary) // replace it just with text
+
+        val wrapper = object : ClickableSpan() {
+
+            override fun onClick(widget: View) {
+                // replace wrappers with real previous spans
+
+                val start = spanned.getSpanStart(this)
+                val end = spanned.getSpanEnd(this)
+
+                spanned.removeSpan(this)
+                spanned.replace(start, end, innerSpanned)
+                postProcessMore(spanned, view)
+
+                view.text = spanned
+                AsyncDrawableScheduler.schedule(view)
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                ds.color = ds.linkColor
+            }
+        }
+
+        spanned.setSpan(wrapper, startIdx, startIdx + span.summary.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    }
 }
 
 /**
@@ -354,7 +393,8 @@ class DetailsTagHandler: TagHandler() {
         }
 
         if (summaryEnd > -1 && summaryStart > -1) {
-            visitor.builder().setSpan(DetailsParsingSpan(visitor.builder().subSequence(summaryStart, summaryEnd)),
+            val summary = visitor.builder().subSequence(summaryStart, summaryEnd)
+            visitor.builder().setSpan(DetailsParsingSpan("$summary ▼\n\n"),
                 tag.start(), tag.end())
         }
     }

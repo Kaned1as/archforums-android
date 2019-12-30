@@ -29,7 +29,7 @@ android {
     compileSdkVersion(29)
 
     defaultConfig {
-        applicationId = "holywarsoo.kanedias.com"
+        applicationId = "com.kanedias.holywarsoo"
         minSdkVersion(21)
         targetSdkVersion(29)
         versionCode = 1
