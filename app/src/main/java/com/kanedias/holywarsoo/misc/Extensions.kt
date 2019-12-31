@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.transition.Slide
 import com.kanedias.holywarsoo.R
+import kotlin.reflect.KClass
 
 private val UNNEEDED_INT_CHARS = Regex("[,. ]")
 

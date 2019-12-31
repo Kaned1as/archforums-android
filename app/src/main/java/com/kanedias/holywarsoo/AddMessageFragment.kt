@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import kotlin.text.Typography.quote
 
 /**
  * @author Kanedias
@@ -27,6 +28,9 @@ class AddMessageFragment: EditorFragment() {
 
     companion object {
         const val TOPIC_ARG = "TOPIC_ARG"
+        const val AUTHOR_ARG = "AUTHOR_ARG"
+        const val MSGID_ARG = "MSGID_ARG"
+        const val QUOTE_ARG = "QUOTE_ARG"
     }
 
     @BindView(R.id.edit_area)
@@ -37,8 +41,37 @@ class AddMessageFragment: EditorFragment() {
         ButterKnife.bind(this, view)
 
         editor = EditorViews(this, editorArea)
+        handleMisc()
 
         return view
+    }
+
+    /**
+     * Handles miscellaneous conditions, such as:
+     * * This fragment was shown due to click on author's nickname
+     * * This fragment was shown due to quoting
+     *
+     */
+    private fun handleMisc() {
+        // handle click on reply in text selection menu
+        val authorName = arguments?.getString(AUTHOR_ARG)
+        val quotedText = arguments?.getString(QUOTE_ARG)
+        val quotedId = arguments?.getString(MSGID_ARG)
+
+        if (authorName.isNullOrEmpty() || quotedText.isNullOrEmpty() || quotedId.isNullOrEmpty()) {
+            return
+        }
+
+        var quoteText = "[quote=\"$authorName\", post=${quotedId}]\n" +
+                "$quotedText\n" +
+                "[/quote]\n\n"
+
+        if (editor.contentInput.text.isNotEmpty()) {
+            quoteText = "${editor.contentInput.text}\n" + quoteText
+        }
+
+        editor.contentInput.setText(quoteText)
+        editor.contentInput.setSelection(quoteText.length)
     }
 
     @OnClick(R.id.message_cancel)

@@ -54,6 +54,7 @@
     <string name="new_messages_topics">With new messages</string>
     <string name="page">Page</string>
     <string name="content">Content</string>
+    <string name="reply">Reply</string>
     <string name="more_tag_default">Read more</string>
     <string name="no_permissions">Permission denied, can\'t perform action</string>
     <string name="select_image_to_upload">Select image to upload</string>
