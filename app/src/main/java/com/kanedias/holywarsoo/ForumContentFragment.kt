@@ -73,8 +73,12 @@ class ForumContentFragment: ContentFragment() {
             forumViewRefresher.isRefreshing = true
 
             try {
-                val loaded = withContext(Dispatchers.IO) { Network.loadForumContents(contents.forum.value!!) }
+                val loaded = withContext(Dispatchers.IO) {
+                    Network.loadForumContents(contents.forum.value!!, page = contents.currentPage.value!!)
+                }
+
                 contents.forum.value = loaded
+                contents.currentPage.value = loaded.currentPage
             } catch (ex: Exception) {
                 context?.let { Network.reportErrors(it, ex) }
             }
@@ -91,8 +95,8 @@ class ForumContentFragment: ContentFragment() {
             const val ITEM_UNKNOWN = -1
         }
 
-        val subforums = forum.subforums
-        val topics = forum.topics
+        private val subforums = forum.subforums
+        private val topics = forum.topics
 
 
         override fun getItemCount() = topics.size + subforums.size

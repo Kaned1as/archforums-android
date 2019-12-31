@@ -11,5 +11,5 @@ import com.kanedias.holywarsoo.dto.Forum
  */
 class ForumContentsModel : ViewModel() {
     val forum = MutableLiveData<Forum>()
-    var currentPage: Int = 1
+    val currentPage = MutableLiveData(1)
 }

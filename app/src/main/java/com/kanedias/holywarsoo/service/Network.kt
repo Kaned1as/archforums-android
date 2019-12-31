@@ -86,8 +86,8 @@ object Network {
     fun resolve(url: String) = MAIN_HOLYWARSOO_URL.resolve(url)
 
     fun daysToAuthExpiration() = authCookie()
-        ?.let { it.expiresAt() - System.currentTimeMillis() / 1000 / 60 / 60 / 24 }
-        ?: 0
+        ?.let { (it.expiresAt() - System.currentTimeMillis()) / 1000 / 60 / 60 / 24 }
+        ?: 0L
 
     fun isLoggedIn() = cookiePersistor.loadAll()
         .filter { it.name().startsWith("pun_cookie") }

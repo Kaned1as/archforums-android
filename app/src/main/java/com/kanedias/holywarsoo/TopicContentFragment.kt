@@ -88,8 +88,11 @@ class TopicContentFragment: ContentFragment() {
 
             try {
                 val customUrl = HttpUrl.parse(requireArguments().getString(URL_ARG, ""))
-                val loaded = withContext(Dispatchers.IO) { Network.loadTopicContents(contents.topic.value!!, link = customUrl) }
+                val loaded = withContext(Dispatchers.IO) {
+                    Network.loadTopicContents(contents.topic.value!!, page = contents.currentPage.value!!, link = customUrl)
+                }
                 contents.topic.value = loaded
+                contents.currentPage.value = loaded.currentPage
 
                 requireArguments().remove(URL_ARG) // only load custom url once
             } catch (ex: Exception) {
