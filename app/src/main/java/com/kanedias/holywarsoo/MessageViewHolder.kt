@@ -58,6 +58,7 @@ class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
             messageDate.setOnClickListener { it.showToast(message.createdDate) }
         } catch (ex: ParseException) {
             messageDate.text = message.createdDate
+            messageDate.isClickable = false
         }
 
         messageBody.handleMarkdown(message.content)
