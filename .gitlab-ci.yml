@@ -55,6 +55,7 @@ functional-tests:
 release-alpha:
   stage: release
   except:
+    - merge_requests
     - tags
   script:
     - *decrypt_publish_json
@@ -67,6 +68,8 @@ release-alpha:
 
 release-gold:
   stage: release
+  except:
+    - merge_requests
   only:
     - tags
   script:

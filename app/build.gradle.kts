@@ -70,6 +70,17 @@ android {
         }
     }
 
+    flavorDimensions("purity")
+    productFlavors {
+        create("fdroid") {
+            setDimension("purity")
+        }
+
+        create("googleplay") {
+            setDimension("purity")
+        }
+    }
+
     applicationVariants.all {
         outputs.forEach { output ->
             val outputApk = output as ApkVariantOutputImpl
