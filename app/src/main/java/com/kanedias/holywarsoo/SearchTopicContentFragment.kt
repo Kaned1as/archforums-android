@@ -54,7 +54,6 @@ class SearchTopicContentFragment: ContentFragment() {
         contents.results.value = requireArguments().getSerializable(SEARCH_ARG) as SearchTopicResults
         contents.results.observe(this, Observer { searchView.adapter = SearchPageContentsAdapter(it) })
         contents.results.observe(this, Observer { refreshViews() })
-        contents.currentPage.observe(this, Observer { refreshContent() })
 
         pageControls = PageViews(this, contents, pageNavigation)
         refreshContent()
@@ -71,8 +70,8 @@ class SearchTopicContentFragment: ContentFragment() {
                     Network.loadSearchResults(contents.results.value!!)
                 }
                 contents.results.value = loaded
-                contents.currentPage.value = loaded.currentPage
                 contents.pageCount.value = loaded.pageCount
+                contents.currentPage.value = loaded.currentPage
             } catch (ex: Exception) {
                 context?.let { Network.reportErrors(it, ex) }
             }

@@ -54,7 +54,6 @@ class ForumContentFragment: ContentFragment() {
         contents.forum.value = requireArguments().getSerializable(FORUM_ARG) as Forum
         contents.forum.observe(this, Observer { forumView.adapter = ForumContentsAdapter(it) })
         contents.forum.observe(this, Observer { refreshViews() })
-        contents.currentPage.observe(this, Observer { refreshContent() })
 
         pageControls = PageViews(this, contents, pageNavigation)
         refreshContent()
@@ -88,8 +87,8 @@ class ForumContentFragment: ContentFragment() {
                     Network.loadForumContents(contents.forum.value!!, page = contents.currentPage.value!!)
                 }
                 contents.forum.value = loaded
-                contents.currentPage.value = loaded.currentPage
                 contents.pageCount.value = loaded.pageCount
+                contents.currentPage.value = loaded.currentPage
             } catch (ex: Exception) {
                 context?.let { Network.reportErrors(it, ex) }
             }

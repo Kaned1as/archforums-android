@@ -37,6 +37,7 @@ class PageViews(parent: ContentFragment, model: PageableModel, iv: View) {
     init {
         ButterKnife.bind(this, iv)
 
+        // remember to first set pageCount, then currentPage in parent fragment
         model.currentPage.observe(parent, Observer { currentPage.text = it.toString() })
         model.currentPage.observe(parent, Observer { toFirstPage.visibilityBool = it > 1 })
         model.currentPage.observe(parent, Observer { toPrevPage.visibilityBool = it > 1 })

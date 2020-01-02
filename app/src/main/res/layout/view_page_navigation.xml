@@ -5,7 +5,8 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/colorSecondary">
+    android:background="?attr/colorSecondary"
+    android:alpha="0.5">
 
     <ImageView
         android:id="@+id/page_navigation_to_first_page"

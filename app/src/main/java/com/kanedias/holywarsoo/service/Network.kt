@@ -127,7 +127,7 @@ object Network {
         val loginPageReq = Request.Builder().url(loginPageUrl).get().build()
         val loginPageResp = httpClient.newCall(loginPageReq).execute()
         if (!loginPageResp.isSuccessful)
-            throw IllegalStateException("Can't load login page")
+            throw IllegalStateException("Can't load login page: ${loginPageResp.message()}")
 
         val loginPageHtml = loginPageResp.body()!!.string()
         val loginPageDoc = Jsoup.parse(loginPageHtml)
@@ -153,7 +153,7 @@ object Network {
 
         val loginResp = httpClient.newCall(loginReq).execute()
         if (!loginResp.isSuccessful)
-            throw IOException("Can't authenticate")
+            throw IOException("Can't authenticate: ${loginResp.message()}")
 
         if (authCookie() == null)
             throw IOException("Authentication failed, invalid login/password")
@@ -175,7 +175,7 @@ object Network {
         val req = Request.Builder().url(MAIN_HOLYWARSOO_URL).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
-            throw IOException("Can't load main page")
+            throw IOException("Can't load main page: ${resp.message()}")
 
         val html = resp.body()!!.string()
         val doc = Jsoup.parse(html)
@@ -206,7 +206,7 @@ object Network {
         val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
-            throw IOException("Can't load forum contents")
+            throw IOException("Can't load forum contents: ${resp.message()}")
 
         val html = resp.body()!!.string()
         val doc = Jsoup.parse(html)
@@ -242,7 +242,7 @@ object Network {
         val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
-            throw IOException("Can't load forum contents")
+            throw IOException("Can't load forum contents: ${resp.message()}")
 
         val html = resp.body()!!.string()
         val doc = Jsoup.parse(html)
@@ -280,7 +280,7 @@ object Network {
         val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
-            throw IOException("Can't load topic contents")
+            throw IOException("Can't load topic contents: ${resp.message()}")
 
         val html = resp.body()!!.string()
         val doc = Jsoup.parse(html)
@@ -319,7 +319,7 @@ object Network {
         val req = Request.Builder().url(postUrl).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
-            throw IOException("Can't load topic reply page")
+            throw IOException("Can't load topic reply page: ${resp.message()}")
 
         val replyPageHtml = resp.body()!!.string()
         val replyPageDoc = Jsoup.parse(replyPageHtml)
@@ -339,7 +339,7 @@ object Network {
             .build()
 
         // if we send reply too quickly website decides we are robots, need to wait a bit
-        Thread.sleep(2500)
+        Thread.sleep(1500)
 
         val postMessageResp = httpClient.newCall(postMessageReq).execute()
         if (!postMessageResp.isSuccessful)
@@ -352,6 +352,25 @@ object Network {
         // we need to extract link from it
         val link = postMessageDoc.select("div#brdmain div.box a").attr("href")
         return resolve(link)!!
+    }
+
+    /**
+     * Manage favorites for currently logged in user. Using this when [isLoggedIn] is false
+     * is undefined behaviour.
+     *
+     * @param topic topic to add or remove from favorites
+     * @param action what to do. Possible values: `favorite` and `unfavorite`
+     */
+    fun manageFavorites(topic: ForumTopic, action: String = "favorite") {
+        val url = resolve("misc.php")!!.newBuilder()
+            .addQueryParameter("action", action)
+            .addQueryParameter("tid", topic.id.toString())
+            .build()
+
+        val req = Request.Builder().url(url).get().build()
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IOException("Can't $action: ${resp.message()}")
     }
 
     /**

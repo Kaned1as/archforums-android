@@ -104,8 +104,8 @@ class TopicContentFragment: ContentFragment() {
                     Network.loadTopicContents(contents.topic.value!!, page = contents.currentPage.value!!, link = customUrl)
                 }
                 contents.topic.value = loaded
-                contents.currentPage.value = loaded.currentPage
                 contents.pageCount.value = loaded.pageCount
+                contents.currentPage.value = loaded.currentPage
 
                 requireArguments().remove(URL_ARG) // only load custom url once
             } catch (ex: Exception) {
@@ -116,7 +116,7 @@ class TopicContentFragment: ContentFragment() {
         }
     }
 
-    class TopicContentsAdapter(topic: ForumTopic) : RecyclerView.Adapter<MessageViewHolder>() {
+    class TopicContentsAdapter(val topic: ForumTopic) : RecyclerView.Adapter<MessageViewHolder>() {
 
         val messages = topic.messages
 
@@ -130,7 +130,7 @@ class TopicContentFragment: ContentFragment() {
 
         override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
             val message = messages[position]
-            holder.setup(message)
+            holder.setup(message, topic)
         }
 
     }

@@ -77,14 +77,13 @@ fun mdRendererFrom(ctx: Context): Markwon {
 fun mdRendererFrom(txt: TextView): Markwon {
     return Markwon.builder(txt.context)
         .usePlugin(HtmlPlugin.create().addHandler(DetailsTagHandler()))
-        .usePlugin(GlideImagesPlugin.create(txt.context))
         .usePlugin(GlideImagesPlugin.create(
             Glide.with(txt.context)
                 .applyDefaultRequestOptions(RequestOptions()
                     .centerInside()
                     .override(txt.context.resources.displayMetrics.widthPixels, SIZE_ORIGINAL)
                     .placeholder(R.drawable.image)
-                    .fallback(R.drawable.image_broken))))
+                    .error(R.drawable.image_broken))))
         .usePlugin(StrikethroughPlugin.create())
         .build()
 }
