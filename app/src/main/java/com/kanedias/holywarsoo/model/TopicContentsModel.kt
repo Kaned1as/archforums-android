@@ -10,7 +10,6 @@ import com.kanedias.holywarsoo.dto.ForumTopic
  *
  * Created on 21.12.19
  */
-class TopicContentsModel : ViewModel() {
+class TopicContentsModel : PageableModel() {
     val topic = MutableLiveData<ForumTopic>()
-    val currentPage = MutableLiveData(1)
 }

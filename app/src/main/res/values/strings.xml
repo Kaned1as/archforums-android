@@ -74,4 +74,9 @@
     <string name="insert_spoiler_tag">Insert spoiler tag</string>
     <string name="submit">Submit</string>
     <string name="submitting">Submitting…</string>
+    <string name="to_first_page">To first page</string>
+    <string name="to_previous_page">To previous page</string>
+    <string name="to_next_page">To next page</string>
+    <string name="to_last_page">To last page</string>
+    <string name="current_page">Current page</string>
 </resources>

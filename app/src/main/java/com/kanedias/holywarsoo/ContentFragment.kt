@@ -7,13 +7,9 @@ import androidx.fragment.app.Fragment
  *
  * Created on 29.12.19
  */
-open class ContentFragment: Fragment() {
+abstract class ContentFragment: Fragment() {
 
-    open fun refreshViews() {
+    abstract fun refreshViews()
 
-    }
-
-    open fun refreshContent() {
-
-    }
+    abstract fun refreshContent()
 }

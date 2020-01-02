@@ -166,6 +166,7 @@ object Network {
 
     /**
      * Load forum list from the main page.
+     * Forums on the main page also have category set.
      *
      * @return list of parsed forums. It has the same ordering as it had on the actual page.
      */
@@ -179,7 +180,14 @@ object Network {
         val html = resp.body()!!.string()
         val doc = Jsoup.parse(html)
 
-        return parseForums(doc)
+        val forumBoards = doc.select("div#brdmain > div.blocktable")
+        val forums = mutableListOf<Forum>()
+        for (board in forumBoards) {
+            val category = board.select("h2 > span").first().text()
+            forums.addAll(parseForums(board, category))
+        }
+
+        return forums
     }
 
     /**
@@ -295,6 +303,7 @@ object Network {
         return topic.copy(
             id = topicId.sanitizeInt(),
             name = topicName,
+            link = resolve(topicRef)!!.toString(),
             writable = topicWritable.isNotEmpty(),
             pageCount = pageCount!!,
             currentPage = currentPage.sanitizeInt(),
@@ -452,13 +461,14 @@ object Network {
      * Parses forum list page of the site and creates a structured list of
      * all forums encountered on the page.
      *
-     * @param doc fully parsed document containing page with forum list (main)
+     * @param where element containing forum list (main or forum with subforums)
+     * @param predefinedCategory optional category to set for items found
      * @return list of parsed forums. It has the same ordering as it had on the actual page.
      */
-    private fun parseForums(doc: Document): List<Forum> {
+    private fun parseForums(where: Element, predefinedCategory: String? = null): List<Forum> {
         val forums = mutableListOf<Forum>()
 
-        for (forum in doc.select("div#brdmain div.inbox table tr[id^=forum]")) {
+        for (forum in where.select("div.inbox table tr[id^=forum]")) {
             // forums can be found in main page and in forum page as well, as a subforums
             // all the info is fortunately self-contained and same across all kinds of pages
             val forumLink = forum.select("td.tcl div > h3 > a")
@@ -475,6 +485,7 @@ object Network {
                     name = forumLink.text(),
                     link = forumUrl.toString(),
                     subtext = forumSub.text(),
+                    category = predefinedCategory,
                     lastMessageName = lastMessageLink.text(),
                     lastMessageLink = lastMessageUrl.toString(),
                     lastMessageDate = lastMessageDate.text()

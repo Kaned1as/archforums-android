@@ -14,6 +14,7 @@ data class Forum(
     val name: String,
     val link: String,
     val subtext: String,
+    val category: String? = null, // only set for forums on the main page
     val lastMessageName: String,
     val lastMessageLink: String,
     val lastMessageDate: String,

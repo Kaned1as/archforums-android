@@ -33,10 +33,14 @@ class ForumContentFragment: ContentFragment() {
     @BindView(R.id.topic_list_scroll_area)
     lateinit var forumViewRefresher: SwipeRefreshLayout
 
+    @BindView(R.id.topic_list_bottom_navigation)
+    lateinit var pageNavigation: ViewGroup
+
     @BindView(R.id.topic_list)
     lateinit var forumView: RecyclerView
 
     private lateinit var contents: ForumContentsModel
+    private lateinit var pageControls: PageViews
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, state: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_forum_contents, parent, false)
@@ -50,7 +54,9 @@ class ForumContentFragment: ContentFragment() {
         contents.forum.value = requireArguments().getSerializable(FORUM_ARG) as Forum
         contents.forum.observe(this, Observer { forumView.adapter = ForumContentsAdapter(it) })
         contents.forum.observe(this, Observer { refreshViews() })
+        contents.currentPage.observe(this, Observer { refreshContent() })
 
+        pageControls = PageViews(this, contents, pageNavigation)
         refreshContent()
 
         return view
@@ -66,6 +72,11 @@ class ForumContentFragment: ContentFragment() {
             title = forum.name
             subtitle = "${getString(R.string.page)} ${forum.currentPage}"
         }
+
+        when (forum.pageCount) {
+            1 -> pageNavigation.visibility = View.GONE
+            else -> pageNavigation.visibility = View.VISIBLE
+        }
     }
 
     override fun refreshContent() {
@@ -76,9 +87,9 @@ class ForumContentFragment: ContentFragment() {
                 val loaded = withContext(Dispatchers.IO) {
                     Network.loadForumContents(contents.forum.value!!, page = contents.currentPage.value!!)
                 }
-
                 contents.forum.value = loaded
                 contents.currentPage.value = loaded.currentPage
+                contents.pageCount.value = loaded.pageCount
             } catch (ex: Exception) {
                 context?.let { Network.reportErrors(it, ex) }
             }

@@ -76,9 +76,9 @@ class MainPageContentFragment: ContentFragment() {
         }
     }
 
-    class ForumListAdapter(private val forumList: List<Forum>?) : RecyclerView.Adapter<ForumViewHolder>() {
+    class ForumListAdapter(private val forumList: List<Forum>) : RecyclerView.Adapter<ForumViewHolder>() {
 
-        override fun getItemCount() = forumList?.size ?: 0
+        override fun getItemCount() = forumList.size
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ForumViewHolder {
             val inflater = LayoutInflater.from(parent.context)
@@ -87,8 +87,16 @@ class MainPageContentFragment: ContentFragment() {
         }
 
         override fun onBindViewHolder(holder: ForumViewHolder, position: Int) {
-            val forum = forumList!![position]
+            val forum = forumList[position]
             holder.setup(forum)
+
+            // show category if it's changed
+            val categoryChanged = position > 0 && forumList[position].category != forumList[position - 1].category
+            if (forum.category != null && (position == 0 || categoryChanged)) {
+                holder.forumCategoryArea.visibility = View.VISIBLE
+            } else {
+                holder.forumCategoryArea.visibility = View.GONE
+            }
         }
 
     }

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/colorSecondary">
+
+    <ImageView
+        android:id="@+id/page_navigation_to_first_page"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_weight="1"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:src="@drawable/skip_backward"
+        android:contentDescription="@string/to_first_page"/>
+
+    <ImageView
+        android:id="@+id/page_navigation_to_previous_page"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_weight="1"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:src="@drawable/step_backward"
+        android:contentDescription="@string/to_previous_page"/>
+
+    <TextView
+        android:id="@+id/page_navigation_current_page"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_weight="1"
+        android:padding="16dp"
+        android:gravity="center"
+        android:text="@string/placeholder_number_short"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+        android:textColor="?attr/colorOnSecondary"
+        android:contentDescription="@string/to_first_page"/>
+
+    <ImageView
+        android:id="@+id/page_navigation_to_next_page"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_weight="1"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:src="@drawable/step_forward"
+        android:contentDescription="@string/to_next_page"/>
+
+    <ImageView
+        android:id="@+id/page_navigation_to_last_page"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_weight="1"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:src="@drawable/skip_forward"
+        android:contentDescription="@string/to_last_page"/>
+
+</LinearLayout>

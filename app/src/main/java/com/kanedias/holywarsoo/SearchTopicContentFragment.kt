@@ -33,10 +33,14 @@ class SearchTopicContentFragment: ContentFragment() {
     @BindView(R.id.topic_list_scroll_area)
     lateinit var searchViewRefresher: SwipeRefreshLayout
 
+    @BindView(R.id.topic_list_bottom_navigation)
+    lateinit var pageNavigation: ViewGroup
+
     @BindView(R.id.topic_list)
     lateinit var searchView: RecyclerView
 
     private lateinit var contents: SearchContentsModel
+    private lateinit var pageControls: PageViews
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, state: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_forum_contents, parent, false)
@@ -47,10 +51,12 @@ class SearchTopicContentFragment: ContentFragment() {
         searchViewRefresher.setOnRefreshListener { refreshContent() }
 
         contents = ViewModelProviders.of(this).get(SearchContentsModel::class.java)
-        contents.page.value = requireArguments().getSerializable(SEARCH_ARG) as SearchTopicResults
-        contents.page.observe(this, Observer { searchView.adapter = SearchPageContentsAdapter(it) })
-        contents.page.observe(this, Observer { refreshViews() })
+        contents.results.value = requireArguments().getSerializable(SEARCH_ARG) as SearchTopicResults
+        contents.results.observe(this, Observer { searchView.adapter = SearchPageContentsAdapter(it) })
+        contents.results.observe(this, Observer { refreshViews() })
+        contents.currentPage.observe(this, Observer { refreshContent() })
 
+        pageControls = PageViews(this, contents, pageNavigation)
         refreshContent()
 
         return view
@@ -61,8 +67,12 @@ class SearchTopicContentFragment: ContentFragment() {
             searchViewRefresher.isRefreshing = true
 
             try {
-                val loaded = withContext(Dispatchers.IO) { Network.loadSearchResults(contents.page.value!!) }
-                contents.page.value = loaded
+                val loaded = withContext(Dispatchers.IO) {
+                    Network.loadSearchResults(contents.results.value!!)
+                }
+                contents.results.value = loaded
+                contents.currentPage.value = loaded.currentPage
+                contents.pageCount.value = loaded.pageCount
             } catch (ex: Exception) {
                 context?.let { Network.reportErrors(it, ex) }
             }
@@ -71,8 +81,9 @@ class SearchTopicContentFragment: ContentFragment() {
         }
     }
 
+
     override fun refreshViews() {
-        val searchResults = contents.page.value ?: return
+        val searchResults = contents.results.value ?: return
         val activity = activity as? MainActivity ?: return
 
         activity.addButton.visibility = View.GONE
@@ -80,6 +91,11 @@ class SearchTopicContentFragment: ContentFragment() {
         activity.toolbar.apply {
             title = searchResults.name
             subtitle = "${getString(R.string.page)} ${searchResults.currentPage}"
+        }
+
+        when (searchResults.pageCount) {
+            1 -> pageNavigation.visibility = View.GONE
+            else -> pageNavigation.visibility = View.VISIBLE
         }
     }
 

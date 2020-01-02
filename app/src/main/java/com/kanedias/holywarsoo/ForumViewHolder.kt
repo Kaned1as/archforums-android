@@ -4,14 +4,25 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.google.android.material.card.MaterialCardView
 import com.kanedias.holywarsoo.dto.Forum
 import com.kanedias.holywarsoo.dto.ForumTopic
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
 
 class ForumViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
+
+    @BindView(R.id.forum_list_item)
+    lateinit var forumCard: MaterialCardView
+
+    @BindView(R.id.forum_list_item_separator)
+    lateinit var forumCategoryArea: ConstraintLayout
+
+    @BindView(R.id.list_item_separator_text)
+    lateinit var forumCategory: TextView
 
     @BindView(R.id.forum_name)
     lateinit var forumName: TextView
@@ -32,10 +43,11 @@ class ForumViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
     fun setup(forum: Forum) {
         forumName.text = forum.name
         forumSubtext.text = forum.subtext
+        forumCategory.text = forum.category
         lastMessageDate.text = forum.lastMessageDate
         lastMessageTopic.text = forum.lastMessageName
 
-        itemView.setOnClickListener {
+        forumCard.setOnClickListener {
             val fragment = ForumContentFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(ForumContentFragment.FORUM_ARG, forum)

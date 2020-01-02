@@ -22,6 +22,12 @@
             android:scrollbars="vertical"
             android:fadeScrollbars="true"/>
 
+        <include layout="@layout/view_page_navigation"
+            android:id="@+id/message_list_bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"/>
+
     </FrameLayout>
 
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

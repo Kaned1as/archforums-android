@@ -9,7 +9,6 @@ import com.kanedias.holywarsoo.dto.SearchTopicResults
  *
  * Created on 21.12.19
  */
-class SearchContentsModel : ViewModel() {
-    val page = MutableLiveData<SearchTopicResults>()
-    var currentPage: Int = 1
+class SearchContentsModel : PageableModel() {
+    val results = MutableLiveData<SearchTopicResults>()
 }

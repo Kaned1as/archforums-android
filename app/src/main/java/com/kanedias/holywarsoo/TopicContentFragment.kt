@@ -1,12 +1,12 @@
 package com.kanedias.holywarsoo
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.lifecycleScope
+import androidx.arch.core.util.Function
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -38,10 +38,15 @@ class TopicContentFragment: ContentFragment() {
     @BindView(R.id.message_list_scroll_area)
     lateinit var topicViewRefresher: SwipeRefreshLayout
 
+    @BindView(R.id.message_list_bottom_navigation)
+    lateinit var pageNavigation: ViewGroup
+
     @BindView(R.id.message_list)
     lateinit var topicView: RecyclerView
 
     private lateinit var contents: TopicContentsModel
+
+    private lateinit var pageControls: PageViews
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, state: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_topic_contents, parent, false)
@@ -56,7 +61,7 @@ class TopicContentFragment: ContentFragment() {
         contents.topic.observe(this, Observer { topicView.adapter = TopicContentsAdapter(it) })
         contents.topic.observe(this, Observer { refreshViews() })
 
-
+        pageControls = PageViews(this, contents, pageNavigation)
         refreshContent()
 
         return view
@@ -80,9 +85,16 @@ class TopicContentFragment: ContentFragment() {
                 frag.show(fragmentManager!!, "reply fragment")
             }
         }
+
+        when (topic.pageCount) {
+            1 -> pageNavigation.visibility = View.GONE
+            else -> pageNavigation.visibility = View.VISIBLE
+        }
     }
 
     override fun refreshContent() {
+        Log.d("TopicFrag", "Refreshing content, topic ${contents.topic.value?.name}, page ${contents.currentPage.value}")
+
         lifecycleScope.launchWhenResumed {
             topicViewRefresher.isRefreshing = true
 
@@ -93,6 +105,7 @@ class TopicContentFragment: ContentFragment() {
                 }
                 contents.topic.value = loaded
                 contents.currentPage.value = loaded.currentPage
+                contents.pageCount.value = loaded.pageCount
 
                 requireArguments().remove(URL_ARG) // only load custom url once
             } catch (ex: Exception) {
