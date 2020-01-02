@@ -12,6 +12,15 @@ import com.kanedias.holywarsoo.dto.ForumTopic
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
 import com.kanedias.holywarsoo.misc.visibilityBool
 
+/**
+ * View holder that shows forum topic
+ *
+ * @see TopicContentFragment
+ *
+ * @author Kanedias
+ *
+ * Created on 22.12.19
+ */
 class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 
     @BindView(R.id.topic_name)

@@ -11,9 +11,12 @@ import com.kanedias.holywarsoo.service.Network
 
 
 /**
- * Place to initialize all data prior to launching activities
+ * Main application class.
+ * Place to initialize all data prior to launching activities.
  *
  * @author Kanedias
+ *
+ * Created on 27.12.19
  */
 @AcraDialog(resIcon = R.drawable.ic_launcher_round, resText = R.string.app_crashed, resCommentPrompt = R.string.leave_crash_comment, resTheme = R.style.AppTheme)
 @AcraMailSender(mailTo = "kanedias@xaker.ru", resSubject = R.string.app_crash_report, reportFileName = "crash-report.json")

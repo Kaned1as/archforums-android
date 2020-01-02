@@ -20,6 +20,10 @@ import kotlinx.coroutines.withContext
 import java.lang.Exception
 
 /**
+ * Fragment representing forum content.
+ * Shows a list of topics/subforums this forum contains.
+ * Can be navigated with paging controls.
+ *
  * @author Kanedias
  *
  * Created on 19.12.19

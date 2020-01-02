@@ -8,6 +8,10 @@ import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 /**
+ * Helper fragment representing edit dialog that pops from the bottom of the screen.
+ *
+ * @see AddMessageFragment
+ *
  * @author Kanedias
  *
  * Created on 29.12.19

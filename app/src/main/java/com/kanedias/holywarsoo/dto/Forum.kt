@@ -3,6 +3,10 @@ package com.kanedias.holywarsoo.dto
 import java.io.Serializable
 
 /**
+ * Entity representing board forum.
+ * Forum is where topics are shown, sorted by date and divided in pages.
+ * Forums can also contain subforums. Usually only moderators of the website can create new forums.
+ *
  * @author Kanedias
  *
  * Created on 17.12.19

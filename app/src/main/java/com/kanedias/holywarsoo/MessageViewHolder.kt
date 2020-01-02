@@ -21,6 +21,13 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * View holder that shows topic message
+ *
+ * @author Kanedias
+ *
+ * Created on 22.12.19
+ */
 class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 
     @BindView(R.id.message_area)
@@ -72,6 +79,10 @@ class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 
     }
 
+    /**
+     * Enhances selection of the text in the specified message.
+     * Shows "Reply" button that opens [AddMessageFragment] with the selected text quoted.
+     */
     inner class SelectionEnhancer(private val message: ForumMessage, private val topic: ForumTopic): ActionMode.Callback {
 
         private val textView = messageBody

@@ -51,6 +51,7 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
@@ -69,8 +70,8 @@ android {
         }
     }
 
-    applicationVariants.forEach { variant ->
-        variant.outputs.forEach { output ->
+    applicationVariants.all {
+        outputs.forEach { output ->
             val outputApk = output as ApkVariantOutputImpl
 
             // user-supplied code

@@ -112,16 +112,15 @@ class EditorViews(private val parent: Fragment, private val iv: View) {
         }
 
         // not from clipboard, show upload dialog
-        val ctx = iv.context as AppCompatActivity
         try {
             val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                 type = "image/*"
                 addCategory(Intent.CATEGORY_OPENABLE)
             }
-            val chooser = Intent.createChooser(intent, ctx.getString(R.string.select_image_to_upload))
+            val chooser = Intent.createChooser(intent, iv.context.getString(R.string.select_image_to_upload))
             parent.startActivityForResult(chooser, ACTIVITY_REQUEST_IMAGE_UPLOAD)
         } catch (ex: ActivityNotFoundException) {
-            Toast.makeText(ctx, ctx.getString(R.string.no_file_manager_found), Toast.LENGTH_SHORT).show()
+            Toast.makeText(iv.context, iv.context.getString(R.string.no_file_manager_found), Toast.LENGTH_SHORT).show()
         }
     }
 

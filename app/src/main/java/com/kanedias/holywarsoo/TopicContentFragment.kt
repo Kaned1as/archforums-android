@@ -23,6 +23,7 @@ import java.lang.Exception
 /**
  * Fragment for showing contents of the topic, i.e. list of messages it contains.
  * Also shows post button if the topic itself is writable.
+ * Can be navigated with paging controls.
  *
  * @author Kanedias
  *

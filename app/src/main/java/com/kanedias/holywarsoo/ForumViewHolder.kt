@@ -13,6 +13,16 @@ import com.kanedias.holywarsoo.dto.Forum
 import com.kanedias.holywarsoo.dto.ForumTopic
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
 
+/**
+ * View holder representing forum
+ *
+ * @see MainPageContentFragment
+ * @see ForumContentFragment
+ *
+ * @author Kanedias
+ *
+ * Created on 23.12.19
+ */
 class ForumViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 
     @BindView(R.id.forum_list_item)

@@ -20,6 +20,9 @@ import java.lang.Exception
 import kotlin.text.Typography.quote
 
 /**
+ * Fragment responsible for adding a new message to the specified topic.
+ * Topic **must** be sent as an argument.
+ *
  * @author Kanedias
  *
  * Created on 29.12.19

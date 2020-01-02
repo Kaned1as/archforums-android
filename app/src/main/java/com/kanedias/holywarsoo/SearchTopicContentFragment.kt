@@ -20,6 +20,10 @@ import kotlinx.coroutines.withContext
 import java.lang.Exception
 
 /**
+ * Fragment representing topic search content.
+ * Shows a list of topics this search results contain.
+ * Can be navigated with paging controls.
+ *
  * @author Kanedias
  *
  * Created on 19.12.19

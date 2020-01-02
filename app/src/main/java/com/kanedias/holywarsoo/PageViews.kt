@@ -11,7 +11,7 @@ import com.kanedias.holywarsoo.misc.visibilityBool
 import com.kanedias.holywarsoo.model.PageableModel
 
 /**
- * Fragment to hold all paging-related functions in all paged views where possible.
+ * Helper fragment to hold all paging-related functions in all paged views where possible.
  *
  * @author Kanedias
  *

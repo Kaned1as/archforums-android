@@ -32,6 +32,10 @@ fun View.showToast(text: String) {
     toast.show()
 }
 
+/**
+ * Deduce what integer number should this string represent.
+ * Gets rid of usual separator chars (we know it's integer).
+ */
 fun String.sanitizeInt(): Int {
     return this
         .replace(UNNEEDED_INT_CHARS, "")
@@ -40,6 +44,10 @@ fun String.sanitizeInt(): Int {
         .toInt()
 }
 
+/**
+ * Try to deduce what integer number should this string represent.
+ * Gets rid of usual separator chars (we know it's integer).
+ */
 fun String.trySanitizeInt(): Int? {
     return this
         .replace(UNNEEDED_INT_CHARS, "")
@@ -48,6 +56,9 @@ fun String.trySanitizeInt(): Int? {
         .toIntOrNull()
 }
 
+/**
+ * Overlays main view of the activity with the specified fragment.
+ */
 fun FragmentActivity.showFullscreenFragment(frag: Fragment) {
     frag.enterTransition = Slide(Gravity.END)
     frag.exitTransition = Slide(Gravity.START)

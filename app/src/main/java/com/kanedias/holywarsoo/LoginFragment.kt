@@ -20,10 +20,9 @@ import kotlinx.coroutines.*
  * Fragment responsible for adding account. Appears when you click "add account" in the sidebar.
  * This may be either registration or logging in.
  *
- * @see Sidebar.addAccount
  * @author Kanedias
  *
- * Created on 11/11/2017.
+ * Created on 11/11/2017
  */
 class LoginFragment : Fragment() {
 

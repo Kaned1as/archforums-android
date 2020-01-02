@@ -13,10 +13,12 @@ import com.kanedias.holywarsoo.dto.*
 import com.kanedias.holywarsoo.misc.sanitizeInt
 import com.kanedias.holywarsoo.misc.trySanitizeInt
 import okhttp3.*
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import java.io.IOException
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -45,6 +47,9 @@ object Network {
 
     private const val USER_AGENT = "Holywarsoo Android ${BuildConfig.VERSION_NAME}"
     private val MAIN_HOLYWARSOO_URL = HttpUrl.parse("https://holywarsoo.net")!!
+    private val MAIN_IMGUR_URL = HttpUrl.parse("https://api.imgur.com")!!
+
+    const val IMGUR_CLIENT_AUTH = "Client-ID 860dc14aa7caf25"
 
     val FAVORITE_TOPICS_URL = resolve("search.php?action=show_favorites")!!.toString()
     val REPLIES_TOPICS_URL = resolve("search.php?action=show_replies")!!.toString()
@@ -374,6 +379,36 @@ object Network {
     }
 
     /**
+     * Uploads image to Imgur provider.
+     * See [Imgur API](https://api.imgur.com/endpoints/image) for more info.
+     *
+     * @param imageBytes byte array containing image bytes
+     * @return string representing full link to uploaded image
+     */
+    fun uploadImage(imageBytes: ByteArray): String {
+        val url = MAIN_IMGUR_URL.resolve("/3/image")!!
+
+        val uploadForm = RequestBody.create(MediaType.parse("image/*"), imageBytes)
+        val reqBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("type", "file")
+            .addFormDataPart("image", "android-holywarsoo-${UUID.randomUUID()}", uploadForm)
+
+        val req = Request.Builder()
+            .url(url)
+            .header("Authorization", IMGUR_CLIENT_AUTH)
+            .post(reqBody.build())
+            .build()
+
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IOException("Can't upload image: ${resp.message()}")
+
+        val respJson = JSONObject(resp.body()!!.string())
+        return respJson.getJSONObject("data").getString("link")
+    }
+
+    /**
      * Parses message list page of the topic and creates a structured list of all messages on the page.
      *
      * @param doc fully parsed document containing page with message list (topic)
@@ -529,9 +564,5 @@ object Network {
         }
 
         else -> throw ex
-    }
-
-    fun uploadImage(readBytes: ByteArray): String {
-        return ""
     }
 }

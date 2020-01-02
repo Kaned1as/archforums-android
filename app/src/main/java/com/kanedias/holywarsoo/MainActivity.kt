@@ -26,6 +26,10 @@ import kotlinx.coroutines.withContext
 import java.lang.Exception
 import java.lang.IllegalStateException
 
+/**
+ * Main activity of the application. Has toolbar and navigation drawer to allow login and search shortcuts.
+ * All fragment transactions happen here.
+ */
 class MainActivity : AppCompatActivity() {
 
     @BindView(R.id.main_area)

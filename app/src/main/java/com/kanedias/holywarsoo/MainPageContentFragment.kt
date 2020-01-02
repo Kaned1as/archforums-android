@@ -20,6 +20,8 @@ import kotlinx.coroutines.withContext
 import java.lang.Exception
 
 /**
+ * Fragment showing main page, i.e. list of forums with optional categories.
+ *
  * @author Kanedias
  *
  * Created on 19.12.19

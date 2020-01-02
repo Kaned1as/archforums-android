@@ -1,11 +1,13 @@
 package com.kanedias.holywarsoo.model
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.kanedias.holywarsoo.dto.Forum
 import com.kanedias.holywarsoo.dto.ForumTopic
+import com.kanedias.holywarsoo.TopicContentFragment
 
 /**
+ * View model for topic contents.
+ *
+ * @see TopicContentFragment
  * @author Kanedias
  *
  * Created on 21.12.19
