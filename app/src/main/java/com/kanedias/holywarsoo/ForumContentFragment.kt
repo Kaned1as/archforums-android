@@ -146,6 +146,14 @@ class ForumContentFragment: ContentFragment() {
                     val forum = subforums[position]
                     (holder as ForumViewHolder).apply {
                         setup(forum)
+
+                        // show category if it's changed
+                        val categoryChanged = position > 0 && forum.category != subforums[position - 1].category
+                        if (forum.category != null && (position == 0 || categoryChanged)) {
+                            holder.forumCategoryArea.visibility = View.VISIBLE
+                        } else {
+                            holder.forumCategoryArea.visibility = View.GONE
+                        }
                     }
                 }
                 else -> {

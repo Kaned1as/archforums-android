@@ -252,7 +252,7 @@ object Network {
         val html = resp.body()!!.string()
         val doc = Jsoup.parse(html)
 
-        val subforums = parseForums(doc)
+        val subforums = parseForums(doc.select("div.subforumlist").first())
         val topics = parseTopics(doc)
 
         val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
@@ -478,11 +478,11 @@ object Network {
 
         val topics = mutableListOf<ForumTopic>()
         for (topic in doc.select("div#vf div.inbox table tr[class^=row]")) {
+            val topicLink = topic.select("td.tcl > div.tclcon a").first() ?: continue
 
             // topic list page may have different layouts depending on whether it's search page
             // or forum page, so we should be smart about it, detecting row meanings by their names
             val isSticky = topic.classNames().contains("isticky")
-            val topicLink = topic.select("td.tcl > div.tclcon a").first()
             val topicPageCount = topic.select("td.tcl span.pagestext a:last-child").text()
 
             val topicReplies = repliesClass?.let { topic.select("td.${it.className()}").text() } ?: "-1"
@@ -519,10 +519,13 @@ object Network {
      * @param predefinedCategory optional category to set for items found
      * @return list of parsed forums. It has the same ordering as it had on the actual page.
      */
-    private fun parseForums(where: Element, predefinedCategory: String? = null): List<Forum> {
-        val forums = mutableListOf<Forum>()
+    private fun parseForums(where: Element?, predefinedCategory: String? = null): List<Forum> {
+        if (where == null) {
+            return emptyList()
 
-        for (forum in where.select("div.inbox table tr[id^=forum]")) {
+        }
+        val forums = mutableListOf<Forum>()
+        for (forum in where.select("div.inbox > table > tbody > tr[class^=row]")) {
             // forums can be found in main page and in forum page as well, as a subforums
             // all the info is fortunately self-contained and same across all kinds of pages
             val forumLink = forum.select("td.tcl div > h3 > a")

@@ -12,6 +12,7 @@ import com.google.android.material.card.MaterialCardView
 import com.kanedias.holywarsoo.dto.Forum
 import com.kanedias.holywarsoo.dto.ForumTopic
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
+import com.kanedias.holywarsoo.misc.visibilityBool
 
 /**
  * View holder representing forum
@@ -67,22 +68,27 @@ class ForumViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
             (itemView.context as AppCompatActivity).showFullscreenFragment(fragment)
         }
 
-        lastMessageTopic.setOnClickListener {
-            val topic = ForumTopic(
-                name = forum.lastMessageName,
-                link = forum.lastMessageLink,
-                lastMessageDate = forum.lastMessageDate,
-                lastMessageUrl = forum.lastMessageLink
-            )
+        if (forum.lastMessageDate.isNotEmpty()) {
+            lastMessageTopic.visibilityBool = true
+            lastMessageTopic.setOnClickListener {
+                val topic = ForumTopic(
+                    name = forum.lastMessageName,
+                    link = forum.lastMessageLink,
+                    lastMessageDate = forum.lastMessageDate,
+                    lastMessageUrl = forum.lastMessageLink
+                )
 
-            val fragment = TopicContentFragment().apply {
-                arguments = Bundle().apply {
-                    putSerializable(TopicContentFragment.TOPIC_ARG, topic)
-                    putString(TopicContentFragment.URL_ARG, forum.lastMessageLink)
+                val fragment = TopicContentFragment().apply {
+                    arguments = Bundle().apply {
+                        putSerializable(TopicContentFragment.TOPIC_ARG, topic)
+                        putString(TopicContentFragment.URL_ARG, forum.lastMessageLink)
+                    }
                 }
-            }
 
-            (itemView.context as AppCompatActivity).showFullscreenFragment(fragment)
+                (itemView.context as AppCompatActivity).showFullscreenFragment(fragment)
+            }
+        } else {
+            lastMessageTopic.visibilityBool = false
         }
     }
 
