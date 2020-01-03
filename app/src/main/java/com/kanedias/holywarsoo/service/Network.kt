@@ -344,7 +344,7 @@ object Network {
             .build()
 
         // if we send reply too quickly website decides we are robots, need to wait a bit
-        Thread.sleep(1500)
+        Thread.sleep(2000)
 
         val postMessageResp = httpClient.newCall(postMessageReq).execute()
         if (!postMessageResp.isSuccessful)

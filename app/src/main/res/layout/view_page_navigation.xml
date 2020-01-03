@@ -16,6 +16,7 @@
         android:padding="16dp"
         android:background="?attr/selectableItemBackground"
         android:src="@drawable/skip_backward"
+        android:tint="?attr/colorOnSecondary"
         android:contentDescription="@string/to_first_page"/>
 
     <ImageView
@@ -26,6 +27,7 @@
         android:padding="16dp"
         android:background="?attr/selectableItemBackground"
         android:src="@drawable/step_backward"
+        android:tint="?attr/colorOnSecondary"
         android:contentDescription="@string/to_previous_page"/>
 
     <TextView
@@ -48,6 +50,7 @@
         android:padding="16dp"
         android:background="?attr/selectableItemBackground"
         android:src="@drawable/step_forward"
+        android:tint="?attr/colorOnSecondary"
         android:contentDescription="@string/to_next_page"/>
 
     <ImageView
@@ -58,6 +61,7 @@
         android:padding="16dp"
         android:background="?attr/selectableItemBackground"
         android:src="@drawable/skip_forward"
+        android:tint="?attr/colorOnSecondary"
         android:contentDescription="@string/to_last_page"/>
 
 </LinearLayout>

@@ -54,12 +54,13 @@ class TopicContentFragment: ContentFragment() {
         ButterKnife.bind(this, view)
 
         topicView.layoutManager = LinearLayoutManager(context)
+        topicView.adapter = TopicContentsAdapter()
 
         topicViewRefresher.setOnRefreshListener { refreshContent() }
 
         contents = ViewModelProviders.of(this).get(TopicContentsModel::class.java)
         contents.topic.value = requireArguments().getSerializable(TOPIC_ARG) as ForumTopic
-        contents.topic.observe(this, Observer { topicView.adapter = TopicContentsAdapter(it) })
+        contents.topic.observe(this, Observer { topicView.adapter!!.notifyDataSetChanged() })
         contents.topic.observe(this, Observer { refreshViews() })
 
         pageControls = PageViews(this, contents, pageNavigation)
@@ -85,6 +86,8 @@ class TopicContentFragment: ContentFragment() {
                 }
                 frag.show(fragmentManager!!, "reply fragment")
             }
+        } else {
+            activity.addButton.visibility = View.GONE
         }
 
         when (topic.pageCount) {
@@ -117,11 +120,19 @@ class TopicContentFragment: ContentFragment() {
         }
     }
 
-    class TopicContentsAdapter(val topic: ForumTopic) : RecyclerView.Adapter<MessageViewHolder>() {
+    inner class TopicContentsAdapter : RecyclerView.Adapter<MessageViewHolder>() {
 
-        val messages = topic.messages
+        init {
+            setHasStableIds(true)
+        }
 
-        override fun getItemCount() = messages.size
+        override fun getItemId(position: Int): Long {
+            val messages = contents.topic.value!!.messages
+            return messages[position].id.toLong()
+        }
+
+        override fun getItemCount() = contents.topic.value?.messages?.size ?: 0
+
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
             val inflater = LayoutInflater.from(parent.context)
@@ -130,7 +141,8 @@ class TopicContentFragment: ContentFragment() {
         }
 
         override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-            val message = messages[position]
+            val topic = contents.topic.value!!
+            val message = topic.messages[position]
             holder.setup(message, topic)
         }
 

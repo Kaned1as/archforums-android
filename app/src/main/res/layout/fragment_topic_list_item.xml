@@ -11,6 +11,7 @@
     android:layout_marginRight="@dimen/mtrl_card_spacing"
     android:minHeight="80dp"
     app:cardElevation="2dp"
+    app:cardBackgroundColor="?attr/colorSecondary"
     tools:context=".TopicViewHolder">
 
     <RelativeLayout

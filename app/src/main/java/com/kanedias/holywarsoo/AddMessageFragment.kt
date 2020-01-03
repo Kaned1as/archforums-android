@@ -90,14 +90,17 @@ class AddMessageFragment: EditorFragment() {
             .create()
 
         val frgPredicate = { it: Fragment -> it is ContentFragment }
-        val curFrg = requireFragmentManager().fragments.reversed().find(frgPredicate) as ContentFragment?
+        val curFrg = requireFragmentManager().fragments.reversed().find(frgPredicate) as TopicContentFragment?
 
         lifecycleScope.launch {
             waitDialog.show()
 
             try {
                 val topic = requireArguments().getSerializable(TOPIC_ARG) as ForumTopic
-                withContext(Dispatchers.IO) { Network.postMessage(topic, editor.contentInput.text.toString()) }
+                val link = withContext(Dispatchers.IO) {
+                    Network.postMessage(topic, editor.contentInput.text.toString())
+                }
+                curFrg?.arguments?.putString(TopicContentFragment.URL_ARG, link.toString())
                 curFrg?.refreshContent()
                 dismiss()
             } catch (ex: Exception) {

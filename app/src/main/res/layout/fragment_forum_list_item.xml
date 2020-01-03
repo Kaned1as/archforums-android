@@ -24,6 +24,7 @@
         android:layout_marginEnd="@dimen/mtrl_card_spacing"
         android:minHeight="120dp"
         app:cardElevation="4dp"
+        app:cardBackgroundColor="?attr/colorSecondary"
         app:layout_constraintTop_toBottomOf="@+id/forum_list_item_separator">
 
         <LinearLayout

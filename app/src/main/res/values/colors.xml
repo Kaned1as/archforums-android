@@ -4,6 +4,7 @@
     <color name="holywarsooMainHeaderDark">#770000</color>
     <color name="holywarsooForumHeader">#ecebe7</color>
     <color name="holywarsooForumContent">#fbfaf5</color>
+    <color name="holywarsooForumText">#333333</color>
 
     <color name="colorPrimary">@color/holywarsooMainHeader</color>
     <color name="colorPrimaryDark">@color/holywarsooMainHeaderDark</color>
