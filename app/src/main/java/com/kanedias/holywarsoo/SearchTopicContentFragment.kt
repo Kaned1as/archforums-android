@@ -15,6 +15,10 @@ import butterknife.ButterKnife
 import com.kanedias.holywarsoo.dto.SearchTopicResults
 import com.kanedias.holywarsoo.model.SearchContentsModel
 import com.kanedias.holywarsoo.service.Network
+import com.r0adkll.slidr.Slidr
+import com.r0adkll.slidr.model.SlidrConfig
+import com.r0adkll.slidr.model.SlidrInterface
+import com.r0adkll.slidr.model.SlidrPosition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.Exception
@@ -44,6 +48,7 @@ class SearchTopicContentFragment: ContentFragment() {
     lateinit var searchView: RecyclerView
 
     private lateinit var contents: SearchContentsModel
+
     private lateinit var pageControls: PageViews
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, state: Bundle?): View {
@@ -83,7 +88,6 @@ class SearchTopicContentFragment: ContentFragment() {
             searchViewRefresher.isRefreshing = false
         }
     }
-
 
     override fun refreshViews() {
         val searchResults = contents.results.value ?: return

@@ -8,6 +8,7 @@
     android:layout_height="match_parent"
     android:focusable="true"
     android:clickable="true"
+    android:background="@android:color/transparent"
     tools:context=".MainActivity">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

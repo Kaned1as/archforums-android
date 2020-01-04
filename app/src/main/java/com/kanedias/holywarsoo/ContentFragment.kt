@@ -1,6 +1,11 @@
 package com.kanedias.holywarsoo
 
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.r0adkll.slidr.Slidr
+import com.r0adkll.slidr.model.SlidrConfig
+import com.r0adkll.slidr.model.SlidrInterface
+import com.r0adkll.slidr.model.SlidrPosition
 
 /**
  * Abstract fragment containing list content
@@ -14,6 +19,19 @@ import androidx.fragment.app.Fragment
  * Created on 29.12.19
  */
 abstract class ContentFragment: Fragment() {
+
+    /**
+     * Slide right to go back helper
+     */
+    private var slidrInterface: SlidrInterface? = null
+
+    override fun onResume() {
+        super.onResume()
+        if (slidrInterface == null) {
+            val mainChild = (requireView() as ViewGroup).getChildAt(0)
+            slidrInterface = Slidr.replace(mainChild, SlidrConfig.Builder().position(SlidrPosition.LEFT).build())
+        }
+    }
 
     abstract fun refreshViews()
 

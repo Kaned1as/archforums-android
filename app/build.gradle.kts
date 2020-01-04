@@ -32,8 +32,8 @@ android {
         applicationId = "com.kanedias.holywarsoo"
         minSdkVersion(21)
         targetSdkVersion(29)
-        versionCode = 3
-        versionName = "1.1.1"
+        versionCode = 4
+        versionName = "1.1.2"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -144,6 +144,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:3.14.0")                         // android http client
     implementation("com.github.franmontiel:PersistentCookieJar:v1.0.1")          // cookie support
     implementation("com.github.stfalcon:stfalcon-imageviewer:0.1.0")             // embedded image viewer
+    implementation("com.r0adkll:slidableactivity:2.1.0")                         // fragment swipe right to go back action
 
     implementation("ch.acra:acra-mail:${rootProject.extra["acraVersion"]}")                             // crash handler
     implementation("ch.acra:acra-dialog:${rootProject.extra["acraVersion"]}")

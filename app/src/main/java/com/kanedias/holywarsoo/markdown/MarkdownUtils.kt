@@ -313,6 +313,8 @@ fun postProcessMore(spanned: SpannableStringBuilder, view: TextView) {
                             }
 
                         postProcessMore(spanned, view)
+
+                        view.text = spanned
                         AsyncDrawableScheduler.schedule(view)
                     }
 
@@ -347,6 +349,8 @@ fun postProcessMore(spanned: SpannableStringBuilder, view: TextView) {
                         spanned.removeSpan(this)
 
                         postProcessMore(spanned, view)
+
+                        view.text = spanned
                     }
 
                     override fun updateDrawState(ds: TextPaint) {

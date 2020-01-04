@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.arch.core.util.Function
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -79,7 +78,7 @@ class TopicContentFragment: ContentFragment() {
         }
 
         if (topic.writable) {
-            activity.addButton.visibility = View.VISIBLE
+            activity.addButton.show()
             activity.addButton.setOnClickListener {
                 val frag = AddMessageFragment().apply {
                     arguments = Bundle().apply { putSerializable(AddMessageFragment.TOPIC_ARG, topic) }

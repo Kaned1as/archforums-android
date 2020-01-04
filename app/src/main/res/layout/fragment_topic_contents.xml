@@ -1,33 +1,48 @@
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- top frame layout with transparent is needed for Slidr -->
+<!-- it has layout behaviour as it will be attached as a child of coordinator layout, see activity_main.xml -->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/message_list_scroll_area"
+    android:id="@+id/main_fragment_area"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/design_default_color_background"
+    android:background="@android:color/transparent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".TopicContentFragment">
 
-    <FrameLayout
+    <!-- refresh layout for the main content -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/message_list_scroll_area"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/message_list"
+        <!-- frame layout to adjust views inside refresher -->
+        <!-- refresh layout itself doesn't have layout_gravity or constraint rules -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="4dp"
-            android:paddingBottom="60dp"
-            android:clipToPadding="false"
-            android:scrollbars="vertical"
-            android:fadeScrollbars="true"/>
+            android:background="@color/design_default_color_background">
 
-        <include layout="@layout/view_page_navigation"
-            android:id="@+id/message_list_bottom_navigation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/message_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="4dp"
+                android:paddingBottom="60dp"
+                android:clipToPadding="false"
+                android:scrollbars="vertical"
+                android:fadeScrollbars="true"
+                tools:context=".MessageViewHolder"/>
 
-    </FrameLayout>
+            <include layout="@layout/view_page_navigation"
+                android:id="@+id/message_list_bottom_navigation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"/>
 
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        </FrameLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+</FrameLayout>
