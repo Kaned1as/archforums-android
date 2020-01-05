@@ -78,6 +78,8 @@ class MainPageContentFragment: ContentFragment() {
         }
     }
 
+    override fun hasBackNavigation() = false
+
     class ForumListAdapter(private val forumList: List<Forum>) : RecyclerView.Adapter<ForumViewHolder>() {
 
         override fun getItemCount() = forumList.size

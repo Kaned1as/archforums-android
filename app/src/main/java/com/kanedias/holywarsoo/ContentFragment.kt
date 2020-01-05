@@ -27,11 +27,13 @@ abstract class ContentFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (slidrInterface == null) {
+        if (hasBackNavigation() && slidrInterface == null) {
             val mainChild = (requireView() as ViewGroup).getChildAt(0)
             slidrInterface = Slidr.replace(mainChild, SlidrConfig.Builder().position(SlidrPosition.LEFT).build())
         }
     }
+
+    open fun hasBackNavigation() = true
 
     abstract fun refreshViews()
 
