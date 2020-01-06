@@ -194,6 +194,7 @@ class MainActivity : AppCompatActivity() {
                 .setTitle(R.string.whats_new)
                 .setMessage(mdRendererFrom(this).toMarkdown(whatsNew.toString()))
                 .setPositiveButton(android.R.string.ok, null)
+                .setNeutralButton(R.string.help_the_project) { _, _ -> donateHelper.donate() }
                 .show()
 
             Config.lastVersion = currVersion

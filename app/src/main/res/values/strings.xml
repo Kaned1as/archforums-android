@@ -56,8 +56,10 @@
     <string tools:context="bottom paging interface" name="to_next_page">To next page</string>
     <string tools:context="bottom paging interface" name="to_last_page">To last page</string>
     <string tools:context="bottom paging interface" name="current_page">Current page</string>
+    <string tools:context="bottom paging interface" name="jump_to_page">Jump to page</string>
 
     <string tools:context="what's new dialogue" name="whats_new">What\'s new?</string>
+    <string tools:context="what's new dialogue" name="help_the_project">Help the project</string>
     <string tools:context="main action bar menu" name="menu_settings">Settings</string>
     <string tools:context="main action bar menu" name="menu_about">About</string>
     <string tools:context="main action bar menu" name="menu_donate">Donate</string>

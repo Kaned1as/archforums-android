@@ -1,14 +1,21 @@
 package com.kanedias.holywarsoo
 
+import android.content.Context
 import android.view.View
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
 import com.kanedias.holywarsoo.misc.visibilityBool
 import com.kanedias.holywarsoo.model.PageableModel
+import kotlinx.coroutines.delay
 
 /**
  * Helper fragment to hold all paging-related functions in all paged views where possible.
@@ -48,5 +55,31 @@ class PageViews(parent: ContentFragment, model: PageableModel, iv: View) {
         toPrevPage.setOnClickListener { model.currentPage.value = model.currentPage.value!! - 1; parent.refreshContent() }
         toNextPage.setOnClickListener { model.currentPage.value = model.currentPage.value!! + 1; parent.refreshContent() }
         toLastPage.setOnClickListener { model.currentPage.value = model.pageCount.value!!; parent.refreshContent() }
+
+        // jump to arbitrary page on click
+        currentPage.setOnClickListener {
+            val jumpToPageView = parent.layoutInflater.inflate(R.layout.view_jump_to_page, null) as TextInputEditText
+            jumpToPageView.hint = "1 .. ${model.pageCount.value}"
+            jumpToPageView.setText(model.currentPage.value!!.toString())
+
+            MaterialAlertDialogBuilder(parent.context)
+                .setTitle(R.string.jump_to_page)
+                .setView(jumpToPageView)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok) {_, _ ->
+                    val number = jumpToPageView.text.toString().toIntOrNull()
+                    if (number != null && number > 0 && number <= model.pageCount.value!!) {
+                        model.currentPage.value = number; parent.refreshContent()
+                    }
+                }
+                .show()
+
+            parent.lifecycleScope.launchWhenResumed {
+                delay(100) // wait for dialog to be shown
+                jumpToPageView.requestFocus()
+                val imm = parent.requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(jumpToPageView, 0)
+            }
+        }
     }
 }

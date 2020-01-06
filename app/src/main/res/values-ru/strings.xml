@@ -53,6 +53,7 @@
     <string name="to_next_page">К следующей странице</string>
     <string name="to_last_page">К последней странице</string>
     <string name="current_page">Текущая страница</string>
+    <string name="jump_to_page">Перейти к странице</string>
     <string name="whats_new">Что нового?</string>
     <string name="menu_settings">Настройки</string>
     <string name="menu_about">О программе</string>
@@ -67,4 +68,5 @@
     <string name="fork_on_gitlab">Создать форк на GitLab</string>
     <string name="report_bug">Сообщить об ошибке</string>
     <string name="gitlab_issue_tracker">Трекер ошибок</string>
+    <string name="help_the_project">Помочь проекту</string>
 </resources>

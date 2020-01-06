@@ -32,12 +32,13 @@
 
     <TextView
         android:id="@+id/page_navigation_current_page"
-        android:layout_width="56dp"
+        android:layout_width="wrap_content"
         android:layout_height="56dp"
         android:layout_weight="1"
         android:padding="16dp"
         android:gravity="center"
-        android:text="@string/placeholder_number_short"
+        android:text="@string/placeholder_number_long"
+        android:minEms="4"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
         android:textColor="?attr/colorOnSecondary"
         android:contentDescription="@string/to_first_page"/>
