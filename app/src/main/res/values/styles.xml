@@ -1,5 +1,8 @@
 <resources>
 
+    <attr name="toolbarOverrideStyle" format="reference" />
+    <attr name="toolbarPopupOverrideStyle" format="reference" />
+
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
@@ -8,15 +11,9 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorSecondary">@color/holywarsooForumContent</item>
         <item name="colorOnSecondary">@color/holywarsooForumText</item>
-<!--        <item name="android:textColorPrimary">@color/colorAccent</item>-->
-        <item name="toolbarStyle">@style/ToolBarStyle</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
-    </style>
-
-    <!-- ToolBar -->
-    <style name="ToolBarStyle" parent="Widget.MaterialComponents.Toolbar">
-        <item name="titleTextColor">@color/holywarsooForumContent</item>
-        <item name="subtitleTextColor">@color/md_grey_300</item>
+        <item name="toolbarOverrideStyle">@style/Theme.MaterialComponents.NoActionBar</item>
+        <item name="toolbarPopupOverrideStyle">@style/Theme.MaterialComponents.Light.NoActionBar</item>
     </style>
 
     <!-- Drawer menu -->

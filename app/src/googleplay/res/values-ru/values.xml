@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="thanks_for_your_pledge">Спасибо за ваш вклад!</string>
+    <string name="request_a_feature">Попросить об услуге</string>
+    <string name="create_issue">Вы будете перенаправлены на трекер проекта. Там вы сможете создать новый тикет.</string>
+    <string name="understood">Понятно</string>
+</resources>

@@ -1,5 +1,6 @@
 package com.kanedias.holywarsoo.misc
 
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.widget.Toast
@@ -8,7 +9,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.transition.Slide
 import com.kanedias.holywarsoo.R
-import kotlin.reflect.KClass
+
 
 private val UNNEEDED_INT_CHARS = Regex("[,. ]")
 
@@ -30,6 +31,17 @@ fun View.showToast(text: String) {
 
     toast.setGravity(Gravity.TOP or Gravity.START, location[0] - 25, location[1] - 10)
     toast.show()
+}
+
+/**
+ * Resolve attribute effectively
+ * @param attr attribute, for example [R.attr.toolbarPopupOverrideStyle]
+ * @return resolved reference
+ */
+fun View.resolveAttr(attr: Int): Int {
+    val typedValue = TypedValue()
+    this.context.theme.resolveAttribute(attr, typedValue, true)
+    return typedValue.data
 }
 
 /**

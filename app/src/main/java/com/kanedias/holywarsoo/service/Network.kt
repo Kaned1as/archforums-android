@@ -295,7 +295,7 @@ object Network {
         val topicRef = doc.select("head link[rel=canonical]").attr("href")
         val topicId = resolve(topicRef)!!.queryParameter("id")!!
         val topicName = doc.select("head title").text()
-        val topicWritable = doc.select("div#brdmain div.postlinksb a[href^=post.php]:containsOwn(Ответить)")
+        val topicWritable = doc.select("div#brdmain div.postlinksb p.postlink a[href^=post.php]")
 
         val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
         val currentPage = pageLinks.select("strong").text()

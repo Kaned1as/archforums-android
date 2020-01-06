@@ -2,6 +2,7 @@ package com.kanedias.holywarsoo
 
 import android.app.Application
 import android.content.Context
+import com.kanedias.holywarsoo.service.Config
 import org.acra.ACRA
 import org.acra.annotation.AcraCore
 import org.acra.annotation.AcraDialog
@@ -34,5 +35,6 @@ class MainApplication : Application() {
         super.onCreate()
 
         Network.init(this)
+        Config.init(this)
     }
 }

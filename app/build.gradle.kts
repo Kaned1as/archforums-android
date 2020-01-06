@@ -32,8 +32,8 @@ android {
         applicationId = "com.kanedias.holywarsoo"
         minSdkVersion(21)
         targetSdkVersion(29)
-        versionCode = 5
-        versionName = "1.1.3"
+        versionCode = 6
+        versionName = "1.1.4"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -145,6 +145,7 @@ dependencies {
     implementation("com.github.franmontiel:PersistentCookieJar:v1.0.1")          // cookie support
     implementation("com.github.stfalcon:stfalcon-imageviewer:0.1.0")             // embedded image viewer
     implementation("com.r0adkll:slidableactivity:2.1.0")                         // fragment swipe right to go back action
+    implementation("com.github.marcoscgdev:EasyAbout:1.0.6")                     // about dialog
 
     implementation("ch.acra:acra-mail:${rootProject.extra["acraVersion"]}")                             // crash handler
     implementation("ch.acra:acra-dialog:${rootProject.extra["acraVersion"]}")
@@ -158,6 +159,8 @@ dependencies {
     implementation("org.jsoup:jsoup:1.12.1")                                          // HTML parser
 
     kapt("com.jakewharton:butterknife-compiler:10.2.0")
+
+    "googleplayImplementation"("com.android.billingclient:billing:2.1.0")            // billing library from Google
 
     testImplementation("junit:junit:4.12")
     androidTestImplementation("androidx.test.ext:junit:1.1.1")

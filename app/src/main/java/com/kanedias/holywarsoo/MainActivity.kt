@@ -2,11 +2,13 @@ package com.kanedias.holywarsoo
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.forEach
 import androidx.drawerlayout.widget.DrawerLayout
@@ -14,11 +16,14 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.*
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.kanedias.holywarsoo.dto.SearchTopicResults
+import com.kanedias.holywarsoo.markdown.mdRendererFrom
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
 import com.kanedias.holywarsoo.model.MainPageModel
+import com.kanedias.holywarsoo.service.Config
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,6 +53,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mainPageModel: MainPageModel
 
+    private lateinit var donateHelper: DonateHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -55,6 +62,9 @@ class MainActivity : AppCompatActivity() {
 
         // setup action bar
         setSupportActionBar(toolbar)
+
+        // setup donate helper
+        donateHelper = DonateHelper(this)
 
         // setup sidebar
         sidebar.menu.forEach { it.isEnabled = false }
@@ -114,6 +124,81 @@ class MainActivity : AppCompatActivity() {
         })
 
         refreshContent()
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        checkWhatsNew()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_action_bar_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        // setupTopSearch(menu)
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item?.itemId) {
+            R.id.menu_donate -> donateHelper.donate()
+            //R.id.menu_settings -> startActivity(Intent(this, SettingsActivity::class.java))
+            R.id.menu_about -> showFullscreenFragment(AboutFragment())
+            else -> return super.onOptionsItemSelected(item)
+        }
+
+        // it was handled in `when` block or we wouldn't be at this point
+        // confirm it
+        return true
+    }
+
+    private fun setupTopSearch(menu: Menu) {
+        val searchItem = menu.findItem(R.id.menu_search)
+        val searchView = searchItem.actionView as SearchView
+    }
+
+    private fun checkWhatsNew() {
+        data class Release(val versionName: String, val textId: Int)
+
+        val releases = mapOf(
+            5 to Release("1.1.3", R.string.release_5),
+            6 to Release("1.1.4", R.string.release_6)
+        )
+
+        val currVersion = BuildConfig.VERSION_CODE
+        if (Config.lastVersion < currVersion) {
+            val whatsNew = StringBuilder(150)
+            for(missedRelease in currVersion downTo Config.lastVersion + 1) {
+                if (!releases.containsKey(missedRelease)) {
+                    // no info on that release, probably internal bugfix or refactoring
+                    // (or current version is very old)
+                    continue
+                }
+
+                val release = releases.getValue(missedRelease)
+                whatsNew.append("${release.versionName}\n")
+                whatsNew.append("----------------------\n")
+
+                val parts = getString(release.textId).split("\n").map(String::trim)
+                parts.forEach {
+                    whatsNew.append("- $it\n")
+                }
+
+                whatsNew.append("\n\n")
+            }
+
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.whats_new)
+                .setMessage(mdRendererFrom(this).toMarkdown(whatsNew.toString()))
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+
+            Config.lastVersion = currVersion
+            return
+        }
     }
 
     private fun onSidebarItemSelected(item: MenuItem): Boolean {

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="release_5">Добавлен диалог "Что нового?"</string>
+    <string name="release_6">
+        Отключено смахивание вправо на главной странице\n
+        Добавлен клик на номер страницы для перехода на любую страницу темы
+    </string>
+</resources>

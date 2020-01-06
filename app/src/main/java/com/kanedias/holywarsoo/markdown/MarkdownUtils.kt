@@ -152,7 +152,7 @@ infix fun TextView.handleMarkdown(html: String) {
  */
 class ScaleToDensity(ctx: Context): BitmapTransformation() {
     companion object {
-        const val ID = "com.bumptech.glide.transformations.FillSpace"
+        const val ID = "com.kanedias.holywarsoo.markdown.ScaleToDensity"
         val ID_BYTES = ID.toByteArray(Charset.forName("UTF-8"))
     }
 
@@ -179,7 +179,7 @@ class ScaleToDensity(ctx: Context): BitmapTransformation() {
 
 
 /**
- * Post-process spans like MORE or image loading
+ * Post-process spans like spoilers or image loading
  * @param spanned editable spannable to change
  * @param view resulting text view to accept the modified spanned string
  */

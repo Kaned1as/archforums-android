@@ -1,2 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="release_5">Disable back-navigation of main page</string>
+    <string name="release_6">
+        Added "What's new" dialogue\n
+        Added click on page number to pick another page
+    </string>
+</resources>
