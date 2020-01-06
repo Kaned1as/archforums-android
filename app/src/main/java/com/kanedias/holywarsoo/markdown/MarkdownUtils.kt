@@ -8,10 +8,9 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
-import android.text.SpannableStringBuilder
-import android.text.Spanned
-import android.text.TextPaint
+import android.text.*
 import android.text.style.CharacterStyle
 import android.text.style.ClickableSpan
 import android.util.AttributeSet
@@ -288,6 +287,12 @@ fun postProcessMore(spanned: SpannableStringBuilder, view: TextView) {
                     override fun onClick(widget: View) {
                         span.state = DetailsSpanState.OPENED
 
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                            // on devices with api < 28 span watcher update causes IndexOutOfBoundsException
+                            // see https://issuetracker.google.com/issues/67924069
+                            spanned.getSpans(0, spanned.length, SpanWatcher::class.java).forEach { spanned.removeSpan(it) }
+                        }
+
                         val start = spanned.getSpanStart(this)
                         val end = spanned.getSpanEnd(this)
 
@@ -541,7 +546,6 @@ data class DetailsSummarySpan(val text: CharSequence)
 
 enum class DetailsSpanState { DORMANT, CLOSED, OPENED }
 
-// false == closed, true == opened
 data class DetailsParsingSpan(
     val summary: DetailsSummarySpan,
     var state: DetailsSpanState = DetailsSpanState.CLOSED

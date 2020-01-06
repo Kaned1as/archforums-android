@@ -12,3 +12,9 @@
 /captures
 .externalNativeBuild
 .cxx
+
+# user-defined
+# environment properties
+.env
+.in
+.out

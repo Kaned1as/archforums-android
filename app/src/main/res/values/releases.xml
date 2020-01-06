@@ -5,4 +5,5 @@
         Added "What's new" dialogue\n
         Added click on page number to pick another page
     </string>
+    <string name="release_7">Crash fix for opening spoiler tags for devices with Android &lt; 9.0.0</string>
 </resources>

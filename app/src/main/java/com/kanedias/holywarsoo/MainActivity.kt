@@ -165,7 +165,8 @@ class MainActivity : AppCompatActivity() {
 
         val releases = mapOf(
             5 to Release("1.1.3", R.string.release_5),
-            6 to Release("1.1.4", R.string.release_6)
+            6 to Release("1.1.4", R.string.release_6),
+            7 to Release("1.1.5", R.string.release_7)
         )
 
         val currVersion = BuildConfig.VERSION_CODE
@@ -188,6 +189,11 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 whatsNew.append("\n\n")
+            }
+
+            if (whatsNew.isEmpty()) {
+                // no info of new releases, skip showing dialog
+                return
             }
 
             MaterialAlertDialogBuilder(this)
