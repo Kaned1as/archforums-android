@@ -458,6 +458,7 @@ object Network {
                 tagName("summary") // replace spoiler text `div` with `summary` tag
                 clearAttributes()          // clear all attributes it might have
                 html(this.ownText())       // we don't need a span with down/up arrow, just spoiler text
+                // select("span").remove() // remove ▼ symbol
             }
         }
 

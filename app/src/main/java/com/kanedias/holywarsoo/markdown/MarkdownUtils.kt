@@ -251,12 +251,19 @@ fun postProcessMore(spanned: SpannableStringBuilder, view: TextView) {
         val startIdx = spanned.getSpanStart(span)
         val endIdx = spanned.getSpanEnd(span)
 
-        val summaryStartIdx = spanned.getSpanStart(span.summary)
-        val summaryEndIdx = spanned.getSpanEnd(span.summary)
+        var summaryStartIdx = spanned.getSpanStart(span.summary)
+        var summaryEndIdx = spanned.getSpanEnd(span.summary)
 
         // details tags can be nested, skip them if they were hidden
         if (startIdx == -1 || endIdx == -1) {
             continue
+        }
+
+        // empty summary text or image as a summary text
+        if (summaryEndIdx == -1 && summaryStartIdx == -1 && span.summary.text.isEmpty()) {
+            summaryStartIdx = startIdx
+            summaryEndIdx = startIdx
+            span.summary.text = view.context.getString(R.string.more_tag_default)
         }
 
         // replace text inside spoiler tag with just spoiler summary that is clickable
@@ -530,8 +537,8 @@ class DetailsTagHandler: TagHandler() {
         }
 
         if (summaryEnd > -1 && summaryStart > -1) {
-            val summary = visitor.builder().subSequence(summaryStart, summaryEnd)
-            val summarySpan = DetailsSummarySpan(summary)
+            val summaryText = visitor.builder().subSequence(summaryStart, summaryEnd)
+            val summarySpan = DetailsSummarySpan(summaryText)
             visitor.builder().setSpan(summarySpan, summaryStart, summaryEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             visitor.builder().setSpan(DetailsParsingSpan(summarySpan), tag.start(), tag.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
@@ -542,7 +549,7 @@ class DetailsTagHandler: TagHandler() {
     }
 }
 
-data class DetailsSummarySpan(val text: CharSequence)
+data class DetailsSummarySpan(var text: CharSequence)
 
 enum class DetailsSpanState { DORMANT, CLOSED, OPENED }
 

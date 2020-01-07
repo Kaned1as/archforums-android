@@ -32,8 +32,8 @@ android {
         applicationId = "com.kanedias.holywarsoo"
         minSdkVersion(21)
         targetSdkVersion(29)
-        versionCode = 7
-        versionName = "1.1.5"
+        versionCode = 8
+        versionName = "1.1.6"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
