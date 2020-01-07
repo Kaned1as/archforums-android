@@ -288,7 +288,7 @@ fun postProcessMore(spanned: SpannableStringBuilder, view: TextView) {
                         span.state = DetailsSpanState.OPENED
 
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                            // on devices with api < 28 span watcher update causes IndexOutOfBoundsException
+                            // on devices with api < 28 span watcher update sometimes causes IndexOutOfBoundsException
                             // see https://issuetracker.google.com/issues/67924069
                             spanned.getSpans(0, spanned.length, SpanWatcher::class.java).forEach { spanned.removeSpan(it) }
                         }

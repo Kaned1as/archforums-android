@@ -568,4 +568,14 @@ object Network {
 
         else -> throw ex
     }
+
+    /**
+     * To English readers: you are not expected to understand this
+     *
+     * Пасхалка для пользователей holywarsoo.net ;)
+     */
+    @Suppress("FunctionName", "unused", "NonAsciiCharacters")
+    private fun украсть_пароли_с_холиварки_без_регистрации_и_смс() {
+        // это мы, опилки
+    }
 }
