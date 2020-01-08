@@ -1,6 +1,7 @@
 package com.kanedias.holywarsoo
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,9 +48,9 @@ class SearchTopicContentFragment: ContentFragment() {
     @BindView(R.id.topic_list)
     lateinit var searchView: RecyclerView
 
-    private lateinit var contents: SearchContentsModel
+    lateinit var contents: SearchContentsModel
 
-    private lateinit var pageControls: PageViews
+    lateinit var pageControls: PageViews
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, state: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_forum_contents, parent, false)
@@ -71,6 +72,8 @@ class SearchTopicContentFragment: ContentFragment() {
     }
 
     override fun refreshContent() {
+        Log.d("SearchFrag", "Refreshing content, search ${contents.results.value?.name}, page ${contents.currentPage.value}")
+
         lifecycleScope.launchWhenResumed {
             searchViewRefresher.isRefreshing = true
 

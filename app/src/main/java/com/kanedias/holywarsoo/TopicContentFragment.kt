@@ -1,5 +1,6 @@
 package com.kanedias.holywarsoo
 
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,10 +12,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.google.android.material.card.MaterialCardView
 import com.kanedias.holywarsoo.dto.ForumTopic
+import com.kanedias.holywarsoo.dto.ForumMessage
+import com.kanedias.holywarsoo.misc.resolveAttr
 import com.kanedias.holywarsoo.model.TopicContentsModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import java.lang.Exception
@@ -44,9 +49,9 @@ class TopicContentFragment: ContentFragment() {
     @BindView(R.id.message_list)
     lateinit var topicView: RecyclerView
 
-    private lateinit var contents: TopicContentsModel
+    lateinit var contents: TopicContentsModel
 
-    private lateinit var pageControls: PageViews
+    lateinit var pageControls: PageViews
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, state: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_topic_contents, parent, false)
@@ -110,12 +115,60 @@ class TopicContentFragment: ContentFragment() {
                 contents.pageCount.value = loaded.pageCount
                 contents.currentPage.value = loaded.currentPage
 
+                customUrl?.queryParameter("pid")?.let { highlightMessage(it.toInt()) }
                 requireArguments().remove(URL_ARG) // only load custom url once
             } catch (ex: Exception) {
                 context?.let { Network.reportErrors(it, ex) }
             }
 
             topicViewRefresher.isRefreshing = false
+        }
+    }
+
+    /**
+     * Highlight the message that has the specified id
+     *
+     * @param messageId unique message identifier, see [ForumMessage.id]
+     */
+    fun highlightMessage(messageId: Int) {
+        val message = contents.topic.value?.messages?.find { it.id == messageId } ?: return
+        val position = contents.topic.value?.messages?.indexOf(message) ?: return
+
+        // the problem with highlighting is that in our recycler views all messages are of different height
+        // when recycler view is asked to scroll to some position, it doesn't know their height in advance
+        // so we have to scroll continually till all the messages have been laid out and parsed
+        lifecycleScope.launchWhenResumed {
+            topicView.smoothScrollToPosition(position)
+
+            var limit = 20 // 2 sec
+            while(topicView.findViewHolderForItemId(messageId.toLong()) == null) {
+                // recycler view hasn't been laid out yet
+                delay(100)
+
+                limit -= 1
+
+                if (!topicView.layoutManager!!.isSmoothScrolling) {
+                    // continue scrolling if stopped and view holder is still not visible
+                    topicView.smoothScrollToPosition(position)
+                }
+
+                if (limit == 0) {
+                    // strange, we waited for message for too long to be viewable
+                    Log.e("[TopicContent]", "Couldn't find holder for mid $messageId, this shouldn't happen!")
+                    return@launchWhenResumed
+                }
+            }
+
+            // highlight message with tinted background
+            val holder = topicView.findViewHolderForItemId(messageId.toLong())
+            val card = holder.itemView as MaterialCardView
+            ValueAnimator.ofArgb(card.resolveAttr(R.attr.colorPrimary), card.resolveAttr(R.attr.colorSecondary)).apply {
+                addUpdateListener {
+                    card.setCardBackgroundColor(it.animatedValue as Int)
+                }
+                duration = 1000
+                start()
+            }
         }
     }
 

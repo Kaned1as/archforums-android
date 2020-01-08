@@ -126,5 +126,4 @@ class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 
         override fun onDestroyActionMode(mode: ActionMode) = Unit
     }
-
 }

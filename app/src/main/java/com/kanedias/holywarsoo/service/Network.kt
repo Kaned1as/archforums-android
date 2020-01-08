@@ -2,6 +2,7 @@ package com.kanedias.holywarsoo.service
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
@@ -46,15 +47,14 @@ object Network {
     private const val PREF_PASSWORD = "password"
 
     private const val USER_AGENT = "Holywarsoo Android ${BuildConfig.VERSION_NAME}"
-    private val MAIN_HOLYWARSOO_URL = HttpUrl.parse("https://holywarsoo.net")!!
     private val MAIN_IMGUR_URL = HttpUrl.parse("https://api.imgur.com")!!
-
     const val IMGUR_CLIENT_AUTH = "Client-ID 860dc14aa7caf25"
 
-    val FAVORITE_TOPICS_URL = resolve("search.php?action=show_favorites")!!.toString()
-    val REPLIES_TOPICS_URL = resolve("search.php?action=show_replies")!!.toString()
-    val NEW_MESSAGES_TOPICS_URL = resolve("search.php?action=show_new")!!.toString()
-    val RECENT_TOPICS_URL = resolve("search.php?action=show_recent")!!.toString()
+    private var MAIN_WEBSITE_URL = HttpUrl.parse("https://holywarsoo.net")!!
+    var FAVORITE_TOPICS_URL = resolve("search.php?action=show_favorites")!!.toString()
+    var REPLIES_TOPICS_URL = resolve("search.php?action=show_replies")!!.toString()
+    var NEW_MESSAGES_TOPICS_URL = resolve("search.php?action=show_new")!!.toString()
+    var RECENT_TOPICS_URL = resolve("search.php?action=show_recent")!!.toString()
 
     private val userAgent = Interceptor { chain ->
         chain.proceed(chain
@@ -71,6 +71,14 @@ object Network {
     private lateinit var cookiePersistor: SharedPrefsCookiePersistor
 
     fun init(ctx: Context) {
+        val meta = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA).metaData
+
+        MAIN_WEBSITE_URL = HttpUrl.parse(meta.getString("mainWebsiteUrl", null))!!
+        FAVORITE_TOPICS_URL = resolve("search.php?action=show_favorites")!!.toString()
+        REPLIES_TOPICS_URL = resolve("search.php?action=show_replies")!!.toString()
+        NEW_MESSAGES_TOPICS_URL = resolve("search.php?action=show_new")!!.toString()
+        RECENT_TOPICS_URL = resolve("search.php?action=show_recent")!!.toString()
+
         accountInfo = ctx.getSharedPreferences(ACCOUNT_SHARED_PREFS, Context.MODE_PRIVATE)
         cookiesInfo = ctx.getSharedPreferences(COOKIES_SHARED_PREFS, Context.MODE_PRIVATE)
         cookiePersistor = SharedPrefsCookiePersistor(cookiesInfo)
@@ -88,7 +96,7 @@ object Network {
 
     private fun authCookie() = cookiePersistor.loadAll().firstOrNull { it.name().startsWith("pun_cookie") }
 
-    fun resolve(url: String) = MAIN_HOLYWARSOO_URL.resolve(url)
+    fun resolve(url: String) = MAIN_WEBSITE_URL.resolve(url)
 
     fun daysToAuthExpiration() = authCookie()
         ?.let { (it.expiresAt() - System.currentTimeMillis()) / 1000 / 60 / 60 / 24 }
@@ -128,7 +136,7 @@ object Network {
 
         // login page contains CSRF tokens and other form parameters that should be
         // present in the request for it to be valid. We need to extract this data prior to logging in
-        val loginPageUrl = MAIN_HOLYWARSOO_URL.resolve("login.php")!!
+        val loginPageUrl = MAIN_WEBSITE_URL.resolve("login.php")!!
         val loginPageReq = Request.Builder().url(loginPageUrl).get().build()
         val loginPageResp = httpClient.newCall(loginPageReq).execute()
         if (!loginPageResp.isSuccessful)
@@ -177,7 +185,7 @@ object Network {
      */
     @Throws(IOException::class)
     fun loadForumList(): List<Forum> {
-        val req = Request.Builder().url(MAIN_HOLYWARSOO_URL).get().build()
+        val req = Request.Builder().url(MAIN_WEBSITE_URL).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
             throw IOException("Can't load main page: ${resp.message()}")
@@ -216,7 +224,7 @@ object Network {
         val html = resp.body()!!.string()
         val doc = Jsoup.parse(html)
 
-        val topics = parseTopics(doc)
+        val topics = parseTopics(doc, true)
 
         val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
         val currentPage = pageLinks.select("strong").text()
@@ -241,8 +249,8 @@ object Network {
      * @return fully enriched forum instance. Topics have the same ordering as they had on the actual page.
      */
     @Throws(IOException::class)
-    fun loadForumContents(forumBase: Forum, page: Int = 1): Forum {
-        val pageUrl = HttpUrl.parse(forumBase.link)!!.newBuilder().addQueryParameter("p", page.toString()).build()
+    fun loadForumContents(forumBase: Forum, link: HttpUrl? = null, page: Int = 1): Forum {
+        val pageUrl = link ?: HttpUrl.parse(forumBase.link)!!.newBuilder().addQueryParameter("p", page.toString()).build()
 
         val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
@@ -253,7 +261,12 @@ object Network {
         val doc = Jsoup.parse(html)
 
         val subforums = parseForums(doc.select("div.subforumlist").first())
-        val topics = parseTopics(doc)
+        val topics = parseTopics(doc, false)
+
+        val forumRef = doc.select("head link[rel=canonical]").attr("href")
+        val forumId = resolve(forumRef)!!.queryParameter("id")!!
+        val forumName = doc.select("head title").text()
+        val forumWritable = doc.select("div#brdmain div.linksb p.postlink a[href^=post.php]")
 
         val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
         val currentPage = pageLinks.select("strong").text()
@@ -262,6 +275,10 @@ object Network {
             .max()
 
         return forumBase.copy(
+            id = forumId.sanitizeInt(),
+            name = forumName,
+            link = resolve(forumRef)!!.toString(),
+            writable = forumWritable.isNotEmpty(),
             pageCount = pageCount!!,
             currentPage = currentPage.sanitizeInt(),
             subforums = subforums,
@@ -424,7 +441,7 @@ object Network {
             val msgBody = message.select("div.postright > div.postmsg").first()
             val msgDate = msgDateLink.text()
 
-            val msgUrl = MAIN_HOLYWARSOO_URL.resolve(msgDateLink.attr("href"))!!
+            val msgUrl = MAIN_WEBSITE_URL.resolve(msgDateLink.attr("href"))!!
 
             messages.add(ForumMessage(
                 id = msgUrl.queryParameter("pid")!!.toInt(),
@@ -473,9 +490,11 @@ object Network {
      * @param doc fully parsed document containing page with topic list (forum/favorites/active etc.)
      * @return list of parsed forum topics. It has the same ordering as it had on the actual page.
      */
-    private fun parseTopics(doc: Document): List<ForumTopic> {
-        val viewsClass = doc.select("div#vf div.inbox table thead tr th:containsOwn(Просмотров)").firstOrNull()
-        val repliesClass = doc.select("div#vf div.inbox table thead tr th:containsOwn(Ответов)").firstOrNull()
+    private fun parseTopics(doc: Document, hasForumColumn: Boolean = false): List<ForumTopic> {
+        val (repliesClass, viewsClass) = when (hasForumColumn) {
+            true -> Pair("tc3", null)
+            false -> Pair("tc2", "tc3")
+        }
 
         val topics = mutableListOf<ForumTopic>()
         for (topic in doc.select("div#vf div.inbox table tr[class^=row]")) {
@@ -486,8 +505,8 @@ object Network {
             val isSticky = topic.classNames().contains("isticky")
             val topicPageCount = topic.select("td.tcl span.pagestext a:last-child").text()
 
-            val topicReplies = repliesClass?.let { topic.select("td.${it.className()}").text() } ?: "-1"
-            val topicViews = viewsClass?.let { topic.select("td.${it.className()}").text() } ?: "-1"
+            val topicReplies = repliesClass.let { topic.select("td.${it}").text() } ?: "-1"
+            val topicViews = viewsClass?.let { topic.select("td.${it}").text() } ?: "-1"
 
             val lastMessageLink = topic.select("td.tcr > a")
 
@@ -558,16 +577,22 @@ object Network {
      * @param ctx context to get error string from
      * @param errMapping mapping of ids like `HttpUrlConnection.HTTP_NOT_FOUND -> R.string.not_found`
      */
-    fun reportErrors(ctx: Context, ex: Exception) = when (ex) {
-
-        // generic connection-level error, show as-is
-        is IOException -> {
-            Log.w("Fair/Network", "Connection error", ex)
-            val errorText = ctx.getString(R.string.error_connecting)
-            Toast.makeText(ctx, "$errorText: ${ex.message}", Toast.LENGTH_SHORT).show()
+    fun reportErrors(ctx: Context?, ex: Exception) {
+        if (ctx == null) {
+            // trying to report on closed fragment?
+            return
         }
 
-        else -> throw ex
+        when (ex) {
+            // generic connection-level error, show as-is
+            is IOException -> {
+                Log.w("Fair/Network", "Connection error", ex)
+                val errorText = ctx.getString(R.string.error_connecting)
+                Toast.makeText(ctx, "$errorText: ${ex.message}", Toast.LENGTH_SHORT).show()
+            }
+
+            else -> throw ex
+        }
     }
 
     /**

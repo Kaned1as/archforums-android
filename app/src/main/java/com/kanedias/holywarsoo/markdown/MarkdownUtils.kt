@@ -91,14 +91,7 @@ fun mdRendererFrom(txt: TextView): Markwon {
         })
         .usePlugin(HtmlPlugin.create()
             .addHandler(DetailsTagHandler()))
-        .usePlugin(GlideImagesPlugin.create(
-            Glide.with(txt.context)
-                .applyDefaultRequestOptions(RequestOptions()
-                    .centerInside()
-                    .override(txt.context.resources.displayMetrics.widthPixels, SIZE_ORIGINAL)
-                    .transform(ScaleToDensity(txt.context))
-                    .placeholder(R.drawable.image)
-                    .error(R.drawable.image_broken))))
+        .usePlugin(GlideImagesPlugin.create(GlideGifSupportStore(txt)))
         .usePlugin(StrikethroughPlugin.create())
         .build()
 }
@@ -145,37 +138,6 @@ infix fun TextView.handleMarkdown(html: String) {
         AsyncDrawableScheduler.schedule(label)
     }
 }
-
-/**
- * scales small images to match density of the screen. Mainly needed for smiley pictures.
- */
-class ScaleToDensity(ctx: Context): BitmapTransformation() {
-    companion object {
-        const val ID = "com.kanedias.holywarsoo.markdown.ScaleToDensity"
-        val ID_BYTES = ID.toByteArray(Charset.forName("UTF-8"))
-    }
-
-    private val density = ctx.resources.displayMetrics.density
-
-    override fun transform(pool: BitmapPool, toTransform: Bitmap, outWidth: Int, outHeight: Int): Bitmap {
-        if (outHeight > 100) {
-            return toTransform
-        }
-
-        val scaledWidth = (toTransform.width * density).toInt()
-        val scaledHeight = (toTransform.height * density).toInt()
-        return Bitmap.createScaledBitmap(toTransform, scaledWidth, scaledHeight, true)
-    }
-
-    override fun equals(other: Any?) = other is ScaleToDensity
-
-    override fun hashCode() = ID.hashCode()
-
-    override fun updateDiskCacheKey(messageDigest: MessageDigest) {
-      messageDigest.update(ID_BYTES)
-    }
-}
-
 
 /**
  * Post-process spans like spoilers or image loading

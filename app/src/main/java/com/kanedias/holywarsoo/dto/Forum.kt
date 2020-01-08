@@ -23,6 +23,11 @@ data class Forum(
     val lastMessageLink: String,
     val lastMessageDate: String,
 
+    /**
+     * True if you can write topics to this forum
+     */
+    val writable: Boolean = true,
+
     // counters
     val topicCount: Int = -1,
     val commentsCount: Int = -1,

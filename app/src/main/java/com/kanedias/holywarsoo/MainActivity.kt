@@ -1,5 +1,7 @@
 package com.kanedias.holywarsoo
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -19,6 +21,8 @@ import butterknife.ButterKnife
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import com.kanedias.holywarsoo.dto.Forum
+import com.kanedias.holywarsoo.dto.ForumTopic
 import com.kanedias.holywarsoo.dto.SearchTopicResults
 import com.kanedias.holywarsoo.markdown.mdRendererFrom
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
@@ -166,9 +170,16 @@ class MainActivity : AppCompatActivity() {
         val releases = mapOf(
             5 to Release("1.1.3", R.string.release_5),
             6 to Release("1.1.4", R.string.release_6),
-            7 to Release("1.1.5", R.string.release_7)
+            7 to Release("1.1.5", R.string.release_7),
+            8 to Release("1.2.0", R.string.release_8)
         )
 
+        if (Config.lastVersion == 0) {
+            // first time opening the app, don't show what's new at all
+            Config.lastVersion = BuildConfig.VERSION_CODE
+        }
+
+        // check how many releases we missed
         val currVersion = BuildConfig.VERSION_CODE
         if (Config.lastVersion < currVersion) {
             val whatsNew = StringBuilder(150)
@@ -236,6 +247,134 @@ class MainActivity : AppCompatActivity() {
         showFullscreenFragment(frag)
 
         return true
+    }
+
+    override fun onNewIntent(received: Intent) {
+        super.onNewIntent(received)
+        handleIntent(received)
+    }
+
+    /**
+     * Handle the passed intent. This is invoked whenever we need to actually react to the intent that was
+     * passed to this activity, this can be just activity start from the app manager, click on a link or
+     * on a notification belonging to this app
+     * @param cause the passed intent. It will not be modified within this function.
+     */
+    private fun handleIntent(cause: Intent?) {
+        if (cause == null)
+            return
+
+        when (cause.action) {
+            Intent.ACTION_VIEW -> {
+                // try to detect if it's someone trying to open the website link with us
+                val meta = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA).metaData
+                val websiteUrl = meta.getString("mainWebsiteUrl", null)!!
+
+                if (cause.data?.toString()?.contains(websiteUrl) == true) {
+                    consumeCallingUrl(cause)
+                }
+            }
+        }
+    }
+
+    /**
+     * Take URI from the activity's intent, try to shape it into something usable
+     * and handle the action user requested in it if possible. E.g. clicking on link
+     * https://<forum-url>/viewtopic.php?... should open that topic or forum inside the app so try
+     * to guess what user wanted with it as much as possible.
+     *
+     * This is also a routing that is responsible for highlighting the messages inside the topics
+     * if the url to topic meant to highlight it.
+     */
+    private fun consumeCallingUrl(cause: Intent) {
+        try {
+            val url = cause.data ?: return
+            val address = url.pathSegments // it's in the form of /viewxxx.php?query=parameters
+
+            when(address[0]) {
+                "viewforum.php" -> {
+                    // e.g https://<website>/viewforum.php?id=2&p=3
+                    val forumId = url.getQueryParameter("id")?.toIntOrNull() ?: return // forum query must contain id
+
+                    // try to find fragment with this forum, if it's last one, launch it
+                    val contentStack = supportFragmentManager.fragments.filterIsInstance<ContentFragment>()
+                    val last = contentStack.lastOrNull()
+                    if (last is ForumContentFragment && last.contents.forum.value?.id == forumId) {
+                        // this is our fragment, open link in it
+                        last.requireArguments().putSerializable(ForumContentFragment.URL_ARG, url.toString())
+                        last.refreshContent()
+                        return
+                    }
+
+                    // no fragment with this forum on top, open it
+                    val fragment = ForumContentFragment().apply {
+                        arguments = Bundle().apply {
+                            putSerializable(ForumContentFragment.FORUM_ARG, Forum(
+                                id = forumId,
+                                name = "to-be-resolved",
+                                subtext = "to-be-resolved",
+                                link = url.toString(),
+                                lastMessageName = "to-be-resolved",
+                                lastMessageDate = "to-be-resolved",
+                                lastMessageLink = url.toString()
+                            ))
+                            putString(ForumContentFragment.URL_ARG, url.toString())
+                        }
+                    }
+                    showFullscreenFragment(fragment)
+                }
+                "viewtopic.php" -> {
+                    // e.g https://<website>/viewtopic.php?pid=XXXXXXXX#pXXXXXXXX
+                    // or https://<website>/viewtopic.php?id=XXXXX&p=XX
+
+                    val topicId = url.getQueryParameter("id")?.toIntOrNull()
+                    if (topicId != null) {
+                        // it's a viewtopic.php?id=3396&p=15 style link
+
+                        // try to find fragment with this topic, if it's last one, launch it
+                        val contentStack = supportFragmentManager.fragments.filterIsInstance<ContentFragment>()
+                        val last = contentStack.lastOrNull()
+                        if (last is TopicContentFragment && last.contents.topic.value?.id == topicId) {
+                            // this is our fragment, open link in it
+                            last.requireArguments().putSerializable(TopicContentFragment.URL_ARG, url.toString())
+                            last.refreshContent()
+                            return
+                        }
+                    }
+
+                    val messageId = url.getQueryParameter("pid")?.toIntOrNull()
+                    if (messageId != null) {
+                        // try to find fragment with this forum, if it's last one, launch it
+                        val contentStack = supportFragmentManager.fragments.filterIsInstance<ContentFragment>()
+                        val last = contentStack.lastOrNull()
+                        if (last is TopicContentFragment && last.contents.topic.value?.messages?.any { it.id == messageId } == true) {
+                            // highlight the message
+                            last.highlightMessage(messageId)
+                            return
+                        }
+                    }
+
+                    // no fragment with this topic on top, open it
+                    val fragment = TopicContentFragment().apply {
+                        arguments = Bundle().apply {
+                            putSerializable(TopicContentFragment.TOPIC_ARG, ForumTopic(
+                                id = -1, // to-be-resolved
+                                name = "to-be-resolved",
+                                link = url.toString(),
+                                lastMessageDate = "to-be-resolved",
+                                lastMessageUrl = url.toString()
+                            ))
+                            putString(TopicContentFragment.URL_ARG, url.toString())
+                        }
+                    }
+                    showFullscreenFragment(fragment)
+                    return
+                }
+                else -> return
+            }
+        } catch (ex: Exception) {
+            Network.reportErrors(this, ex)
+        }
     }
 
     private fun refreshContent() {

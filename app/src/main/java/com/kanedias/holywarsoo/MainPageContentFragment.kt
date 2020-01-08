@@ -34,7 +34,7 @@ class MainPageContentFragment: ContentFragment() {
     @BindView(R.id.main_forum_list)
     lateinit var forumList: RecyclerView
 
-    private lateinit var contents: MainPageModel
+    lateinit var contents: MainPageModel
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, state: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_main_contents, parent, false)

@@ -1,6 +1,7 @@
 package com.kanedias.holywarsoo
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import com.kanedias.holywarsoo.model.ForumContentsModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.HttpUrl
 import java.lang.Exception
 
 /**
@@ -32,6 +34,7 @@ class ForumContentFragment: ContentFragment() {
 
     companion object {
         const val FORUM_ARG = "FORUM_ARG"
+        const val URL_ARG = "URL_ARG"
     }
 
     @BindView(R.id.topic_list_scroll_area)
@@ -43,8 +46,9 @@ class ForumContentFragment: ContentFragment() {
     @BindView(R.id.topic_list)
     lateinit var forumView: RecyclerView
 
-    private lateinit var contents: ForumContentsModel
-    private lateinit var pageControls: PageViews
+    lateinit var contents: ForumContentsModel
+
+    lateinit var pageControls: PageViews
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, state: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_forum_contents, parent, false)
@@ -83,18 +87,23 @@ class ForumContentFragment: ContentFragment() {
     }
 
     override fun refreshContent() {
+        Log.d("ForumFrag", "Refreshing content, forum ${contents.forum.value?.name}, page ${contents.currentPage.value}")
+
         lifecycleScope.launchWhenResumed {
             forumViewRefresher.isRefreshing = true
 
             try {
+                val customUrl = HttpUrl.parse(requireArguments().getString(URL_ARG, ""))
                 val loaded = withContext(Dispatchers.IO) {
-                    Network.loadForumContents(contents.forum.value!!, page = contents.currentPage.value!!)
+                    Network.loadForumContents(contents.forum.value!!, page = contents.currentPage.value!!, link = customUrl)
                 }
                 contents.forum.value = loaded
                 contents.pageCount.value = loaded.pageCount
                 contents.currentPage.value = loaded.currentPage
+
+                requireArguments().remove(URL_ARG) // only load custom url once
             } catch (ex: Exception) {
-                context?.let { Network.reportErrors(it, ex) }
+                Network.reportErrors(context, ex)
             }
 
             forumViewRefresher.isRefreshing = false
