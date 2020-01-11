@@ -5,6 +5,7 @@
     <color name="holywarsooForumHeader">#ecebe7</color>
     <color name="holywarsooForumContent">#fbfaf5</color>
     <color name="holywarsooForumText">#333333</color>
+    <color name="holywarsooForumHintText">#665858</color>
 
     <color name="colorPrimary">@color/holywarsooMainHeader</color>
     <color name="colorPrimaryDark">@color/holywarsooMainHeaderDark</color>
@@ -173,4 +174,6 @@
     <color name="md_yellow_800">#f9a825</color>
     <color name="md_yellow_900">#f57f17</color>
     <color name="md_yellow_A400">#ffea00</color>
+
+    <integer name="tag_badge">1</integer>
 </resources>

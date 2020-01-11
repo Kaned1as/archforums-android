@@ -17,6 +17,10 @@ var View.visibilityBool: Boolean
     get() = visibility == View.VISIBLE
     set(value) { visibility = if (value) { View.VISIBLE } else { View.INVISIBLE } }
 
+var View.layoutVisibilityBool: Boolean
+    get() = visibility == View.VISIBLE
+    set(value) { visibility = if (value) { View.VISIBLE } else { View.GONE } }
+
 /**
  * Show toast exactly under specified view
  *
@@ -66,8 +70,8 @@ fun String?.trySanitizeInt(): Int? {
 
     return this
         .replace(UNNEEDED_INT_CHARS, "")
-        .replace(Regex("^-$"), "-1")
-        .replace(Regex("-{2,}"), "-1")
+        .replace(Regex("^-$"), "")
+        .replace(Regex("-{2,}"), "")
         .toIntOrNull()
 }
 

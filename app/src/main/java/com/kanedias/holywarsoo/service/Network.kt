@@ -96,7 +96,12 @@ object Network {
 
     private fun authCookie() = cookiePersistor.loadAll().firstOrNull { it.name().startsWith("pun_cookie") }
 
-    fun resolve(url: String) = MAIN_WEBSITE_URL.resolve(url)
+    fun resolve(url: String?): HttpUrl? {
+        if (url.isNullOrEmpty())
+            return null
+
+        return MAIN_WEBSITE_URL.resolve(url)
+    }
 
     fun daysToAuthExpiration() = authCookie()
         ?.let { (it.expiresAt() - System.currentTimeMillis()) / 1000 / 60 / 60 / 24 }
@@ -341,6 +346,7 @@ object Network {
             id = topicId.sanitizeInt(),
             name = topicName,
             link = resolve(topicRef)!!.toString(),
+            refererLink = resp.request().url().toString(),
             isWritable = topicWritable.isNotEmpty(),
             isFavorite = topicFavorite.attr("href").contains("unfavorite"),
             favoriteLink = topicFavoriteLink,
@@ -527,21 +533,24 @@ object Network {
             val topicReplies = repliesClass?.let { topic.select("td.${it}").text() }
             val topicViews = viewsClass?.let { topic.select("td.${it}").text() }
 
-            val lastMessageLink = topic.select("td.tcr > a")
+            val lastMessageLink = topic.select("td.tcr > a").first()
+            val newMessageLink = topic.select("td.tcl span.newtext a")
 
             val topicUrl = resolve(topicLink.attr("href"))!!
-            val lastMessageUrl = resolve(lastMessageLink.attr("href"))!!
+            val lastMessageUrl = resolve(lastMessageLink?.attr("href"))
+            val newMessageUrl = resolve(newMessageLink.attr("href"))
 
             topics.add(
                 ForumTopicDesc(
                     sticky = isSticky,
                     name = topicLink.text(),
-                    link = topicUrl.toString(),
+                    url = topicUrl.toString(),
                     replyCount = topicReplies.trySanitizeInt(),
                     viewCount = topicViews.trySanitizeInt(),
                     pageCount = topicPageCount.toIntOrNull() ?: 1,
-                    lastMessageUrl = lastMessageUrl.toString(),
-                    lastMessageDate = lastMessageLink.text()
+                    lastMessageUrl = lastMessageUrl?.toString(),
+                    lastMessageDate = lastMessageLink?.text(),
+                    newMessageUrl = newMessageUrl?.toString()
                 )
             )
         }
@@ -573,8 +582,8 @@ object Network {
             val lastMessageLink = forum.select("td.tcr > a")
             val lastMessageDate = forum.select("td.tcr > span")
 
-            val forumUrl = resolve(forumLink.attr("href"))!!
-            val lastMessageUrl = resolve(lastMessageLink.attr("href"))!!
+            val forumUrl = resolve(forumLink.attr("href"))
+            val lastMessageUrl = resolve(lastMessageLink.attr("href"))
 
             forums.add(
                 ForumDesc(

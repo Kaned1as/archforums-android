@@ -68,7 +68,7 @@ class ForumViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
             (itemView.context as AppCompatActivity).showFullscreenFragment(fragment)
         }
 
-        if (forumDesc.lastMessageDate.isNotEmpty()) {
+        if (!forumDesc.lastMessageDate.isNullOrEmpty()) {
             lastMessageTopic.visibilityBool = true
             lastMessageTopic.setOnClickListener {
                 val fragment = TopicContentFragment().apply {

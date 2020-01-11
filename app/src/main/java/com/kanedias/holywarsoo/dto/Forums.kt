@@ -16,9 +16,9 @@ data class ForumDesc(
     val link: String,
     val subtext: String,
     val category: String? = null, // only set for forums on the main page, not for subforums
-    val lastMessageName: String,
-    val lastMessageLink: String,
-    val lastMessageDate: String,
+    val lastMessageName: String?,
+    val lastMessageLink: String?,
+    val lastMessageDate: String?,
 
     // statistics
     val topicCount: Int,

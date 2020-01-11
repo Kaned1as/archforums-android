@@ -82,6 +82,8 @@ class MainActivity : AppCompatActivity() {
                     R.drawable.guy_fawkes_mask,
                     R.drawable.incognito,
                     R.drawable.bomb,
+                    R.drawable.television,
+                    R.drawable.cinema,
                     R.drawable.nuke)
                 sidebarHeader.randomImage.setImageResource(resources.random())
             }

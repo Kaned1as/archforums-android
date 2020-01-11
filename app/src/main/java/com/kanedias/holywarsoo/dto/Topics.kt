@@ -13,9 +13,27 @@ import java.io.Serializable
 data class ForumTopicDesc(
     // info
     val name: String,
-    val link: String,
-    val lastMessageUrl: String,
-    val lastMessageDate: String,
+    val url: String,
+
+    /**
+     * Last message link.
+     * When topic has no replies last message link points to the first message.
+     * Can be omitted if topic is moved.
+     */
+    val lastMessageUrl: String?,
+
+    /**
+     * Last message date link.
+     * When topic has no replies last message date link points to the first message date.
+     * Can be omitted if topic is moved.
+     */
+    val lastMessageDate: String?,
+
+    /**
+     * New message link.
+     * Present when you are logged in and have unread messages in this topic.
+     */
+    val newMessageUrl: String?,
 
     /**
      * True if the topic is pinned to the top of the forum
@@ -43,6 +61,7 @@ data class ForumTopic(
     // info
     val name: String,
     val link: String,
+    val refererLink: String, // if we were redirected, use original url for tracking
 
     /**
      * True if this topic is in your profile favorites

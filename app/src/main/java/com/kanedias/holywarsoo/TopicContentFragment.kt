@@ -113,9 +113,12 @@ class TopicContentFragment: ContentFragment() {
                 contents.pageCount.value = loaded.pageCount
                 contents.currentPage.value = loaded.currentPage
 
-                // highlight custom message if custom query mentioned it
-                customUrl?.let { HttpUrl.parse(it) }?.queryParameter("pid")?.let { highlightMessage(it.toInt()) }
-                requireArguments().remove(URL_ARG) // only load custom url once
+                // highlight custom message if original query mentioned it
+                val messageId = HttpUrl.parse(loaded.refererLink)!!.queryParameter("pid")
+                messageId?.let { highlightMessage(it.toInt()) }
+
+                // only load custom url once
+                requireArguments().remove(URL_ARG)
             } catch (ex: Exception) {
                 context?.let { Network.reportErrors(it, ex) }
             }
@@ -187,7 +190,7 @@ class TopicContentFragment: ContentFragment() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
             val inflater = LayoutInflater.from(parent.context)
-            val view = inflater.inflate(R.layout.fragment_topic_message_item, parent, false)
+            val view = inflater.inflate(R.layout.fragment_topic_message_list_item, parent, false)
             return MessageViewHolder(view)
         }
 

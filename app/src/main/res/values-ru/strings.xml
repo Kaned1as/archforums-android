@@ -29,6 +29,7 @@
     <string name="page">Страница</string>
     <string name="content">Содержимое</string>
     <string name="reply">Ответить</string>
+    <string name="new_messages">Новые сообщения</string>
     <string name="more_tag_default">Скрытый текст</string>
     <string name="no_permissions">Доступ запрещен, не могу завершить действие</string>
     <string name="select_image_to_upload">Выберите изображение для загрузки</string>

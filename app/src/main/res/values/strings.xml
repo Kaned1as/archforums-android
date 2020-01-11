@@ -32,6 +32,7 @@
     <string name="page">Page</string>
     <string name="content">Content</string>
     <string name="reply">Reply</string>
+    <string name="new_messages">New messages</string>
     <string tools:context="image upload" name="no_permissions">Permission denied, can\'t perform action</string>
     <string tools:context="image upload" name="select_image_to_upload">Select image to upload</string>
     <string tools:context="image upload" name="no_file_manager_found">No file manager found</string>

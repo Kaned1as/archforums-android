@@ -12,7 +12,6 @@ import butterknife.ButterKnife
 import butterknife.OnClick
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kanedias.holywarsoo.dto.ForumTopic
-import com.kanedias.holywarsoo.dto.ForumTopicDesc
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

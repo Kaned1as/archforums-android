@@ -20,10 +20,10 @@
         android:padding="8dp">
 
         <ImageView
-            android:id="@+id/topic_sticky"
+            android:id="@+id/topic_sticky_marker"
             android:layout_height="28dp"
             android:layout_width="28dp"
-            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
             android:padding="8dp"
             android:src="@drawable/pin"
             android:tint="@color/colorPrimary"
@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="28dp"
-            android:layout_alignParentStart="true"
+            android:layout_toEndOf="@+id/topic_sticky_marker"
             android:textAppearance="@android:style/TextAppearance.Material.Medium"
             android:textColor="@color/colorAccent"
             android:minEms="10"
@@ -54,6 +54,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentRight="true"
                 android:textSize="@dimen/small_text_unnecessary_content"
+                android:textColor="?attr/colorNonImportantText"
                 android:paddingEnd="2dp"
                 android:paddingStart="2dp"
                 android:text="@string/replies_prefix"/>
@@ -65,6 +66,7 @@
                 android:layout_toEndOf="@+id/topic_replies_label"
                 android:layout_alignBaseline="@+id/topic_replies_label"
                 android:textSize="@dimen/small_text_unnecessary_content"
+                android:textColor="?attr/colorNonImportantText"
                 android:minEms="10"
                 android:maxEms="20"
                 android:ellipsize="end"
@@ -77,6 +79,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/topic_replies_label"
                 android:textSize="@dimen/small_text_unnecessary_content"
+                android:textColor="?attr/colorNonImportantText"
                 android:paddingEnd="2dp"
                 android:paddingStart="2dp"
                 android:text="@string/views_prefix"/>
@@ -88,6 +91,7 @@
                 android:layout_toEndOf="@+id/topic_views_label"
                 android:layout_alignBaseline="@+id/topic_views_label"
                 android:textSize="@dimen/small_text_unnecessary_content"
+                android:textColor="?attr/colorNonImportantText"
                 android:maxEms="20"
                 android:ellipsize="end"
                 android:text="@string/placeholder_long"/>

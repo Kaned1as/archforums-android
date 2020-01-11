@@ -1,5 +1,6 @@
 package com.kanedias.holywarsoo
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -8,9 +9,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.google.android.material.textview.MaterialTextView
 import com.kanedias.holywarsoo.dto.ForumTopicDesc
+import com.kanedias.holywarsoo.misc.layoutVisibilityBool
+import com.kanedias.holywarsoo.misc.resolveAttr
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
-import com.kanedias.holywarsoo.misc.visibilityBool
+
 
 /**
  * View holder that shows forum topic
@@ -24,24 +28,24 @@ import com.kanedias.holywarsoo.misc.visibilityBool
 class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 
     @BindView(R.id.topic_name)
-    lateinit var topicName: TextView
+    lateinit var topicName: MaterialTextView
 
     @BindView(R.id.topic_replies_label)
-    lateinit var topicRepliesLabel: TextView
+    lateinit var topicRepliesLabel: MaterialTextView
 
     @BindView(R.id.topic_replies_count)
-    lateinit var topicReplies: TextView
+    lateinit var topicReplies: MaterialTextView
 
     @BindView(R.id.topic_views_label)
-    lateinit var topicViewsLabel: TextView
+    lateinit var topicViewsLabel: MaterialTextView
 
     @BindView(R.id.topic_view_count)
-    lateinit var topicViews: TextView
+    lateinit var topicViews: MaterialTextView
 
     @BindView(R.id.topic_last_message_topic)
-    lateinit var lastMessage: TextView
+    lateinit var lastMessage: MaterialTextView
 
-    @BindView(R.id.topic_sticky)
+    @BindView(R.id.topic_sticky_marker)
     lateinit var stickyMarker: ImageView
 
     init {
@@ -49,7 +53,7 @@ class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
     }
 
     fun setup(topic: ForumTopicDesc) {
-        stickyMarker.visibilityBool = topic.sticky
+        stickyMarker.layoutVisibilityBool = topic.sticky
         topicName.text = topic.name
 
         if (topic.replyCount != null) {
@@ -70,17 +74,29 @@ class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
             topicViews.visibility = View.GONE
         }
 
-        if (topic.lastMessageDate.isEmpty()) {
+        if (topic.lastMessageDate.isNullOrEmpty()) {
             lastMessage.visibility = View.GONE
         } else {
             lastMessage.visibility = View.VISIBLE
             lastMessage.text = topic.lastMessageDate
         }
 
+        if (topic.newMessageUrl != null) {
+            val color = itemView.resolveAttr(R.attr.colorPrimary)
+            lastMessage.setTextColor(color)
+            lastMessage.supportCompoundDrawablesTintList = ColorStateList.valueOf(color)
+        } else {
+            val color = itemView.resolveAttr(R.attr.colorNonImportantText)
+            lastMessage.setTextColor(color)
+            lastMessage.supportCompoundDrawablesTintList = ColorStateList.valueOf(color)
+        }
+
         itemView.setOnClickListener {
+            val relevantUrl = topic.newMessageUrl ?: topic.url
+
             val fragment = TopicContentFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(TopicContentFragment.URL_ARG, topic.link)
+                    putSerializable(TopicContentFragment.URL_ARG, relevantUrl)
                 }
             }
 
