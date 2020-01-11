@@ -33,5 +33,5 @@ data class SearchTopicResults(
      * Topics that this search page contains.
      * Only includes topics from [currentPage].
      */
-    val topics: List<ForumTopic> = emptyList()
+    val topics: List<ForumTopicDesc> = emptyList()
 ) : Serializable

@@ -1,8 +1,8 @@
 package com.kanedias.holywarsoo.model
 
 import androidx.lifecycle.MutableLiveData
-import com.kanedias.holywarsoo.dto.Forum
 import com.kanedias.holywarsoo.ForumContentFragment
+import com.kanedias.holywarsoo.dto.Forum
 
 
 /**

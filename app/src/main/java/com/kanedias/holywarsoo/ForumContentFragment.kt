@@ -18,7 +18,6 @@ import com.kanedias.holywarsoo.model.ForumContentsModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.HttpUrl
 import java.lang.Exception
 
 /**
@@ -33,7 +32,6 @@ import java.lang.Exception
 class ForumContentFragment: ContentFragment() {
 
     companion object {
-        const val FORUM_ARG = "FORUM_ARG"
         const val URL_ARG = "URL_ARG"
     }
 
@@ -59,7 +57,6 @@ class ForumContentFragment: ContentFragment() {
         forumViewRefresher.setOnRefreshListener { refreshContent() }
 
         contents = ViewModelProviders.of(this).get(ForumContentsModel::class.java)
-        contents.forum.value = requireArguments().getSerializable(FORUM_ARG) as Forum
         contents.forum.observe(this, Observer { forumView.adapter = ForumContentsAdapter(it) })
         contents.forum.observe(this, Observer { refreshViews() })
 
@@ -93,9 +90,11 @@ class ForumContentFragment: ContentFragment() {
             forumViewRefresher.isRefreshing = true
 
             try {
-                val customUrl = HttpUrl.parse(requireArguments().getString(URL_ARG, ""))
+                val forumUrl =  contents.forum.value?.link
+                val customUrl = requireArguments().getString(URL_ARG, "")
+
                 val loaded = withContext(Dispatchers.IO) {
-                    Network.loadForumContents(contents.forum.value!!, page = contents.currentPage.value!!, link = customUrl)
+                    Network.loadForumContents(forumUrl, customUrl, page = contents.currentPage.value!!)
                 }
                 contents.forum.value = loaded
                 contents.pageCount.value = loaded.pageCount
@@ -110,6 +109,12 @@ class ForumContentFragment: ContentFragment() {
         }
     }
 
+    /**
+     * Adapter for presenting forum and topic descriptions and links in a material card view.
+     * Forum pages can contain both subforums and topics, so the adapter has to distinguish between them.
+     *
+     * Subforums also never have category assigned.
+     */
     class ForumContentsAdapter(forum: Forum) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         companion object {

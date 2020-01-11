@@ -474,6 +474,10 @@ class ImageShowOverlay(ctx: Context,
     }
 }
 
+/**
+ * Custom tag handler that deals with `<details>` and `<summary>` tags. They are used to implement
+ * spoilers in the text.
+ */
 class DetailsTagHandler: TagHandler() {
 
     override fun handle(visitor: MarkwonVisitor, renderer: MarkwonHtmlRenderer, tag: HtmlTag) {

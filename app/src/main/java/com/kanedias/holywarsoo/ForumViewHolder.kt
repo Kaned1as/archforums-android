@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.card.MaterialCardView
-import com.kanedias.holywarsoo.dto.Forum
-import com.kanedias.holywarsoo.dto.ForumTopic
+import com.kanedias.holywarsoo.dto.ForumDesc
+import com.kanedias.holywarsoo.dto.ForumTopicDesc
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
 import com.kanedias.holywarsoo.misc.visibilityBool
 
@@ -51,37 +51,29 @@ class ForumViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
         ButterKnife.bind(this, iv)
     }
 
-    fun setup(forum: Forum) {
-        forumName.text = forum.name
-        forumSubtext.text = forum.subtext
-        forumCategory.text = forum.category
-        lastMessageDate.text = forum.lastMessageDate
-        lastMessageTopic.text = forum.lastMessageName
+    fun setup(forumDesc: ForumDesc) {
+        forumName.text = forumDesc.name
+        forumSubtext.text = forumDesc.subtext
+        forumCategory.text = forumDesc.category
+        lastMessageDate.text = forumDesc.lastMessageDate
+        lastMessageTopic.text = forumDesc.lastMessageName
 
         forumCard.setOnClickListener {
             val fragment = ForumContentFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(ForumContentFragment.FORUM_ARG, forum)
+                    putSerializable(ForumContentFragment.URL_ARG, forumDesc.link)
                 }
             }
 
             (itemView.context as AppCompatActivity).showFullscreenFragment(fragment)
         }
 
-        if (forum.lastMessageDate.isNotEmpty()) {
+        if (forumDesc.lastMessageDate.isNotEmpty()) {
             lastMessageTopic.visibilityBool = true
             lastMessageTopic.setOnClickListener {
-                val topic = ForumTopic(
-                    name = forum.lastMessageName,
-                    link = forum.lastMessageLink,
-                    lastMessageDate = forum.lastMessageDate,
-                    lastMessageUrl = forum.lastMessageLink
-                )
-
                 val fragment = TopicContentFragment().apply {
                     arguments = Bundle().apply {
-                        putSerializable(TopicContentFragment.TOPIC_ARG, topic)
-                        putString(TopicContentFragment.URL_ARG, forum.lastMessageLink)
+                        putString(TopicContentFragment.URL_ARG, forumDesc.lastMessageLink)
                     }
                 }
 

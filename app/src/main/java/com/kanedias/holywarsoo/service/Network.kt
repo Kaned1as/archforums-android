@@ -184,7 +184,7 @@ object Network {
      * @return list of parsed forums. It has the same ordering as it had on the actual page.
      */
     @Throws(IOException::class)
-    fun loadForumList(): List<Forum> {
+    fun loadForumList(): List<ForumDesc> {
         val req = Request.Builder().url(MAIN_WEBSITE_URL).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
@@ -194,7 +194,7 @@ object Network {
         val doc = Jsoup.parse(html)
 
         val forumBoards = doc.select("div#brdmain > div.blocktable")
-        val forums = mutableListOf<Forum>()
+        val forums = mutableListOf<ForumDesc>()
         for (board in forumBoards) {
             val category = board.select("h2 > span").first().text()
             forums.addAll(parseForums(board, category))
@@ -240,17 +240,21 @@ object Network {
     }
 
     /**
-     * Loads forum page completely, with all the supporting browsing info, enriching the existing
-     * object. The returned value is a copy of the original.
+     * Loads forum page completely, with all the supporting browsing info, pages, subforums and topics.
+     * Either [forumLink] or [customLink] **must** be present for this call.
      *
-     * @param forumBase base forum object to enrich, which may have no subforums or topics available
-     *                  at the moment of loading
+     * @param forumLink canonical link to the the forum page, in form of `https://<website>/viewforum.php?id=<forum-id>`
+     * @param customLink any non-canonical link that leads to the forum page. Overrides [forumLink] if both are present
+     * @param page page number that is used in conjunction with [forumLink] to produce paged link
      *
-     * @return fully enriched forum instance. Topics have the same ordering as they had on the actual page.
+     * @return fully enriched forum instance.
+     *         Topics/subforums have the same ordering as they had on the actual page.
      */
     @Throws(IOException::class)
-    fun loadForumContents(forumBase: Forum, link: HttpUrl? = null, page: Int = 1): Forum {
-        val pageUrl = link ?: HttpUrl.parse(forumBase.link)!!.newBuilder().addQueryParameter("p", page.toString()).build()
+    fun loadForumContents(forumLink: String? = null, customLink: String? = null, page: Int = 1): Forum {
+        val pageUrl = customLink?.let { HttpUrl.parse(it) }
+            ?: forumLink?.let {  HttpUrl.parse(it)!!.newBuilder().addQueryParameter("p", page.toString()).build() }
+            ?: throw IllegalStateException("Both forum link and custom link are null!")
 
         val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
@@ -274,7 +278,7 @@ object Network {
             .mapNotNull { it.ownText().trySanitizeInt() }
             .max()
 
-        return forumBase.copy(
+        return Forum(
             id = forumId.sanitizeInt(),
             name = forumName,
             link = resolve(forumRef)!!.toString(),
@@ -287,17 +291,20 @@ object Network {
     }
 
     /**
-     * Loads topic page completely, with all the supporting browsing info, enriching the existing
-     * object. The returned value is a copy of the original.
+     * Loads topic page completely, with all the supporting browsing info, pages, messages and their content.
+     * Either [topicLink] or [customLink] **must** be present for this call.
      *
-     * @param topic base topic object to enrich, which may have no messages or pages available
-     *                  at the moment of loading
+     * @param topicLink canonical link to the the forum page, in form of `https://<website>/viewtopic.php?id=<forum-id>`
+     * @param customLink any non-canonical link that leads to the forum page. Overrides [topicLink] if both are present
+     * @param page page number that is used in conjunction with [topicLink] to produce paged link
      *
      * @return fully enriched topic instance. Messages have the same ordering as they had on the actual page.
      */
     @Throws(IOException::class)
-    fun loadTopicContents(topic: ForumTopic, link: HttpUrl? = null, page: Int = 1): ForumTopic {
-        val pageUrl = link ?: HttpUrl.parse(topic.link)!!.newBuilder().addQueryParameter("p", page.toString()).build()
+    fun loadTopicContents(topicLink: String? = null, customLink: String? = null, page: Int = 1): ForumTopic {
+        val pageUrl = customLink?.let { HttpUrl.parse(it) }
+            ?: topicLink?.let {  HttpUrl.parse(it)!!.newBuilder().addQueryParameter("p", page.toString()).build() }
+            ?: throw IllegalStateException("Both forum link and custom link are null!")
 
         val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
@@ -313,6 +320,8 @@ object Network {
         val topicId = resolve(topicRef)!!.queryParameter("id")!!
         val topicName = doc.select("head title").text()
         val topicWritable = doc.select("div#brdmain div.postlinksb p.postlink a[href^=post.php]")
+        val topicFavorite = doc.select("div#brdmain div.postlinksb p.subscribelink a[href*=favorite]")
+        val topicSubscribe = doc.select("div#brdmain div.postlinksb p.subscribelink a[href*=subscribe]")
 
         val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
         val currentPage = pageLinks.select("strong").text()
@@ -320,13 +329,23 @@ object Network {
             .mapNotNull { it.ownText().trySanitizeInt() }
             .max()
 
+        // delete action from the switchable links so they can be reused in any context
+        val topicFavoriteLink = resolve(topicFavorite.attr("href"))?.newBuilder()
+            ?.removeAllQueryParameters("action")?.build()?.toString()
+        val topicSubscribeLink = resolve(topicSubscribe.attr("href"))?.newBuilder()
+            ?.removeAllQueryParameters("action")?.build()?.toString()
+
         val messages = parseMessages(doc)
 
-        return topic.copy(
+        return ForumTopic(
             id = topicId.sanitizeInt(),
             name = topicName,
             link = resolve(topicRef)!!.toString(),
-            writable = topicWritable.isNotEmpty(),
+            isWritable = topicWritable.isNotEmpty(),
+            isFavorite = topicFavorite.attr("href").contains("unfavorite"),
+            favoriteLink = topicFavoriteLink,
+            isSubscribed = topicSubscribe.attr("href").contains("unsubscribe"),
+            subscriptionLink = topicSubscribeLink,
             pageCount = pageCount!!,
             currentPage = currentPage.sanitizeInt(),
             messages = messages
@@ -381,7 +400,7 @@ object Network {
      * is undefined behaviour.
      *
      * @param topic topic to add or remove from favorites
-     * @param action what to do. Possible values: `favorite` and `unfavorite`
+     * @param action what to do. Possible values: `favorite`, `unfavorite`, `subscribe`, `unsubscribe`
      */
     fun manageFavorites(topic: ForumTopic, action: String = "favorite") {
         val url = resolve("misc.php")!!.newBuilder()
@@ -490,13 +509,13 @@ object Network {
      * @param doc fully parsed document containing page with topic list (forum/favorites/active etc.)
      * @return list of parsed forum topics. It has the same ordering as it had on the actual page.
      */
-    private fun parseTopics(doc: Document, hasForumColumn: Boolean = false): List<ForumTopic> {
+    private fun parseTopics(doc: Document, hasForumColumn: Boolean = false): List<ForumTopicDesc> {
         val (repliesClass, viewsClass) = when (hasForumColumn) {
             true -> Pair("tc3", null)
             false -> Pair("tc2", "tc3")
         }
 
-        val topics = mutableListOf<ForumTopic>()
+        val topics = mutableListOf<ForumTopicDesc>()
         for (topic in doc.select("div#vf div.inbox table tr[class^=row]")) {
             val topicLink = topic.select("td.tcl > div.tclcon a").first() ?: continue
 
@@ -505,8 +524,8 @@ object Network {
             val isSticky = topic.classNames().contains("isticky")
             val topicPageCount = topic.select("td.tcl span.pagestext a:last-child").text()
 
-            val topicReplies = repliesClass.let { topic.select("td.${it}").text() } ?: "-1"
-            val topicViews = viewsClass?.let { topic.select("td.${it}").text() } ?: "-1"
+            val topicReplies = repliesClass?.let { topic.select("td.${it}").text() }
+            val topicViews = viewsClass?.let { topic.select("td.${it}").text() }
 
             val lastMessageLink = topic.select("td.tcr > a")
 
@@ -514,13 +533,12 @@ object Network {
             val lastMessageUrl = resolve(lastMessageLink.attr("href"))!!
 
             topics.add(
-                ForumTopic(
-                    id = topicUrl.queryParameter("id")!!.toInt(),
+                ForumTopicDesc(
                     sticky = isSticky,
                     name = topicLink.text(),
                     link = topicUrl.toString(),
-                    replyCount = topicReplies.sanitizeInt(),
-                    viewCount = topicViews.sanitizeInt(),
+                    replyCount = topicReplies.trySanitizeInt(),
+                    viewCount = topicViews.trySanitizeInt(),
                     pageCount = topicPageCount.toIntOrNull() ?: 1,
                     lastMessageUrl = lastMessageUrl.toString(),
                     lastMessageDate = lastMessageLink.text()
@@ -539,17 +557,19 @@ object Network {
      * @param predefinedCategory optional category to set for items found
      * @return list of parsed forums. It has the same ordering as it had on the actual page.
      */
-    private fun parseForums(where: Element?, predefinedCategory: String? = null): List<Forum> {
+    private fun parseForums(where: Element?, predefinedCategory: String? = null): List<ForumDesc> {
         if (where == null) {
             return emptyList()
 
         }
-        val forums = mutableListOf<Forum>()
+        val forums = mutableListOf<ForumDesc>()
         for (forum in where.select("div.inbox > table > tbody > tr[class^=row]")) {
             // forums can be found in main page and in forum page as well, as a subforums
             // all the info is fortunately self-contained and same across all kinds of pages
             val forumLink = forum.select("td.tcl div > h3 > a")
             val forumSub = forum.select("td.tcl div.forumdesc")
+            val forumTopics = forum.select("td.tc2").text()
+            val forumMessages = forum.select("td.tc3").text()
             val lastMessageLink = forum.select("td.tcr > a")
             val lastMessageDate = forum.select("td.tcr > span")
 
@@ -557,15 +577,16 @@ object Network {
             val lastMessageUrl = resolve(lastMessageLink.attr("href"))!!
 
             forums.add(
-                Forum(
-                    id = forumUrl.queryParameter("id")!!.toInt(),
+                ForumDesc(
                     name = forumLink.text(),
                     link = forumUrl.toString(),
                     subtext = forumSub.text(),
                     category = predefinedCategory,
                     lastMessageName = lastMessageLink.text(),
                     lastMessageLink = lastMessageUrl.toString(),
-                    lastMessageDate = lastMessageDate.text()
+                    lastMessageDate = lastMessageDate.text(),
+                    topicCount = forumTopics.sanitizeInt(),
+                    messageCount = forumMessages.sanitizeInt()
                 )
             )
         }

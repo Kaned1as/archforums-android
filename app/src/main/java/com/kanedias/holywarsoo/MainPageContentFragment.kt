@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import butterknife.ButterKnife
-import com.kanedias.holywarsoo.dto.Forum
+import com.kanedias.holywarsoo.dto.ForumDesc
 import com.kanedias.holywarsoo.model.MainPageModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
@@ -80,9 +80,13 @@ class MainPageContentFragment: ContentFragment() {
 
     override fun hasBackNavigation() = false
 
-    class ForumListAdapter(private val forumList: List<Forum>) : RecyclerView.Adapter<ForumViewHolder>() {
+    /**
+     * Adapter for presenting forum descriptions and links in a material card view.
+     * Main page only contains top-level forums, which always are part of some category.
+     */
+    class ForumListAdapter(private val forumDescList: List<ForumDesc>) : RecyclerView.Adapter<ForumViewHolder>() {
 
-        override fun getItemCount() = forumList.size
+        override fun getItemCount() = forumDescList.size
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ForumViewHolder {
             val inflater = LayoutInflater.from(parent.context)
@@ -91,11 +95,11 @@ class MainPageContentFragment: ContentFragment() {
         }
 
         override fun onBindViewHolder(holder: ForumViewHolder, position: Int) {
-            val forum = forumList[position]
+            val forum = forumDescList[position]
             holder.setup(forum)
 
             // show category if it's changed
-            val categoryChanged = position > 0 && forum.category != forumList[position - 1].category
+            val categoryChanged = position > 0 && forum.category != forumDescList[position - 1].category
             if (forum.category != null && (position == 0 || categoryChanged)) {
                 holder.forumCategoryArea.visibility = View.VISIBLE
             } else {

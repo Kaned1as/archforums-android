@@ -113,7 +113,7 @@ class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
             // don't show "Reply" option if topic is closed or we are not logged in
-            if (!topic.writable) {
+            if (!topic.isWritable) {
                 return true
             }
 

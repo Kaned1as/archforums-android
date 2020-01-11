@@ -60,7 +60,10 @@ fun String.sanitizeInt(): Int {
  * Try to deduce what integer number should this string represent.
  * Gets rid of usual separator chars (we know it's integer).
  */
-fun String.trySanitizeInt(): Int? {
+fun String?.trySanitizeInt(): Int? {
+    if (this == null)
+        return null
+
     return this
         .replace(UNNEEDED_INT_CHARS, "")
         .replace(Regex("^-$"), "-1")

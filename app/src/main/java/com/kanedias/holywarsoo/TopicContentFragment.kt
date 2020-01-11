@@ -13,7 +13,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.card.MaterialCardView
-import com.kanedias.holywarsoo.dto.ForumTopic
 import com.kanedias.holywarsoo.dto.ForumMessage
 import com.kanedias.holywarsoo.misc.resolveAttr
 import com.kanedias.holywarsoo.model.TopicContentsModel
@@ -36,7 +35,6 @@ import java.lang.Exception
 class TopicContentFragment: ContentFragment() {
 
     companion object {
-        const val TOPIC_ARG = "TOPIC_ARG"
         const val URL_ARG = "URL_ARG"
     }
 
@@ -63,7 +61,6 @@ class TopicContentFragment: ContentFragment() {
         topicViewRefresher.setOnRefreshListener { refreshContent() }
 
         contents = ViewModelProviders.of(this).get(TopicContentsModel::class.java)
-        contents.topic.value = requireArguments().getSerializable(TOPIC_ARG) as ForumTopic
         contents.topic.observe(this, Observer { topicView.adapter!!.notifyDataSetChanged() })
         contents.topic.observe(this, Observer { refreshViews() })
 
@@ -82,7 +79,7 @@ class TopicContentFragment: ContentFragment() {
             subtitle = "${getString(R.string.page)} ${topic.currentPage}"
         }
 
-        if (topic.writable) {
+        if (topic.isWritable) {
             activity.addButton.show()
             activity.addButton.setOnClickListener {
                 val frag = AddMessageFragment().apply {
@@ -107,15 +104,17 @@ class TopicContentFragment: ContentFragment() {
             topicViewRefresher.isRefreshing = true
 
             try {
-                val customUrl = HttpUrl.parse(requireArguments().getString(URL_ARG, ""))
+                val topicUrl =  contents.topic.value?.link
+                val customUrl = requireArguments().getString(URL_ARG, "")
                 val loaded = withContext(Dispatchers.IO) {
-                    Network.loadTopicContents(contents.topic.value!!, page = contents.currentPage.value!!, link = customUrl)
+                    Network.loadTopicContents(topicUrl, customUrl, page = contents.currentPage.value!!)
                 }
                 contents.topic.value = loaded
                 contents.pageCount.value = loaded.pageCount
                 contents.currentPage.value = loaded.currentPage
 
-                customUrl?.queryParameter("pid")?.let { highlightMessage(it.toInt()) }
+                // highlight custom message if custom query mentioned it
+                customUrl?.let { HttpUrl.parse(it) }?.queryParameter("pid")?.let { highlightMessage(it.toInt()) }
                 requireArguments().remove(URL_ARG) // only load custom url once
             } catch (ex: Exception) {
                 context?.let { Network.reportErrors(it, ex) }
@@ -141,8 +140,8 @@ class TopicContentFragment: ContentFragment() {
             topicView.smoothScrollToPosition(position)
 
             var limit = 20 // 2 sec
-            while(topicView.findViewHolderForItemId(messageId.toLong()) == null) {
-                // recycler view hasn't been laid out yet
+            while(topicView.findViewHolderForAdapterPosition(position) == null) {
+                // holder view hasn't been laid out yet
                 delay(100)
 
                 limit -= 1
@@ -160,7 +159,7 @@ class TopicContentFragment: ContentFragment() {
             }
 
             // highlight message with tinted background
-            val holder = topicView.findViewHolderForItemId(messageId.toLong())
+            val holder = topicView.findViewHolderForAdapterPosition(position) ?: return@launchWhenResumed
             val card = holder.itemView as MaterialCardView
             ValueAnimator.ofArgb(card.resolveAttr(R.attr.colorPrimary), card.resolveAttr(R.attr.colorSecondary)).apply {
                 addUpdateListener {

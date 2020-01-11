@@ -21,8 +21,6 @@ import butterknife.ButterKnife
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import com.kanedias.holywarsoo.dto.Forum
-import com.kanedias.holywarsoo.dto.ForumTopic
 import com.kanedias.holywarsoo.dto.SearchTopicResults
 import com.kanedias.holywarsoo.markdown.mdRendererFrom
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
@@ -309,15 +307,6 @@ class MainActivity : AppCompatActivity() {
                     // no fragment with this forum on top, open it
                     val fragment = ForumContentFragment().apply {
                         arguments = Bundle().apply {
-                            putSerializable(ForumContentFragment.FORUM_ARG, Forum(
-                                id = forumId,
-                                name = "to-be-resolved",
-                                subtext = "to-be-resolved",
-                                link = url.toString(),
-                                lastMessageName = "to-be-resolved",
-                                lastMessageDate = "to-be-resolved",
-                                lastMessageLink = url.toString()
-                            ))
                             putString(ForumContentFragment.URL_ARG, url.toString())
                         }
                     }
@@ -357,13 +346,6 @@ class MainActivity : AppCompatActivity() {
                     // no fragment with this topic on top, open it
                     val fragment = TopicContentFragment().apply {
                         arguments = Bundle().apply {
-                            putSerializable(TopicContentFragment.TOPIC_ARG, ForumTopic(
-                                id = -1, // to-be-resolved
-                                name = "to-be-resolved",
-                                link = url.toString(),
-                                lastMessageDate = "to-be-resolved",
-                                lastMessageUrl = url.toString()
-                            ))
                             putString(TopicContentFragment.URL_ARG, url.toString())
                         }
                     }
@@ -397,7 +379,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    class SidebarHeaderViewHolder(private val iv: View) {
+    class SidebarHeaderViewHolder(iv: View) {
         @BindView(R.id.sidebar_header_random_image)
         lateinit var randomImage: ImageView
 

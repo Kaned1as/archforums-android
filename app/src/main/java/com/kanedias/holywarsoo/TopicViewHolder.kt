@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
-import com.kanedias.holywarsoo.dto.ForumTopic
+import com.kanedias.holywarsoo.dto.ForumTopicDesc
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
 import com.kanedias.holywarsoo.misc.visibilityBool
 
@@ -48,26 +48,26 @@ class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
         ButterKnife.bind(this, iv)
     }
 
-    fun setup(topic: ForumTopic) {
+    fun setup(topic: ForumTopicDesc) {
         stickyMarker.visibilityBool = topic.sticky
         topicName.text = topic.name
 
-        if (topic.replyCount < 0) {
-            topicRepliesLabel.visibility = View.GONE
-            topicReplies.visibility = View.GONE
-        } else {
+        if (topic.replyCount != null) {
             topicReplies.visibility = View.VISIBLE
             topicRepliesLabel.visibility = View.VISIBLE
             topicReplies.text = topic.replyCount.toString()
+        } else {
+            topicRepliesLabel.visibility = View.GONE
+            topicReplies.visibility = View.GONE
         }
 
-        if (topic.viewCount < 0) {
-            topicViewsLabel.visibility = View.GONE
-            topicViews.visibility = View.GONE
-        } else {
+        if (topic.viewCount != null) {
             topicViewsLabel.visibility = View.VISIBLE
             topicViews.visibility = View.VISIBLE
             topicViews.text = topic.viewCount.toString()
+        } else {
+            topicViewsLabel.visibility = View.GONE
+            topicViews.visibility = View.GONE
         }
 
         if (topic.lastMessageDate.isEmpty()) {
@@ -80,7 +80,7 @@ class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
         itemView.setOnClickListener {
             val fragment = TopicContentFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(TopicContentFragment.TOPIC_ARG, topic)
+                    putSerializable(TopicContentFragment.URL_ARG, topic.link)
                 }
             }
 
@@ -90,7 +90,6 @@ class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
         lastMessage.setOnClickListener {
             val fragment = TopicContentFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(TopicContentFragment.TOPIC_ARG, topic)
                     putString(TopicContentFragment.URL_ARG, topic.lastMessageUrl)
                 }
             }
