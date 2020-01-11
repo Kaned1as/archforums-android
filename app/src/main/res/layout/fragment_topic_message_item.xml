@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:padding="8dp">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/message_author_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
             android:textColor="@color/colorAccent"
             android:text="@string/placeholder_long"/>
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/message_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
             android:text="@string/placeholder_date"/>
 
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/message_index"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"

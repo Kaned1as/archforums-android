@@ -9,6 +9,7 @@ import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
 import android.text.Spannable
 import android.text.method.ArrowKeyMovementMethod
+import com.google.android.material.textview.MaterialTextView
 
 
 /**
@@ -18,7 +19,7 @@ import android.text.method.ArrowKeyMovementMethod
  *
  * Created on 05.04.18
  */
-class ClickPreventingTextView : TextView {
+class ClickPreventingTextView : MaterialTextView {
 
     private var linkHit: Boolean = false
 

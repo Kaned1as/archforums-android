@@ -39,7 +39,7 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/sidebar_header_welcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
             android:textColor="#fff"
             android:textSize="18sp"/>
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/sidebar_header_current_user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

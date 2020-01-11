@@ -30,7 +30,7 @@
             android:visibility="invisible"
             android:contentDescription="@string/topic_pinned"/>
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/topic_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/topic_name">
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/topic_replies_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
                 android:paddingStart="2dp"
                 android:text="@string/replies_prefix"/>
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/topic_replies_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
                 android:ellipsize="end"
                 android:text="@string/placeholder_long"/>
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/topic_views_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -81,7 +81,7 @@
                 android:paddingStart="2dp"
                 android:text="@string/views_prefix"/>
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/topic_view_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
 
         </RelativeLayout>
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/topic_last_message_topic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -104,12 +104,12 @@
             android:textAppearance="@android:style/TextAppearance.Material.Small"
             android:textColor="@color/colorAccent"
             android:gravity="center_vertical"
-            android:drawableEnd="@drawable/arrow_right"
-            android:drawableTint="@color/colorAccent"
             android:drawablePadding="8dp"
             android:maxEms="20"
             android:ellipsize="end"
-            android:text="@string/placeholder_long"/>
+            android:text="@string/placeholder_long"
+            app:drawableEndCompat="@drawable/arrow_right"
+            app:drawableTint="@color/colorAccent"/>
 
     </RelativeLayout>
 
