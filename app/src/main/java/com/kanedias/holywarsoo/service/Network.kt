@@ -3,6 +3,7 @@ package com.kanedias.holywarsoo.service
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.text.Spanned
 import android.util.Log
 import android.widget.Toast
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
@@ -11,8 +12,12 @@ import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersisto
 import com.kanedias.holywarsoo.BuildConfig
 import com.kanedias.holywarsoo.R
 import com.kanedias.holywarsoo.dto.*
+import com.kanedias.holywarsoo.markdown.toMarkdown
 import com.kanedias.holywarsoo.misc.sanitizeInt
 import com.kanedias.holywarsoo.misc.trySanitizeInt
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import okhttp3.*
 import org.json.JSONObject
 import org.jsoup.Jsoup
@@ -50,11 +55,11 @@ object Network {
     private val MAIN_IMGUR_URL = HttpUrl.parse("https://api.imgur.com")!!
     const val IMGUR_CLIENT_AUTH = "Client-ID 860dc14aa7caf25"
 
-    private var MAIN_WEBSITE_URL = HttpUrl.parse("https://holywarsoo.net")!!
-    var FAVORITE_TOPICS_URL = resolve("search.php?action=show_favorites")!!.toString()
-    var REPLIES_TOPICS_URL = resolve("search.php?action=show_replies")!!.toString()
-    var NEW_MESSAGES_TOPICS_URL = resolve("search.php?action=show_new")!!.toString()
-    var RECENT_TOPICS_URL = resolve("search.php?action=show_recent")!!.toString()
+    private lateinit var MAIN_WEBSITE_URL: HttpUrl
+    lateinit var FAVORITE_TOPICS_URL: String
+    lateinit var REPLIES_TOPICS_URL: String
+    lateinit var NEW_MESSAGES_TOPICS_URL: String
+    lateinit var RECENT_TOPICS_URL: String
 
     private val userAgent = Interceptor { chain ->
         chain.proceed(chain
@@ -64,6 +69,7 @@ object Network {
             .build())
     }
 
+    private lateinit var appCtx: Context
     private lateinit var httpClient: OkHttpClient
     private lateinit var accountInfo: SharedPreferences
     private lateinit var cookiesInfo: SharedPreferences
@@ -71,6 +77,8 @@ object Network {
     private lateinit var cookiePersistor: SharedPrefsCookiePersistor
 
     fun init(ctx: Context) {
+        appCtx = ctx
+
         val meta = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA).metaData
 
         MAIN_WEBSITE_URL = HttpUrl.parse(meta.getString("mainWebsiteUrl", null))!!
@@ -456,38 +464,41 @@ object Network {
      * @param doc fully parsed document containing page with message list (topic)
      * @return list of parsed messages. It has the same ordering as it had on the actual page.
      */
-    private fun parseMessages(doc: Document): List<ForumMessage> {
-        val messages = mutableListOf<ForumMessage>()
-        for (message in doc.select("div#brdmain div.blockpost")) {
-            // all message info is self-contained in the message box
-            val msgDateLink = message.select("h2 > span > a")
-            val msgIndex = message.select("h2 > span > span.conr").text()
-            val msgAuthor = message.select("div.postleft > dl > dt > strong:last-child").text()
-            val msgBody = message.select("div.postright > div.postmsg").first()
-            val msgDate = msgDateLink.text()
+    private fun parseMessages(doc: Document) = runBlocking {
+        doc.select("div#brdmain div.blockpost")
+            .map { message ->
+                // all message info is self-contained in the message box
+                val msgDateLink = message.select("h2 > span > a")
+                val msgIndex = message.select("h2 > span > span.conr").text()
+                val msgAuthor = message.select("div.postleft > dl > dt > strong:last-child").text()
+                val msgBody = message.select("div.postright > div.postmsg").first()
+                val msgDate = msgDateLink.text()
 
-            val msgUrl = MAIN_WEBSITE_URL.resolve(msgDateLink.attr("href"))!!
+                val msgUrl = MAIN_WEBSITE_URL.resolve(msgDateLink.attr("href"))!!
+                val msgId = msgUrl.queryParameter("pid")!!.toInt()
 
-            messages.add(ForumMessage(
-                id = msgUrl.queryParameter("pid")!!.toInt(),
-                index = msgIndex.replace("#", "").toInt(),
-                author = msgAuthor,
-                createdDate = msgDate,
-                content = postProcessMessage(msgBody)
-            ))
-        }
-
-        return messages
+                async(Dispatchers.IO) {
+                    ForumMessage(
+                        id = msgId,
+                        index = msgIndex.replace("#", "").toInt(),
+                        author = msgAuthor,
+                        createdDate = msgDate,
+                        content = postProcessMessage(msgId, msgBody)
+                    )
+                }
+            }.map { it.await() }
+            .toList()
     }
 
     /**
      * Post-processes the message, replaces all JS-based spoiler tags with standard HTML
      * `<details>` + `<summary>` tags that were meant to be actual spoilers, without requiring JS.
      *
+     * @param msgId unique message identifier. Used to locate cached content
      * @param msgBody element representing message body, usually `div.postmsg` in the document
      * @return HTML string after postprocessing
      */
-    private fun postProcessMessage(msgBody: Element): String {
+    private fun postProcessMessage(msgId: Int, msgBody: Element): Spanned {
         // need to detect all expandable spoiler tags and replace them with
         // standard `details` + `summary`
         for (spoilerTag in msgBody.select("div[onclick*=▼]")) {
@@ -506,7 +517,7 @@ object Network {
 
         // other post-processing steps may follow, leaving this vacant...
 
-        return msgBody.outerHtml()
+        return toMarkdown(msgId, msgBody.outerHtml(), appCtx)
     }
 
     /**

@@ -2,14 +2,9 @@ package com.kanedias.holywarsoo.markdown
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.widget.TextView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
-import com.bumptech.glide.load.resource.gif.GifDrawable
-import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.kanedias.holywarsoo.R
@@ -24,14 +19,14 @@ import java.security.MessageDigest
  *
  * Created on 07.01.20
  */
-class GlideGifSupportStore(txt: TextView): GlideImagesPlugin.GlideStore {
+class GlideGifSupportStore(ctx: Context): GlideImagesPlugin.GlideStore {
 
-    private val requestManager = Glide.with(txt.context)
+    private val requestManager = Glide.with(ctx)
         .applyDefaultRequestOptions(
             RequestOptions()
                 .centerInside()
-                .override(txt.context.resources.displayMetrics.widthPixels, Target.SIZE_ORIGINAL)
-                .transform(ScaleToDensity(txt.context))
+                .override(ctx.resources.displayMetrics.widthPixels, Target.SIZE_ORIGINAL)
+                .transform(ScaleToDensity(ctx))
                 .placeholder(R.drawable.image)
                 .error(R.drawable.image_broken))
 

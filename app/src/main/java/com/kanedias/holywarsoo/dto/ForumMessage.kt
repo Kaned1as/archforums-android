@@ -1,5 +1,6 @@
 package com.kanedias.holywarsoo.dto
 
+import android.text.Spanned
 import java.io.Serializable
 
 /**
@@ -37,9 +38,9 @@ data class ForumMessage(
     val createdDate: String,
 
     /**
-     * Main content of the forum message. HTML represented as string.
+     * Main content of the forum message. Markdown converted to spanned.
      */
-    val content: String,
+    val content: Spanned,
 
     // counters
 

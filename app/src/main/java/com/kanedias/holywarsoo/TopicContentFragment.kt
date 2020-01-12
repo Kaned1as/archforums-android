@@ -161,7 +161,7 @@ class TopicContentFragment: ContentFragment() {
                 }
             }
 
-            // highlight message with tinted background
+            // highlight message by tinting background
             val holder = topicView.findViewHolderForAdapterPosition(position) ?: return@launchWhenResumed
             val card = holder.itemView as MaterialCardView
             ValueAnimator.ofArgb(card.resolveAttr(R.attr.colorPrimary), card.resolveAttr(R.attr.colorSecondary)).apply {
