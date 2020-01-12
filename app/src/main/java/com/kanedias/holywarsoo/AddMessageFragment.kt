@@ -1,5 +1,6 @@
 package com.kanedias.holywarsoo
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,12 +12,16 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.kanedias.holywarsoo.database.entities.OfflineDraft
 import com.kanedias.holywarsoo.dto.ForumTopic
+import com.kanedias.holywarsoo.service.Database
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import java.util.*
 
 /**
  * Fragment responsible for adding a new message to the specified topic.
@@ -29,6 +34,7 @@ import java.lang.Exception
 class AddMessageFragment: EditorFragment() {
 
     companion object {
+        const val DB_CONTEXT_PREFIX = "newmessage-topic"
         const val TOPIC_ARG = "TOPIC_ARG"
         const val AUTHOR_ARG = "AUTHOR_ARG"
         const val MSGID_ARG = "MSGID_ARG"
@@ -43,9 +49,35 @@ class AddMessageFragment: EditorFragment() {
         ButterKnife.bind(this, view)
 
         editor = EditorViews(this, editorArea)
+        handleDraft()
         handleMisc()
 
         return view
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+
+        // if we have text in content input, save it
+        editor.contentInput.takeIf { it.text.isNotEmpty() }?.let {
+            val topic = requireArguments().getSerializable(TOPIC_ARG) as ForumTopic
+            val contextKey = "${DB_CONTEXT_PREFIX}-${topic.id}"
+
+            val draft = OfflineDraft(createdAt = Date(), ctxKey = contextKey, content = it.text.toString())
+            Database.draftDao().insertDraft(draft)
+        }
+    }
+
+    private fun handleDraft() {
+        val topic = requireArguments().getSerializable(TOPIC_ARG) as ForumTopic
+        val contextKey = "${DB_CONTEXT_PREFIX}-${topic.id}"
+
+        // if draft exists with this key, fill content with it
+        Database.draftDao().getByKey(contextKey)?.let {
+            Database.draftDao().deleteDraft(it)
+            editor.contentInput.setText(it.content)
+            editor.contentInput.setSelection(editor.contentInput.length())
+        }
     }
 
     /**
@@ -56,11 +88,12 @@ class AddMessageFragment: EditorFragment() {
      */
     private fun handleMisc() {
         // handle click on reply in text selection menu
-        val authorName = arguments?.getString(AUTHOR_ARG)
-        val quotedText = arguments?.getString(QUOTE_ARG)
-        val quotedId = arguments?.getString(MSGID_ARG)
+        val authorName = requireArguments().getString(AUTHOR_ARG)
+        val quotedText = requireArguments().getString(QUOTE_ARG)
+        val quotedId = requireArguments().getString(MSGID_ARG)
 
         if (authorName.isNullOrEmpty() || quotedText.isNullOrEmpty() || quotedId.isNullOrEmpty()) {
+            // not provided, add nothing
             return
         }
 

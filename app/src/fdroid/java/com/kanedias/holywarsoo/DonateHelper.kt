@@ -20,7 +20,7 @@ class DonateHelper(private val activity: AppCompatActivity) {
         val options = arrayOf("Paypal", "Patreon", "Liberapay")
         MaterialAlertDialogBuilder(activity)
                 .setTitle(R.string.donate)
-            .setItems(options) { dialog: DialogInterface, pos: Int -> when(pos) {
+            .setItems(options) { _: DialogInterface, pos: Int -> when(pos) {
                 0 -> openLink("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6CFFYXFT6QT46")
                 1 -> openLink("https://www.patreon.com/kanedias")
                 2 -> openLink("https://liberapay.com/Kanedias")
