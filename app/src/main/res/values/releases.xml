@@ -11,4 +11,5 @@
         Following links from quotes now highlights the message that was quoted\n
         Fixed icon on old devices (Lollipop, Marshmallow)
     </string>
+    <string name="release_9">Added saving of messages on accidental dialog close</string>
 </resources>
