@@ -1,7 +1,6 @@
 package com.kanedias.holywarsoo.dto
 
 import android.text.Spanned
-import java.io.Serializable
 
 /**
  * Entity representing forum message.
@@ -39,6 +38,7 @@ data class ForumMessage(
 
     /**
      * Main content of the forum message. Markdown converted to spanned.
+     * As spanned strings are not serializable, the forum message is not serializable as well.
      */
     val content: Spanned,
 
@@ -49,4 +49,4 @@ data class ForumMessage(
      * Unique across the topic only.
      */
     val index: Int = -1
-) : Serializable
+)

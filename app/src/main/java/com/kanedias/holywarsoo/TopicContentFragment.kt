@@ -83,7 +83,7 @@ class TopicContentFragment: ContentFragment() {
             activity.addButton.show()
             activity.addButton.setOnClickListener {
                 val frag = AddMessageFragment().apply {
-                    arguments = Bundle().apply { putSerializable(AddMessageFragment.TOPIC_ARG, topic) }
+                    arguments = Bundle().apply { putSerializable(AddMessageFragment.TOPIC_ID_ARG, topic.id) }
                 }
                 frag.show(fragmentManager!!, "reply fragment")
             }

@@ -1,11 +1,12 @@
 package com.kanedias.holywarsoo
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.core.os.postDelayed
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import butterknife.BindView
@@ -13,12 +14,10 @@ import butterknife.ButterKnife
 import butterknife.OnClick
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kanedias.holywarsoo.database.entities.OfflineDraft
-import com.kanedias.holywarsoo.dto.ForumTopic
 import com.kanedias.holywarsoo.service.Database
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.lang.Exception
 import java.util.*
@@ -35,7 +34,7 @@ class AddMessageFragment: EditorFragment() {
 
     companion object {
         const val DB_CONTEXT_PREFIX = "newmessage-topic"
-        const val TOPIC_ARG = "TOPIC_ARG"
+        const val TOPIC_ID_ARG = "TOPIC_ID_ARG"
         const val AUTHOR_ARG = "AUTHOR_ARG"
         const val MSGID_ARG = "MSGID_ARG"
         const val QUOTE_ARG = "QUOTE_ARG"
@@ -55,28 +54,23 @@ class AddMessageFragment: EditorFragment() {
         return view
     }
 
-    override fun onCancel(dialog: DialogInterface) {
-        super.onCancel(dialog)
-
-        // if we have text in content input, save it
-        editor.contentInput.takeIf { it.text.isNotEmpty() }?.let {
-            val topic = requireArguments().getSerializable(TOPIC_ARG) as ForumTopic
-            val contextKey = "${DB_CONTEXT_PREFIX}-${topic.id}"
-
-            val draft = OfflineDraft(createdAt = Date(), ctxKey = contextKey, content = it.text.toString())
-            Database.draftDao().insertDraft(draft)
-        }
-    }
-
     private fun handleDraft() {
-        val topic = requireArguments().getSerializable(TOPIC_ARG) as ForumTopic
-        val contextKey = "${DB_CONTEXT_PREFIX}-${topic.id}"
+        val topicId = requireArguments().getInt(TOPIC_ID_ARG)
+        val contextKey = "${DB_CONTEXT_PREFIX}-${topicId}"
 
         // if draft exists with this key, fill content with it
         Database.draftDao().getByKey(contextKey)?.let {
-            Database.draftDao().deleteDraft(it)
             editor.contentInput.setText(it.content)
             editor.contentInput.setSelection(editor.contentInput.length())
+        }
+
+        // delay saving text a bit so database won't be spammed with it
+        editor.contentInput.addTextChangedListener { text ->
+            editor.contentInput.handler?.removeCallbacksAndMessages(contextKey)
+            editor.contentInput.handler?.postDelayed(1500, contextKey, action = {
+                val draft = OfflineDraft(createdAt = Date(), ctxKey = contextKey, content = text.toString())
+                Database.draftDao().insertDraft(draft)
+            })
         }
     }
 
@@ -116,6 +110,9 @@ class AddMessageFragment: EditorFragment() {
 
     @OnClick(R.id.message_submit)
     fun submit() {
+        val topicId = requireArguments().getInt(TOPIC_ID_ARG)
+        val contextKey = "${DB_CONTEXT_PREFIX}-${topicId}"
+
         val waitDialog = MaterialAlertDialogBuilder(context)
             .setTitle(R.string.please_wait)
             .setMessage(R.string.submitting)
@@ -128,12 +125,19 @@ class AddMessageFragment: EditorFragment() {
             waitDialog.show()
 
             try {
-                val topic = requireArguments().getSerializable(TOPIC_ARG) as ForumTopic
                 val link = withContext(Dispatchers.IO) {
-                    Network.postMessage(topic, editor.contentInput.text.toString())
+                    Network.postMessage(topicId, editor.contentInput.text.toString())
                 }
+
+                // delete draft of this message, prevent reinsertion
+                // should be race-free since it's in the same thread as this one (Main UI thread)
+                editor.contentInput.handler?.removeCallbacksAndMessages(contextKey)
+                Database.draftDao().deleteByKey(contextKey)
+
+                // refresh parent fragment
                 curFrg?.arguments?.putString(TopicContentFragment.URL_ARG, link.toString())
                 curFrg?.refreshContent()
+
                 dismiss()
             } catch (ex: Exception) {
                 context?.let { Network.reportErrors(it, ex) }

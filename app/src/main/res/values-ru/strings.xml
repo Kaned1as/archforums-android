@@ -5,6 +5,7 @@
     <string name="replies_prefix">Ответов:</string>
     <string name="views_prefix">Просмотров:</string>
     <string name="topic_pinned">Закреплённая тема</string>
+    <string name="topic_closed">Закрытая тема</string>
     <string name="message_index">Индекс сообщения</string>
     <string name="share_link_using">Поделиться ссылкой с помощью…</string>
     <string name="share_image_using">Поделиться изображением с помощью…</string>

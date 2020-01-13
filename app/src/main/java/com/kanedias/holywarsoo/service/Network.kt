@@ -52,8 +52,8 @@ object Network {
     private const val PREF_PASSWORD = "password"
 
     private const val USER_AGENT = "Holywarsoo Android ${BuildConfig.VERSION_NAME}"
+    private const val IMGUR_CLIENT_AUTH = "Client-ID 860dc14aa7caf25"
     private val MAIN_IMGUR_URL = HttpUrl.parse("https://api.imgur.com")!!
-    const val IMGUR_CLIENT_AUTH = "Client-ID 860dc14aa7caf25"
 
     private lateinit var MAIN_WEBSITE_URL: HttpUrl
     lateinit var FAVORITE_TOPICS_URL: String
@@ -368,8 +368,8 @@ object Network {
 
 
     @Throws(IOException::class)
-    fun postMessage(topic: ForumTopic, message: String): HttpUrl {
-        val postUrl = resolve("post.php")!!.newBuilder().addQueryParameter("tid", topic.id.toString()).build()
+    fun postMessage(topicId: Int, message: String): HttpUrl {
+        val postUrl = resolve("post.php")!!.newBuilder().addQueryParameter("tid", topicId.toString()).build()
 
         val req = Request.Builder().url(postUrl).get().build()
         val resp = httpClient.newCall(req).execute()
@@ -467,6 +467,9 @@ object Network {
     private fun parseMessages(doc: Document) = runBlocking {
         doc.select("div#brdmain div.blockpost")
             .map { message ->
+                // detach message from the document, so it won't touch parent DOM concurrently
+                message.remove()
+
                 // all message info is self-contained in the message box
                 val msgDateLink = message.select("h2 > span > a")
                 val msgIndex = message.select("h2 > span > span.conr").text()
@@ -539,6 +542,7 @@ object Network {
             // topic list page may have different layouts depending on whether it's search page
             // or forum page, so we should be smart about it, detecting row meanings by their names
             val isSticky = topic.classNames().contains("isticky")
+            val isClosed = topic.classNames().contains("iclosed")
             val topicPageCount = topic.select("td.tcl span.pagestext a:last-child").text()
 
             val topicReplies = repliesClass?.let { topic.select("td.${it}").text() }
@@ -554,6 +558,7 @@ object Network {
             topics.add(
                 ForumTopicDesc(
                     sticky = isSticky,
+                    closed = isClosed,
                     name = topicLink.text(),
                     url = topicUrl.toString(),
                     replyCount = topicReplies.trySanitizeInt(),
@@ -616,7 +621,7 @@ object Network {
     /**
      * Handle typical network-related problems.
      * @param ctx context to get error string from
-     * @param errMapping mapping of ids like `HttpUrlConnection.HTTP_NOT_FOUND -> R.string.not_found`
+     * @param ex exception that should be reported
      */
     fun reportErrors(ctx: Context?, ex: Exception) {
         if (ctx == null) {

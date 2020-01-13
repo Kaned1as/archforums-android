@@ -48,12 +48,16 @@ class TopicViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
     @BindView(R.id.topic_sticky_marker)
     lateinit var stickyMarker: ImageView
 
+    @BindView(R.id.topic_closed_marker)
+    lateinit var closedMarker: ImageView
+
     init {
         ButterKnife.bind(this, iv)
     }
 
     fun setup(topic: ForumTopicDesc) {
         stickyMarker.layoutVisibilityBool = topic.sticky
+        closedMarker.layoutVisibilityBool = topic.closed
         topicName.text = topic.name
 
         if (topic.replyCount != null) {

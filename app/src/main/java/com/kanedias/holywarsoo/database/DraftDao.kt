@@ -23,8 +23,10 @@ interface DraftDao {
     @Update
     fun updateDraft(draft: OfflineDraft)
 
-
     @Delete
     fun deleteDraft(draft: OfflineDraft)
+
+    @Query("DELETE FROM offline_draft WHERE ctx_key = :ctxKey")
+    fun deleteByKey(ctxKey: String)
 
 }

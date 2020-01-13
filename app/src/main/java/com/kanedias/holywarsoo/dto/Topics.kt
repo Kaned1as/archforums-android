@@ -40,6 +40,11 @@ data class ForumTopicDesc(
      */
     val sticky: Boolean = false,
 
+    /**
+     * True if the topic is closed and can't be answered to
+     */
+    val closed: Boolean = false,
+
     // statistics
     val replyCount: Int?,
     val viewCount: Int?,
@@ -98,5 +103,7 @@ data class ForumTopic(
      * Messages that this topic page contains.
      * Only includes topics from [currentPage].
      */
+    @Transient
     val messages: List<ForumMessage> = emptyList()
+
 ) : Serializable

@@ -95,7 +95,7 @@ class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
                     // open create new message fragment and insert quote
                     val messageAdd = AddMessageFragment().apply {
                         arguments = Bundle().apply {
-                            putSerializable(AddMessageFragment.TOPIC_ARG, topic)
+                            putInt(AddMessageFragment.TOPIC_ID_ARG, topic.id)
                             putString(AddMessageFragment.AUTHOR_ARG, message.author)
                             putString(AddMessageFragment.MSGID_ARG, message.id.toString())
                             putString(AddMessageFragment.QUOTE_ARG, text.toString())

@@ -8,6 +8,7 @@
     <string tools:context="message view elements" name="replies_prefix">Replies:</string>
     <string tools:context="message view elements" name="views_prefix">Views:</string>
     <string tools:context="message view elements" name="topic_pinned">Topic pinned</string>
+    <string tools:context="message view elements" name="topic_closed">Topic closed</string>
     <string tools:context="message view elements" name="message_index">Message index</string>
     <string name="share_link_using">Share link using…</string>
     <string name="share_image_using">Share image using…</string>
