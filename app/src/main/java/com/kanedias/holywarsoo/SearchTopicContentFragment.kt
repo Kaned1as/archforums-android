@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.kanedias.holywarsoo.dto.SearchTopicResults
+import com.kanedias.holywarsoo.model.PageableModel
 import com.kanedias.holywarsoo.model.SearchContentsModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
@@ -34,29 +35,17 @@ class SearchTopicContentFragment: FullscreenContentFragment() {
         const val URL_ARG = "URL_ARG"
     }
 
-    @BindView(R.id.topic_list_bottom_navigation)
-    lateinit var pageNavigation: ViewGroup
-
-    @BindView(R.id.topic_list)
-    lateinit var searchView: RecyclerView
-
     lateinit var contents: SearchContentsModel
 
-    lateinit var pageControls: PageViews
-
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, state: Bundle?): View {
-        val view = inflater.inflate(R.layout.fragment_forum_contents, parent, false)
+        val view = inflater.inflate(R.layout.fragment_contents, parent, false)
         ButterKnife.bind(this, view)
 
-        searchView.layoutManager = LinearLayoutManager(context)
-
-        viewRefresher.setOnRefreshListener { refreshContent() }
-
         contents = ViewModelProviders.of(this).get(SearchContentsModel::class.java)
-        contents.results.observe(this, Observer { searchView.adapter = SearchPageContentsAdapter(it) })
+        contents.results.observe(this, Observer { contentView.adapter = SearchPageContentsAdapter(it) })
         contents.results.observe(this, Observer { refreshViews() })
 
-        pageControls = PageViews(this, contents, pageNavigation)
+        setupUI(contents)
         refreshContent()
 
         return view

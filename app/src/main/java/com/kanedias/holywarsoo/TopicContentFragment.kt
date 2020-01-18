@@ -7,12 +7,11 @@ import android.view.*
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.card.MaterialCardView
 import com.kanedias.holywarsoo.dto.ForumMessage
 import com.kanedias.holywarsoo.misc.resolveAttr
+import com.kanedias.holywarsoo.model.PageableModel
 import com.kanedias.holywarsoo.model.TopicContentsModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
@@ -36,35 +35,27 @@ class TopicContentFragment: FullscreenContentFragment() {
         const val URL_ARG = "URL_ARG"
     }
 
-    @BindView(R.id.message_list_bottom_navigation)
-    lateinit var pageNavigation: ViewGroup
-
-    @BindView(R.id.message_list)
-    lateinit var topicView: RecyclerView
-
     lateinit var contents: TopicContentsModel
 
-    lateinit var pageControls: PageViews
-
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, state: Bundle?): View {
-        val view = inflater.inflate(R.layout.fragment_topic_contents, parent, false)
+        val view = inflater.inflate(R.layout.fragment_contents, parent, false)
         ButterKnife.bind(this, view)
 
-        topicView.layoutManager = LinearLayoutManager(context)
-        topicView.adapter = TopicContentsAdapter()
-
-        toolbar.inflateMenu(R.menu.topic_content_menu)
-
-        viewRefresher.setOnRefreshListener { refreshContent() }
-
         contents = ViewModelProviders.of(this).get(TopicContentsModel::class.java)
-        contents.topic.observe(this, Observer { topicView.adapter!!.notifyDataSetChanged() })
+        contents.topic.observe(this, Observer { contentView.adapter!!.notifyDataSetChanged() })
         contents.topic.observe(this, Observer { refreshViews() })
 
-        pageControls = PageViews(this, contents, pageNavigation)
+        setupUI(contents)
         refreshContent()
 
         return view
+    }
+
+    override fun setupUI(model: PageableModel) {
+        super.setupUI(model)
+
+        contentView.adapter = TopicContentsAdapter()
+        toolbar.inflateMenu(R.menu.topic_content_menu)
     }
 
     override fun refreshViews() {
@@ -139,18 +130,18 @@ class TopicContentFragment: FullscreenContentFragment() {
         // when recycler view is asked to scroll to some position, it doesn't know their height in advance
         // so we have to scroll continually till all the messages have been laid out and parsed
         lifecycleScope.launchWhenResumed {
-            topicView.smoothScrollToPosition(position)
+            contentView.smoothScrollToPosition(position)
 
             var limit = 20 // 2 sec
-            while(topicView.findViewHolderForAdapterPosition(position) == null) {
+            while(contentView.findViewHolderForAdapterPosition(position) == null) {
                 // holder view hasn't been laid out yet
                 delay(100)
 
                 limit -= 1
 
-                if (!topicView.layoutManager!!.isSmoothScrolling) {
+                if (!contentView.layoutManager!!.isSmoothScrolling) {
                     // continue scrolling if stopped and view holder is still not visible
-                    topicView.smoothScrollToPosition(position)
+                    contentView.smoothScrollToPosition(position)
                 }
 
                 if (limit == 0) {
@@ -161,7 +152,7 @@ class TopicContentFragment: FullscreenContentFragment() {
             }
 
             // highlight message by tinting background
-            val holder = topicView.findViewHolderForAdapterPosition(position) ?: return@launchWhenResumed
+            val holder = contentView.findViewHolderForAdapterPosition(position) ?: return@launchWhenResumed
             val card = holder.itemView as MaterialCardView
             ValueAnimator.ofArgb(card.resolveAttr(R.attr.colorPrimary), card.resolveAttr(R.attr.colorSecondary)).apply {
                 addUpdateListener {

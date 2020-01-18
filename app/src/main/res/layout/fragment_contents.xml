@@ -45,7 +45,7 @@
                 android:background="@color/design_default_color_background">
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/topic_list"
+                    android:id="@+id/content_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:paddingTop="4dp"
@@ -54,10 +54,10 @@
                     android:clipToPadding="false"
                     android:scrollbars="vertical"
                     android:fadeScrollbars="true"
-                    tools:context=".TopicViewHolder"/>
+                    tools:context=".MessageViewHolder"/>
 
                 <include layout="@layout/view_page_navigation"
-                    android:id="@+id/topic_list_bottom_navigation"
+                    android:id="@+id/content_bottom_navigation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"/>

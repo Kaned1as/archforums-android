@@ -1,10 +1,14 @@
 package com.kanedias.holywarsoo
 
+import android.view.ViewGroup
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
+import com.kanedias.holywarsoo.model.PageableModel
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrConfig
 import com.r0adkll.slidr.model.SlidrInterface
@@ -25,6 +29,20 @@ abstract class FullscreenContentFragment: ContentFragment() {
 
     @BindView(R.id.content_scroll_area)
     lateinit var viewRefresher: SwipeRefreshLayout
+
+    @BindView(R.id.content_bottom_navigation)
+    lateinit var pageNavigation: ViewGroup
+
+    @BindView(R.id.content_list)
+    lateinit var contentView: RecyclerView
+
+    private lateinit var pageControls: PageViews
+
+    open fun setupUI(model: PageableModel) {
+        viewRefresher.setOnRefreshListener { refreshContent() }
+        contentView.layoutManager = LinearLayoutManager(context)
+        pageControls = PageViews(this, model, pageNavigation)
+    }
 
     override fun refreshViews() {
         // setup toolbar
