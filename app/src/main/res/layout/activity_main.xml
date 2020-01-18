@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_area"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:focusable="true"
-    android:clickable="true"
-    android:background="@android:color/transparent"
+    android:id="@+id/main_area"
     tools:context=".MainActivity">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/main_toolbar_area"
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/main_drawer_area"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:focusable="true"
+        android:clickable="true">
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/main_toolbar_area"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fitsSystemWindows="true">
-
 
                 <androidx.appcompat.widget.Toolbar
                     android:theme="?attr/toolbarOverrideStyle"
@@ -33,41 +35,42 @@
 
             </com.google.android.material.appbar.AppBarLayout>
 
-        <FrameLayout
-            android:id="@+id/main_content_area"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <fragment
-                android:tag="main page content"
-                android:name="com.kanedias.holywarsoo.MainPageContentFragment"
+            <FrameLayout
+                android:id="@+id/main_content_area"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        </FrameLayout>
+                <fragment
+                    android:tag="main page content"
+                    android:name="com.kanedias.holywarsoo.MainPageContentFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
 
-        <!-- had to place FAB this way, see https://stackoverflow.com/questions/35255704 as to why -->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/main_reply_button"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="16dp"
+            </FrameLayout>
+
+            <!-- had to place FAB this way, see https://stackoverflow.com/questions/35255704 as to why -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/main_reply_button"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/add"
+                android:visibility="gone"
+                app:layout_behavior="com.kanedias.holywarsoo.misc.ScrollAwareFabBehavior"/>
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/main_sidebar"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/add"
-            android:visibility="gone"
-            app:layout_behavior="com.kanedias.holywarsoo.misc.ScrollAwareFabBehavior"/>
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            android:layout_gravity="start"
+            app:itemIconTint="@color/colorAccent"
+            app:menu="@menu/main_sidebar_menu"
+            app:headerLayout="@layout/view_sidebar_header"/>
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/main_sidebar"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        android:layout_gravity="start"
-        app:itemIconTint="@color/colorAccent"
-        app:menu="@menu/main_sidebar_menu"
-        app:headerLayout="@layout/view_sidebar_header"/>
-
-</androidx.drawerlayout.widget.DrawerLayout>
+    </androidx.drawerlayout.widget.DrawerLayout>
+</FrameLayout>

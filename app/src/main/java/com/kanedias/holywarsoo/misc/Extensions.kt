@@ -85,6 +85,6 @@ fun FragmentActivity.showFullscreenFragment(frag: Fragment) {
     supportFragmentManager.beginTransaction()
         .addToBackStack("Showing fragment: $frag")
         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-        .add(R.id.main_content_area, frag)
+        .add(R.id.main_area, frag)
         .commit()
 }

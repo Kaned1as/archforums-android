@@ -2,13 +2,11 @@
 <!-- it has layout behaviour as it will be attached as a child of coordinator layout, see activity_main.xml -->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_fragment_area"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ForumContentFragment">
 
     <!-- refresh layout for the main content -->

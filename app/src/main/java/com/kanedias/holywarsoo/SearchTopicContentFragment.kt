@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.kanedias.holywarsoo.dto.SearchTopicResults
@@ -29,14 +28,11 @@ import java.lang.Exception
  *
  * Created on 19.12.19
  */
-class SearchTopicContentFragment: ContentFragment() {
+class SearchTopicContentFragment: FullscreenContentFragment() {
 
     companion object {
-        const val SEARCH_ARG = "SEARCH_ARG"
+        const val URL_ARG = "URL_ARG"
     }
-
-    @BindView(R.id.topic_list_scroll_area)
-    lateinit var searchViewRefresher: SwipeRefreshLayout
 
     @BindView(R.id.topic_list_bottom_navigation)
     lateinit var pageNavigation: ViewGroup
@@ -54,10 +50,9 @@ class SearchTopicContentFragment: ContentFragment() {
 
         searchView.layoutManager = LinearLayoutManager(context)
 
-        searchViewRefresher.setOnRefreshListener { refreshContent() }
+        viewRefresher.setOnRefreshListener { refreshContent() }
 
         contents = ViewModelProviders.of(this).get(SearchContentsModel::class.java)
-        contents.results.value = requireArguments().getSerializable(SEARCH_ARG) as SearchTopicResults
         contents.results.observe(this, Observer { searchView.adapter = SearchPageContentsAdapter(it) })
         contents.results.observe(this, Observer { refreshViews() })
 
@@ -71,30 +66,35 @@ class SearchTopicContentFragment: ContentFragment() {
         Log.d("SearchFrag", "Refreshing content, search ${contents.results.value?.name}, page ${contents.currentPage.value}")
 
         lifecycleScope.launchWhenResumed {
-            searchViewRefresher.isRefreshing = true
+            viewRefresher.isRefreshing = true
 
             try {
+                val url = requireArguments().getString(URL_ARG, "")
                 val loaded = withContext(Dispatchers.IO) {
-                    Network.loadSearchResults(contents.results.value!!)
+                    Network.loadSearchResults(url, page = contents.currentPage.value!!)
                 }
+
                 contents.results.value = loaded
                 contents.pageCount.value = loaded.pageCount
                 contents.currentPage.value = loaded.currentPage
+
             } catch (ex: Exception) {
-                context?.let { Network.reportErrors(it, ex) }
+                Network.reportErrors(context, ex)
             }
 
-            searchViewRefresher.isRefreshing = false
+            viewRefresher.isRefreshing = false
         }
     }
 
     override fun refreshViews() {
+        super.refreshViews()
+
         val searchResults = contents.results.value ?: return
         val activity = activity as? MainActivity ?: return
 
         activity.addButton.visibility = View.GONE
 
-        activity.toolbar.apply {
+        toolbar.apply {
             title = searchResults.name
             subtitle = "${getString(R.string.page)} ${searchResults.currentPage}"
         }

@@ -217,17 +217,17 @@ object Network {
     }
 
     /**
-     * Loads search page completely, with all the supporting browsing info, enriching the existing
-     * object. The returned value is a copy of the original.
+     * Loads search page completely, with all the supporting browsing info, caption, pages and topics.
      *
-     * @param resultsBase base search results object to enrich, which may have no topics available
-     *                    at the moment of loading
+     * @param searchLink canonical link to the the search page, in form of `https://<website>/search.php?action=<action>`
+     * @param page page number that is used in conjunction with [searchLink] to produce paged link
      *
-     * @return fully enriched search page instance. Topics have the same ordering as they had on the actual page.
+     * @return fully enriched search results instance.
+     *         Topics have the same ordering as they had on the actual page.
      */
     @Throws(IOException::class)
-    fun loadSearchResults(resultsBase: SearchTopicResults, page: Int = 1): SearchTopicResults {
-        val pageUrl = HttpUrl.parse(resultsBase.link)!!.newBuilder().addQueryParameter("p", page.toString()).build()
+    fun loadSearchResults(searchLink: String, page: Int = 1): SearchTopicResults {
+        val pageUrl = HttpUrl.parse(searchLink)!!.newBuilder().addQueryParameter("p", page.toString()).build()
 
         val req = Request.Builder().url(pageUrl).get().build()
         val resp = httpClient.newCall(req).execute()
@@ -237,6 +237,8 @@ object Network {
         val html = resp.body()!!.string()
         val doc = Jsoup.parse(html)
 
+        val searchPageName = doc.select("div#brdmain > div.linkst ul.crumbs > li:last-child strong").text()
+
         val topics = parseTopics(doc, true)
 
         val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
@@ -245,7 +247,9 @@ object Network {
             .mapNotNull { it.ownText().trySanitizeInt() }
             .max()
 
-        return resultsBase.copy(
+        return SearchTopicResults(
+            link = searchLink,
+            name = searchPageName,
             pageCount = pageCount!!,
             currentPage = currentPage.sanitizeInt(),
             topics = topics

@@ -78,8 +78,6 @@ class MainPageContentFragment: ContentFragment() {
         }
     }
 
-    override fun hasBackNavigation() = false
-
     /**
      * Adapter for presenting forum descriptions and links in a material card view.
      * Main page only contains top-level forums, which always are part of some category.

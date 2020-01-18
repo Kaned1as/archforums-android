@@ -5,12 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.kanedias.holywarsoo.dto.Forum
@@ -29,14 +29,11 @@ import java.lang.Exception
  *
  * Created on 19.12.19
  */
-class ForumContentFragment: ContentFragment() {
+class ForumContentFragment: FullscreenContentFragment() {
 
     companion object {
         const val URL_ARG = "URL_ARG"
     }
-
-    @BindView(R.id.topic_list_scroll_area)
-    lateinit var forumViewRefresher: SwipeRefreshLayout
 
     @BindView(R.id.topic_list_bottom_navigation)
     lateinit var pageNavigation: ViewGroup
@@ -54,7 +51,7 @@ class ForumContentFragment: ContentFragment() {
 
         forumView.layoutManager = LinearLayoutManager(context)
 
-        forumViewRefresher.setOnRefreshListener { refreshContent() }
+        viewRefresher.setOnRefreshListener { refreshContent() }
 
         contents = ViewModelProviders.of(this).get(ForumContentsModel::class.java)
         contents.forum.observe(this, Observer { forumView.adapter = ForumContentsAdapter(it) })
@@ -67,12 +64,14 @@ class ForumContentFragment: ContentFragment() {
     }
 
     override fun refreshViews() {
+        super.refreshViews()
+
         val forum = contents.forum.value ?: return
         val activity = activity as? MainActivity ?: return
 
         activity.addButton.visibility = View.GONE
 
-        activity.toolbar.apply {
+        toolbar.apply {
             title = forum.name
             subtitle = "${getString(R.string.page)} ${forum.currentPage}"
         }
@@ -87,7 +86,7 @@ class ForumContentFragment: ContentFragment() {
         Log.d("ForumFrag", "Refreshing content, forum ${contents.forum.value?.name}, page ${contents.currentPage.value}")
 
         lifecycleScope.launchWhenResumed {
-            forumViewRefresher.isRefreshing = true
+            viewRefresher.isRefreshing = true
 
             try {
                 val forumUrl =  contents.forum.value?.link
@@ -105,7 +104,7 @@ class ForumContentFragment: ContentFragment() {
                 Network.reportErrors(context, ex)
             }
 
-            forumViewRefresher.isRefreshing = false
+            viewRefresher.isRefreshing = false
         }
     }
 

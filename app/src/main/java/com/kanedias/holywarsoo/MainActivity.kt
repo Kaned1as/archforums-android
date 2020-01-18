@@ -21,7 +21,6 @@ import butterknife.ButterKnife
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import com.kanedias.holywarsoo.dto.SearchTopicResults
 import com.kanedias.holywarsoo.markdown.mdRendererFrom
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
 import com.kanedias.holywarsoo.model.MainPageModel
@@ -39,7 +38,7 @@ import java.lang.IllegalStateException
  */
 class MainActivity : AppCompatActivity() {
 
-    @BindView(R.id.main_area)
+    @BindView(R.id.main_drawer_area)
     lateinit var drawer: DrawerLayout
 
     @BindView(R.id.main_sidebar)
@@ -221,29 +220,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onSidebarItemSelected(item: MenuItem): Boolean {
-        val page = when (item.itemId) {
-            R.id.menu_item_favorites -> {
-                val name = getString(R.string.favorite_topics)
-                SearchTopicResults(name = name, link = Network.FAVORITE_TOPICS_URL)
-            }
-            R.id.menu_item_replies -> {
-                val name = getString(R.string.replies_topics)
-                SearchTopicResults(name = name, link = Network.REPLIES_TOPICS_URL)
-            }
-            R.id.menu_item_new_messages -> {
-                val name = getString(R.string.new_messages_topics)
-                SearchTopicResults(name = name, link = Network.NEW_MESSAGES_TOPICS_URL)
-            }
-            R.id.menu_item_recent -> {
-                val name = getString(R.string.recent_topics)
-                SearchTopicResults(name = name, link = Network.RECENT_TOPICS_URL)
-            }
+        val url = when (item.itemId) {
+            R.id.menu_item_favorites -> Network.FAVORITE_TOPICS_URL
+            R.id.menu_item_replies -> Network.REPLIES_TOPICS_URL
+            R.id.menu_item_new_messages -> Network.NEW_MESSAGES_TOPICS_URL
+            R.id.menu_item_recent -> Network.RECENT_TOPICS_URL
             else -> throw IllegalStateException("No such page!")
         }
         drawer.closeDrawers()
 
         val frag = SearchTopicContentFragment().apply {
-            arguments = Bundle().apply { putSerializable(SearchTopicContentFragment.SEARCH_ARG, page) }
+            arguments = Bundle().apply { putString(SearchTopicContentFragment.URL_ARG, url) }
         }
         showFullscreenFragment(frag)
 

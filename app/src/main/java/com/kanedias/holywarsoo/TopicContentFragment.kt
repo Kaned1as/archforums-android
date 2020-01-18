@@ -3,9 +3,7 @@ package com.kanedias.holywarsoo
 import android.animation.ValueAnimator
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,14 +30,11 @@ import java.lang.Exception
  *
  * Created on 22.12.19
  */
-class TopicContentFragment: ContentFragment() {
+class TopicContentFragment: FullscreenContentFragment() {
 
     companion object {
         const val URL_ARG = "URL_ARG"
     }
-
-    @BindView(R.id.message_list_scroll_area)
-    lateinit var topicViewRefresher: SwipeRefreshLayout
 
     @BindView(R.id.message_list_bottom_navigation)
     lateinit var pageNavigation: ViewGroup
@@ -58,7 +53,9 @@ class TopicContentFragment: ContentFragment() {
         topicView.layoutManager = LinearLayoutManager(context)
         topicView.adapter = TopicContentsAdapter()
 
-        topicViewRefresher.setOnRefreshListener { refreshContent() }
+        toolbar.inflateMenu(R.menu.topic_content_menu)
+
+        viewRefresher.setOnRefreshListener { refreshContent() }
 
         contents = ViewModelProviders.of(this).get(TopicContentsModel::class.java)
         contents.topic.observe(this, Observer { topicView.adapter!!.notifyDataSetChanged() })
@@ -71,10 +68,12 @@ class TopicContentFragment: ContentFragment() {
     }
 
     override fun refreshViews() {
+        super.refreshViews()
+
         val topic = contents.topic.value ?: return
         val activity = activity as? MainActivity ?: return
 
-        activity.toolbar.apply {
+        toolbar.apply {
             title = topic.name
             subtitle = "${getString(R.string.page)} ${topic.currentPage}"
         }
@@ -101,7 +100,7 @@ class TopicContentFragment: ContentFragment() {
         Log.d("TopicFrag", "Refreshing content, topic ${contents.topic.value?.name}, page ${contents.currentPage.value}")
 
         lifecycleScope.launchWhenResumed {
-            topicViewRefresher.isRefreshing = true
+            viewRefresher.isRefreshing = true
 
             try {
                 val topicUrl =  contents.topic.value?.link
@@ -123,7 +122,7 @@ class TopicContentFragment: ContentFragment() {
                 context?.let { Network.reportErrors(it, ex) }
             }
 
-            topicViewRefresher.isRefreshing = false
+            viewRefresher.isRefreshing = false
         }
     }
 

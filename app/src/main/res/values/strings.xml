@@ -1,43 +1,61 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Holywarsoo</string>
-    <string name="the_maker" translatable="false">Kanedias</string>
-    <string name="house_of_maker" translatable="false">House of Maker</string>
-    <string name="gplv3" translatable="false">GPLv3</string>
-    <string name="open">Open</string>
-    <string name="close">Close</string>
+    <string tools:context="general" name="app_name">Holywarsoo</string>
+
+    <string tools:context="'about this app' dialog" name="the_maker" translatable="false">Kanedias</string>
+    <string tools:context="'about this app' dialog" name="house_of_maker" translatable="false">House of Maker</string>
+    <string tools:context="'about this app' dialog" name="gplv3" translatable="false">GPLv3</string>
+    <string tools:context="'about this app' dialog" name="version">Version</string>
+    <string tools:context="'about this app' dialog" name="license">License</string>
+    <string tools:context="'about this app' dialog" name="author">Author</string>
+    <string tools:context="'about this app' dialog" name="donate">Donate</string>
+    <string tools:context="'about this app' dialog" name="send_email">Send e-mail</string>
+    <string tools:context="'about this app' dialog" name="source_code">Source code</string>
+    <string tools:context="'about this app' dialog" name="fork_on_gitlab">Fork on GitLab</string>
+    <string tools:context="'about this app' dialog" name="report_bug">Report bug</string>
+    <string tools:context="'about this app' dialog" name="gitlab_issue_tracker">GitLab issue tracker</string>
+
     <string tools:context="message view elements" name="replies_prefix">Replies:</string>
     <string tools:context="message view elements" name="views_prefix">Views:</string>
     <string tools:context="message view elements" name="topic_pinned">Topic pinned</string>
     <string tools:context="message view elements" name="topic_closed">Topic closed</string>
     <string tools:context="message view elements" name="message_index">Message index</string>
-    <string name="share_link_using">Share link using…</string>
-    <string name="share_image_using">Share image using…</string>
-    <string name="downloading_image">Downloading image…</string>
-    <string name="image_saved_as">Image saved as</string>
-    <string name="app_crashed">Sorry, app just crashed</string>
-    <string name="app_crash_report">Holywarsoo crash report</string>
-    <string name="leave_crash_comment">Please describe your last performed action before the crash</string>
-    <string name="hello_plus_comma">Hello,</string>
-    <string name="username">Username</string>
-    <string name="password">Password</string>
-    <string name="guest">Guest</string>
-    <string name="enter">Enter</string>
-    <string name="please_wait">Please wait</string>
-    <string name="logging_in">Logging in…</string>
-    <string name="login_successful">Login successful</string>
-    <string name="error_connecting">Error connecting</string>
-    <string name="favorite_topics">Favorites</string>
-    <string name="replies_topics">Replies</string>
-    <string name="recent_topics">Recent</string>
-    <string name="new_messages_topics">With new messages</string>
-    <string name="page">Page</string>
-    <string name="content">Content</string>
-    <string name="reply">Reply</string>
-    <string name="new_messages">New messages</string>
+
+    <string tools:context="fullscreen image viewer" name="share_link_using">Share link using…</string>
+    <string tools:context="fullscreen image viewer" name="share_image_using">Share image using…</string>
+    <string tools:context="fullscreen image viewer" name="downloading_image">Downloading image…</string>
+    <string tools:context="fullscreen image viewer" name="image_saved_as">Image saved as</string>
+
+    <string tools:context="ACRA dialog" name="app_crashed">Sorry, app just crashed</string>
+    <string tools:context="ACRA dialog" name="app_crash_report">Holywarsoo crash report</string>
+    <string tools:context="ACRA dialog" name="leave_crash_comment">Please describe your last performed action before the crash</string>
+
+    <string tools:context="sidebar panel" name="open">Open</string>
+    <string tools:context="sidebar panel" name="close">Close</string>
+    <string tools:context="sidebar panel" name="hello_plus_comma">Hello,</string>
+    <string tools:context="sidebar panel" name="guest">Guest</string>
+    <string tools:context="sidebar panel" name="enter">Enter</string>
+    <string tools:context="sidebar panel" name="favorite_topics">Favorites</string>
+    <string tools:context="sidebar panel" name="replies_topics">Replies</string>
+    <string tools:context="sidebar panel" name="recent_topics">Recent</string>
+    <string tools:context="sidebar panel" name="new_messages_topics">With new messages</string>
+
+    <string tools:context="login procedure" name="username">Username</string>
+    <string tools:context="login procedure" name="password">Password</string>
+    <string tools:context="login procedure" name="please_wait">Please wait</string>
+    <string tools:context="login procedure" name="logging_in">Logging in…</string>
+    <string tools:context="login procedure" name="login_successful">Login successful</string>
+
+    <string tools:context="error reporting" name="error_connecting">Error connecting</string>
+
+    <string tools:context="topic/forum browsing" name="page">Page</string>
+    <string tools:context="topic/forum browsing" name="reply">Reply</string>
+
     <string tools:context="image upload" name="no_permissions">Permission denied, can\'t perform action</string>
     <string tools:context="image upload" name="select_image_to_upload">Select image to upload</string>
     <string tools:context="image upload" name="no_file_manager_found">No file manager found</string>
     <string tools:context="image upload" name="uploading">Uploading…</string>
+
+    <string tools:context="text editor" name="content">Content</string>
     <string tools:context="text editor" name="more_tag_default">Read more</string>
     <string tools:context="text editor" name="bold_font">Bold font</string>
     <string tools:context="text editor" name="italic_font">Italic font</string>
@@ -53,6 +71,7 @@
     <string tools:context="text editor" name="insert_spoiler_tag">Insert spoiler tag</string>
     <string tools:context="text editor" name="submit">Submit</string>
     <string tools:context="text editor" name="submitting">Submitting…</string>
+
     <string tools:context="bottom paging interface" name="to_first_page">To first page</string>
     <string tools:context="bottom paging interface" name="to_previous_page">To previous page</string>
     <string tools:context="bottom paging interface" name="to_next_page">To next page</string>
@@ -62,18 +81,12 @@
 
     <string tools:context="what's new dialogue" name="whats_new">What\'s new?</string>
     <string tools:context="what's new dialogue" name="help_the_project">Help the project</string>
+
     <string tools:context="main action bar menu" name="menu_settings">Settings</string>
     <string tools:context="main action bar menu" name="menu_about">About</string>
     <string tools:context="main action bar menu" name="menu_donate">Donate</string>
     <string tools:context="main action bar menu" name="menu_search">Search</string>
 
-    <string tools:context="'about this app' dialog" name="version">Version</string>
-    <string tools:context="'about this app' dialog" name="license">License</string>
-    <string tools:context="'about this app' dialog" name="author">Author</string>
-    <string tools:context="'about this app' dialog" name="donate">Donate</string>
-    <string tools:context="'about this app' dialog" name="send_email">Send e-mail</string>
-    <string tools:context="'about this app' dialog" name="source_code">Source code</string>
-    <string tools:context="'about this app' dialog" name="fork_on_gitlab">Fork on GitLab</string>
-    <string tools:context="'about this app' dialog" name="report_bug">Report bug</string>
-    <string tools:context="'about this app' dialog" name="gitlab_issue_tracker">GitLab issue tracker</string>
+    <string tools:context="topic contents menu" name="share">Share</string>
+    <string name="favorite">Favorite</string>
 </resources>
