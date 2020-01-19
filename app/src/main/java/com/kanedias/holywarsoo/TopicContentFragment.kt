@@ -135,6 +135,7 @@ class TopicContentFragment: FullscreenContentFragment() {
             }
 
             val shareMi = menu.findItem(R.id.menu_topic_share)
+            shareMi.isVisible = true
             shareMi.setOnMenuItemClickListener { context.shareLink(topic.link); true }
         }
 

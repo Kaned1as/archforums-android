@@ -16,7 +16,7 @@
         android:id="@+id/menu_settings"
         android:title="@string/menu_settings"
         android:icon="@drawable/settings"
-        android:visible="false"/>
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/menu_donate"

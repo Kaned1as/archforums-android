@@ -3,6 +3,8 @@ package com.kanedias.holywarsoo.service
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
+import com.kanedias.holywarsoo.misc.resolveMetadataValue
+import com.kanedias.holywarsoo.service.Config.prefs
 
 /**
  * @author Kanedias
@@ -11,15 +13,32 @@ import androidx.preference.PreferenceManager
  */
 object Config {
 
-    private const val LAST_VERSION = "last-version"
+    const val LAST_VERSION = "last-version"
+    const val HOME_URL = "home-url"
 
     lateinit var prefs: SharedPreferences
 
     fun init(ctx: Context) {
         prefs = PreferenceManager.getDefaultSharedPreferences(ctx.applicationContext)
+
+        if (homeUrl.isEmpty()) {
+            // initial run, store value from app metadata
+            homeUrl = ctx.resolveMetadataValue("mainWebsiteUrl")
+        }
+    }
+
+    /**
+     * Reset config values to their default state
+     */
+    fun reset(ctx: Context) {
+        homeUrl = ctx.resolveMetadataValue("mainWebsiteUrl")
     }
 
     var lastVersion: Int
         get() = prefs.getInt(LAST_VERSION, 0)
         set(lastVersion) = prefs.edit().putInt(LAST_VERSION, lastVersion).apply()
+
+    var homeUrl: String
+        get() = prefs.getString(HOME_URL, "")!!
+        set(homeUrl) = prefs.edit().putString(HOME_URL, homeUrl).apply()
 }

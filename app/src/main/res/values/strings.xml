@@ -96,4 +96,9 @@
     <string tools:context="topic contents menu toast" name="removed_from_favorites">Removed from favorites</string>
     <string tools:context="topic contents menu toast" name="subscribed">Subscribed</string>
     <string tools:context="topic contents menu toast" name="unsubscribed">Unsubscribed</string>
+
+    <string tools:context="settings activity" name="api_home_server">API home server</string>
+    <string tools:context="settings activity" name="api_home_server_hint" translatable="false">http[s]://hostname[:port]/[endpoint]</string>
+    <string tools:context="settings activity" name="api_home_server_sum">Don\'t change this if you don\'t know what you\'re doing</string>
+    <string tools:context="settings activity" name="invalid_home_server_endpoint">Invalid homeserver API endpoint, reset to default</string>
 </resources>

@@ -13,6 +13,7 @@ import com.kanedias.holywarsoo.BuildConfig
 import com.kanedias.holywarsoo.R
 import com.kanedias.holywarsoo.dto.*
 import com.kanedias.holywarsoo.markdown.toMarkdown
+import com.kanedias.holywarsoo.misc.resolveMetadataValue
 import com.kanedias.holywarsoo.misc.sanitizeInt
 import com.kanedias.holywarsoo.misc.trySanitizeInt
 import kotlinx.coroutines.Dispatchers
@@ -75,20 +76,32 @@ object Network {
     private lateinit var cookiesInfo: SharedPreferences
     private lateinit var cookieJar: PersistentCookieJar
     private lateinit var cookiePersistor: SharedPrefsCookiePersistor
+    private lateinit var prefChangeListener: SharedPreferences.OnSharedPreferenceChangeListener
 
     fun init(ctx: Context) {
         appCtx = ctx
 
-        val meta = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA).metaData
+        prefChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key != Config.HOME_URL)
+                return@OnSharedPreferenceChangeListener
 
-        MAIN_WEBSITE_URL = HttpUrl.parse(meta.getString("mainWebsiteUrl", null))!!
-        FAVORITE_TOPICS_URL = resolve("search.php?action=show_favorites")!!.toString()
-        REPLIES_TOPICS_URL = resolve("search.php?action=show_replies")!!.toString()
-        NEW_MESSAGES_TOPICS_URL = resolve("search.php?action=show_new")!!.toString()
-        RECENT_TOPICS_URL = resolve("search.php?action=show_recent")!!.toString()
+            // check validity of new homeserver
+            val isValid = HttpUrl.parse(Config.homeUrl) != null
+            if (!isValid) {
+                Toast.makeText(appCtx, R.string.invalid_home_server_endpoint, Toast.LENGTH_LONG).show()
+                Config.reset(appCtx)
+                return@OnSharedPreferenceChangeListener
+            }
 
-        accountInfo = ctx.getSharedPreferences(ACCOUNT_SHARED_PREFS, Context.MODE_PRIVATE)
-        cookiesInfo = ctx.getSharedPreferences(COOKIES_SHARED_PREFS, Context.MODE_PRIVATE)
+            // url is valid
+            setupEndpoints(Config.homeUrl)
+        }
+
+        Config.prefs.registerOnSharedPreferenceChangeListener(prefChangeListener)
+        setupEndpoints(Config.homeUrl)
+
+        accountInfo = appCtx.getSharedPreferences(ACCOUNT_SHARED_PREFS, Context.MODE_PRIVATE)
+        cookiesInfo = appCtx.getSharedPreferences(COOKIES_SHARED_PREFS, Context.MODE_PRIVATE)
         cookiePersistor = SharedPrefsCookiePersistor(cookiesInfo)
         cookieJar = PersistentCookieJar(SetCookieCache(), cookiePersistor)
         httpClient = OkHttpClient.Builder()
@@ -100,6 +113,14 @@ object Network {
             .addInterceptor(userAgent)
             .cookieJar(cookieJar)
             .build()
+    }
+
+    private fun setupEndpoints(url: String) {
+        MAIN_WEBSITE_URL = HttpUrl.parse(url)!!
+        FAVORITE_TOPICS_URL = resolve("search.php?action=show_favorites")!!.toString()
+        REPLIES_TOPICS_URL = resolve("search.php?action=show_replies")!!.toString()
+        NEW_MESSAGES_TOPICS_URL = resolve("search.php?action=show_new")!!.toString()
+        RECENT_TOPICS_URL = resolve("search.php?action=show_recent")!!.toString()
     }
 
     private fun authCookie() = cookiePersistor.loadAll().firstOrNull { it.name().startsWith("pun_cookie") }

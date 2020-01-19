@@ -35,8 +35,8 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        Network.init(this)
         Config.init(this)
+        Network.init(this)
         Database.init(this)
     }
 }

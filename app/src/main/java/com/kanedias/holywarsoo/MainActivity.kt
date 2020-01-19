@@ -15,6 +15,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.forEach
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.*
 import butterknife.BindView
 import butterknife.ButterKnife
@@ -129,8 +130,13 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_donate -> donateHelper.donate()
-            //R.id.menu_settings -> startActivity(Intent(this, SettingsActivity::class.java))
-            R.id.menu_about -> showFullscreenFragment(AboutFragment())
+            R.id.menu_settings -> startActivity(Intent(this, SettingsActivity::class.java))
+            R.id.menu_about -> supportFragmentManager.beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .addToBackStack("showing about fragment")
+                .replace(R.id.main_page_fragment, AboutFragment())
+                .commit()
+
             else -> return super.onOptionsItemSelected(item)
         }
 

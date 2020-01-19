@@ -3,6 +3,7 @@ package com.kanedias.holywarsoo.misc
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -101,4 +102,15 @@ fun Context.shareLink(link: String) {
     } catch (e: ActivityNotFoundException) {
         // no applications to share text link? what is it, a set-top-box?
     }
+}
+
+fun Context.resolveMetadataValue(key: String): String {
+    val meta = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA).metaData
+    return meta.getString(key, null)
+}
+
+fun Context.resolveAttr(attr: Int): Int {
+    val typedValue = TypedValue()
+    this.theme.resolveAttribute(attr, typedValue, true)
+    return typedValue.data
 }
