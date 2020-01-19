@@ -56,8 +56,6 @@ class MainPageContentFragment: ContentFragment() {
     override fun refreshViews() {
         val activity = activity as? MainActivity ?: return
 
-        activity.addButton.visibility = View.GONE
-
         activity.toolbar.apply {
             title = getString(R.string.app_name)
             subtitle = ""

@@ -19,7 +19,6 @@ import androidx.lifecycle.*
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.kanedias.holywarsoo.markdown.mdRendererFrom
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
@@ -46,9 +45,6 @@ class MainActivity : AppCompatActivity() {
 
     @BindView(R.id.main_toolbar)
     lateinit var toolbar: Toolbar
-
-    @BindView(R.id.main_reply_button)
-    lateinit var addButton: FloatingActionButton
 
     lateinit var sidebarHeader: SidebarHeaderViewHolder
 
@@ -108,21 +104,6 @@ class MainActivity : AppCompatActivity() {
                     Network.logout()
                     refreshContent()
                 }
-            }
-        })
-
-        // hack: resume fragment that is activated on tapping "back"
-        supportFragmentManager.addOnBackStackChangedListener(object: FragmentManager.OnBackStackChangedListener {
-            var lastStackSize = 0
-
-            override fun onBackStackChanged() {
-                val currentStackSize = supportFragmentManager.backStackEntryCount
-                if (currentStackSize < lastStackSize) { // we navigated back
-                    val top = supportFragmentManager.fragments.findLast { it is ContentFragment }
-                    (top as? ContentFragment)?.refreshViews()
-                }
-
-                lastStackSize = currentStackSize
             }
         })
 

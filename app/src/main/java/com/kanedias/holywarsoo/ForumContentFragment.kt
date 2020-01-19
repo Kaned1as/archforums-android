@@ -59,9 +59,6 @@ class ForumContentFragment: FullscreenContentFragment() {
         super.refreshViews()
 
         val forum = contents.forum.value ?: return
-        val activity = activity as? MainActivity ?: return
-
-        activity.addButton.visibility = View.GONE
 
         toolbar.apply {
             title = forum.name

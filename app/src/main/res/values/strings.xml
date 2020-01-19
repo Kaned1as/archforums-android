@@ -88,5 +88,12 @@
     <string tools:context="main action bar menu" name="menu_search">Search</string>
 
     <string tools:context="topic contents menu" name="share">Share</string>
-    <string name="favorite">Favorite</string>
+    <string tools:context="topic contents menu" name="add_to_favorites">Add to favorites</string>
+    <string tools:context="topic contents menu" name="remove_from_favorites">Remove from favorites</string>
+    <string tools:context="topic contents menu" name="subscribe">Subscribe</string>
+    <string tools:context="topic contents menu" name="unsubscribe">Unsubscribe</string>
+    <string tools:context="topic contents menu toast" name="added_to_favorites">Added to favorites</string>
+    <string tools:context="topic contents menu toast" name="removed_from_favorites">Removed from favorites</string>
+    <string tools:context="topic contents menu toast" name="subscribed">Subscribed</string>
+    <string tools:context="topic contents menu toast" name="unsubscribed">Unsubscribed</string>
 </resources>

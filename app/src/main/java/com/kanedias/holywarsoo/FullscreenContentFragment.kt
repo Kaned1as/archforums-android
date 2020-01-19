@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.kanedias.holywarsoo.model.PageableModel
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrConfig
@@ -35,6 +36,9 @@ abstract class FullscreenContentFragment: ContentFragment() {
 
     @BindView(R.id.content_list)
     lateinit var contentView: RecyclerView
+
+    @BindView(R.id.content_reply_button)
+    lateinit var actionButton: FloatingActionButton
 
     private lateinit var pageControls: PageViews
 

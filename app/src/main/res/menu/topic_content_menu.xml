@@ -5,8 +5,9 @@
 
     <item
         android:id="@+id/menu_topic_favorite"
-        android:title="@string/favorite"
+        android:title="@string/add_to_favorites"
         android:icon="@drawable/bookmark_add"
+        android:visible="false"
         app:showAsAction="ifRoom"/>
 
     <item
@@ -14,5 +15,11 @@
         android:title="@string/share"
         android:icon="@drawable/share"
         app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/menu_topic_subscribe"
+        android:title="@string/subscribe"
+        android:visible="false"
+        app:showAsAction="never"/>
 
 </menu>

@@ -1,5 +1,8 @@
 package com.kanedias.holywarsoo.misc
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -87,4 +90,15 @@ fun FragmentActivity.showFullscreenFragment(frag: Fragment) {
         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         .add(R.id.main_area, frag)
         .commit()
+}
+
+fun Context.shareLink(link: String) {
+    try {
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = "text/plain"
+        intent.putExtra(Intent.EXTRA_TEXT, link)
+        startActivity(Intent.createChooser(intent, getString(R.string.share_link_using)))
+    } catch (e: ActivityNotFoundException) {
+        // no applications to share text link? what is it, a set-top-box?
+    }
 }

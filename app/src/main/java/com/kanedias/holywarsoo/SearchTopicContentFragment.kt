@@ -79,9 +79,6 @@ class SearchTopicContentFragment: FullscreenContentFragment() {
         super.refreshViews()
 
         val searchResults = contents.results.value ?: return
-        val activity = activity as? MainActivity ?: return
-
-        activity.addButton.visibility = View.GONE
 
         toolbar.apply {
             title = searchResults.name
