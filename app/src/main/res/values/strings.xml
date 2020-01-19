@@ -98,7 +98,16 @@
     <string tools:context="topic contents menu toast" name="unsubscribed">Unsubscribed</string>
 
     <string tools:context="settings activity" name="api_home_server">API home server</string>
-    <string tools:context="settings activity" name="api_home_server_hint" translatable="false">http[s]://hostname[:port]/[endpoint]</string>
+    <string tools:context="settings activity" name="api_home_server_hint">http[s]://hostname[:port]/[endpoint]</string>
     <string tools:context="settings activity" name="api_home_server_sum">Don\'t change this if you don\'t know what you\'re doing</string>
     <string tools:context="settings activity" name="invalid_home_server_endpoint">Invalid homeserver API endpoint, reset to default</string>
+    <string tools:context="settings activity" name="app_theme">Application theme</string>
+    <string tools:context="settings activity" name="app_theme_summary">Applied fully after application restart</string>
+
+    <string-array name="preference_themes_titles">
+        <item>Fire</item>
+        <item>Water (Dark)</item>
+        <item>Air</item>
+        <item>Earth</item>
+    </string-array>
 </resources>

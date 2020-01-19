@@ -79,4 +79,18 @@
     <string name="removed_from_favorites">Удалено из избранного</string>
     <string name="subscribed">Подписано</string>
     <string name="unsubscribed">Отписано</string>
+
+    <string name="api_home_server">Адрес сервера</string>
+    <string name="api_home_server_hint">http[s]://имя-хоста[:порт]/[адрес]</string>
+    <string name="api_home_server_sum">Не изменяйте, если не знаете, что делаете</string>
+    <string name="invalid_home_server_endpoint">Некорректный адрес сервера, сброс…</string>
+    <string name="app_theme">Тема оформления</string>
+    <string name="app_theme_summary">Применяется полностью после перезагрузки приложения</string>
+
+    <string-array name="preference_themes_titles">
+        <item>Огонь</item>
+        <item>Вода (Тёмная)</item>
+        <item>Воздух</item>
+        <item>Земля</item>
+    </string-array>
 </resources>

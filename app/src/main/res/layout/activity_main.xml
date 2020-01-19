@@ -58,7 +58,7 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             android:layout_gravity="start"
-            app:itemIconTint="@color/colorAccent"
+            app:itemIconTint="?attr/colorAccent"
             app:menu="@menu/main_sidebar_menu"
             app:headerLayout="@layout/view_sidebar_header"/>
 

@@ -8,4 +8,13 @@
         android:title="@string/api_home_server"
         android:summary="@string/api_home_server_sum"/>
 
+    <ListPreference
+        android:icon="@drawable/theme"
+        android:entries="@array/preference_themes_titles"
+        android:entryValues="@array/preference_themes_values"
+        android:key="application-theme"
+        android:defaultValue="fire"
+        android:summary="@string/app_theme_summary"
+        android:title="@string/app_theme"/>
+
 </PreferenceScreen>

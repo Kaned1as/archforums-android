@@ -1,33 +1,70 @@
 <resources>
 
     <attr name="colorNonImportantText" format="reference" />
+    <attr name="colorMainBackground" format="reference" />
+    <attr name="colorForumBackground" format="reference" />
     <attr name="toolbarOverrideStyle" format="reference" />
     <attr name="toolbarPopupOverrideStyle" format="reference" />
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorSecondary">@color/holywarsooForumContent</item>
-        <item name="colorOnSecondary">@color/holywarsooForumText</item>
-        <item name="colorNonImportantText">@color/holywarsooForumHintText</item>
+    <style name="FireTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/holywarsooFireMainHeader</item>
+        <item name="colorPrimaryDark">@color/holywarsooFireMainHeaderDark</item>
+        <item name="colorAccent">@color/holywarsooFireForumLinkText</item>
+        <item name="colorSecondary">@color/holywarsooFireForumContent</item>
+        <item name="colorOnSecondary">@color/holywarsooFireForumText</item>
+        <item name="colorNonImportantText">@color/holywarsooFireForumHintText</item>
+        <item name="colorMainBackground">@color/holywarsooFireMainBg</item>
+        <item name="colorForumBackground">@color/holywarsooFireForumHeader</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
         <item name="toolbarOverrideStyle">@style/Theme.MaterialComponents.NoActionBar</item>
         <item name="toolbarPopupOverrideStyle">@style/Theme.MaterialComponents.Light.NoActionBar</item>
     </style>
 
+    <style name="AirTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/holywarsooAirMainHeader</item>
+        <item name="colorPrimaryDark">@color/holywarsooAirMainHeaderDark</item>
+        <item name="colorAccent">@color/holywarsooAirForumLinkText</item>
+        <item name="colorSecondary">@color/holywarsooAirForumContent</item>
+        <item name="colorOnSecondary">@color/holywarsooAirForumText</item>
+        <item name="colorNonImportantText">@color/holywarsooAirForumHintText</item>
+        <item name="colorMainBackground">@color/holywarsooAirMainBg</item>
+        <item name="colorForumBackground">@color/holywarsooAirForumHeader</item>
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="toolbarOverrideStyle">@style/Theme.MaterialComponents.NoActionBar</item>
+        <item name="toolbarPopupOverrideStyle">@style/Theme.MaterialComponents.Light.NoActionBar</item>
+    </style>
+
+    <style name="EarthTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/holywarsooEarthMainHeader</item>
+        <item name="colorPrimaryDark">@color/holywarsooEarthMainHeaderDark</item>
+        <item name="colorAccent">@color/holywarsooEarthForumLink</item>
+        <item name="colorSecondary">@color/holywarsooEarthForumContent</item>
+        <item name="colorOnSecondary">@color/holywarsooEarthForumText</item>
+        <item name="colorNonImportantText">@color/holywarsooEarthForumHintText</item>
+        <item name="colorMainBackground">@color/holywarsooEarthMainBg</item>
+        <item name="colorForumBackground">@color/holywarsooEarthForumHeader</item>
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="toolbarOverrideStyle">@style/Theme.MaterialComponents.NoActionBar</item>
+        <item name="toolbarPopupOverrideStyle">@style/Theme.MaterialComponents.Light.NoActionBar</item>
+    </style>
+
+    <style name="WaterTheme" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@color/holywarsooWaterForumLinkText</item>
+        <item name="colorPrimaryDark">@color/holywarsooWaterMainHeaderDark</item>
+        <item name="colorAccent">@color/holywarsooWaterForumLinkText</item>
+        <item name="colorSecondary">@color/holywarsooWaterForumContent</item>
+        <item name="colorOnSecondary">@color/holywarsooWaterForumText</item>
+        <item name="colorNonImportantText">@color/holywarsooWaterForumHintText</item>
+        <item name="colorMainBackground">@color/holywarsooWaterMainBg</item>
+        <item name="colorForumBackground">@color/holywarsooWaterForumHeader</item>
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="toolbarOverrideStyle">@style/Theme.MaterialComponents.NoActionBar</item>
+        <item name="toolbarPopupOverrideStyle">@style/Theme.MaterialComponents.NoActionBar</item>
+    </style>
+
     <!-- Drawer menu -->
     <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>
-        <item name="color">@color/holywarsooForumContent</item>
+        <item name="color">?attr/colorSecondary</item>
     </style>
-
-    <style name="Ripple" />
-
-    <style name="Ripple.Item">
-        <item name="android:background">?android:selectableItemBackground</item>
-    </style>
-
 </resources>

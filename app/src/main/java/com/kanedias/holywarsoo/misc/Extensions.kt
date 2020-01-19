@@ -1,5 +1,6 @@
 package com.kanedias.holywarsoo.misc
 
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -13,6 +14,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.transition.Slide
 import com.kanedias.holywarsoo.R
+import com.kanedias.holywarsoo.service.Config
 
 
 private val UNNEEDED_INT_CHARS = Regex("[,. ]")
@@ -91,6 +93,15 @@ fun FragmentActivity.showFullscreenFragment(frag: Fragment) {
         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         .add(R.id.main_area, frag)
         .commit()
+}
+
+fun FragmentActivity.setupTheme() {
+    when (Config.appTheme) {
+        "fire" -> setTheme(R.style.FireTheme)
+        "water" -> setTheme(R.style.WaterTheme)
+        "air" -> setTheme(R.style.AirTheme)
+        "earth" -> setTheme(R.style.EarthTheme)
+    }
 }
 
 fun Context.shareLink(link: String) {

@@ -4,7 +4,6 @@ import android.view.ViewGroup
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
@@ -44,7 +43,6 @@ abstract class FullscreenContentFragment: ContentFragment() {
 
     open fun setupUI(model: PageableModel) {
         viewRefresher.setOnRefreshListener { refreshContent() }
-        contentView.layoutManager = LinearLayoutManager(context)
         pageControls = PageViews(this, model, pageNavigation)
     }
 

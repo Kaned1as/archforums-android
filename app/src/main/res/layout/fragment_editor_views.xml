@@ -41,7 +41,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="2dp"
-            android:theme="@style/Ripple.Item"
+            android:background="?android:selectableItemBackground"
             android:src="@drawable/bold"
             android:tint="?attr/colorOnSecondary"
             android:contentDescription="@string/bold_font"/>
@@ -53,7 +53,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="2dp"
-            android:theme="@style/Ripple.Item"
+            android:background="?android:selectableItemBackground"
             android:src="@drawable/italic"
             android:tint="?attr/colorOnSecondary"
             android:contentDescription="@string/italic_font"/>
@@ -65,7 +65,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="2dp"
-            android:theme="@style/Ripple.Item"
+            android:background="?android:selectableItemBackground"
             android:src="@drawable/underlined"
             android:tint="?attr/colorOnSecondary"
             android:contentDescription="@string/underlined_font"/>
@@ -77,7 +77,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="2dp"
-            android:theme="@style/Ripple.Item"
+            android:background="?android:selectableItemBackground"
             android:src="@drawable/strikethrough"
             android:tint="?attr/colorOnSecondary"
             android:contentDescription="@string/strikethrough_font"/>
@@ -89,7 +89,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="2dp"
-            android:theme="@style/Ripple.Item"
+            android:background="?android:selectableItemBackground"
             android:src="@drawable/code"
             android:tint="?attr/colorOnSecondary"
             android:contentDescription="@string/insert_code_block"/>
@@ -101,7 +101,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="2dp"
-            android:theme="@style/Ripple.Item"
+            android:background="?android:selectableItemBackground"
             android:src="@drawable/quote"
             android:tint="?attr/colorOnSecondary"
             android:contentDescription="@string/insert_quote_block"/>
@@ -113,7 +113,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="2dp"
-            android:theme="@style/Ripple.Item"
+            android:background="?android:selectableItemBackground"
             android:src="@drawable/numbered_list"
             android:tint="?attr/colorOnSecondary"
             android:contentDescription="@string/insert_numbered_list"/>
@@ -125,7 +125,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="2dp"
-            android:theme="@style/Ripple.Item"
+            android:background="?android:selectableItemBackground"
             android:src="@drawable/bulleted_list"
             android:tint="?attr/colorOnSecondary"
             android:contentDescription="@string/insert_bulleted_list"/>
@@ -137,7 +137,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="2dp"
-            android:theme="@style/Ripple.Item"
+            android:background="?android:selectableItemBackground"
             android:src="@drawable/link"
             android:tint="?attr/colorOnSecondary"
             android:contentDescription="@string/insert_link"/>
@@ -149,7 +149,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="2dp"
-            android:theme="@style/Ripple.Item"
+            android:background="?android:selectableItemBackground"
             android:src="@drawable/image"
             android:tint="?attr/colorOnSecondary"
             android:contentDescription="@string/insert_image"/>
@@ -161,7 +161,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="2dp"
-            android:theme="@style/Ripple.Item"
+            android:background="?android:selectableItemBackground"
             android:src="@drawable/more"
             android:tint="?attr/colorOnSecondary"
             android:contentDescription="@string/insert_spoiler_tag"/>

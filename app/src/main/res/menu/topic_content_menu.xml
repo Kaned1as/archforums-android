@@ -15,7 +15,7 @@
         android:title="@string/share"
         android:icon="@drawable/share"
         android:visible="false"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/menu_topic_subscribe"

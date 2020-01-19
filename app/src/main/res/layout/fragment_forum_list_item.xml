@@ -37,8 +37,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                android:background="@color/holywarsooForumHeader"
-                android:textColor="@color/colorAccent"
+                android:background="?attr/colorForumBackground"
+                android:textColor="?attr/colorAccent"
                 android:padding="12dp"
                 android:minEms="10"
                 android:text="@string/placeholder_long"/>
@@ -80,14 +80,14 @@
                     android:layout_below="@+id/forum_last_message_date"
                     android:background="?attr/selectableItemBackground"
                     android:textAppearance="@android:style/TextAppearance.Material.Small"
-                    android:textColor="@color/colorAccent"
+                    android:textColor="?attr/colorAccent"
                     android:gravity="center_vertical"
                     android:drawablePadding="8dp"
                     android:maxEms="20"
                     android:ellipsize="end"
                     android:text="@string/placeholder_long"
                     app:drawableEndCompat="@drawable/arrow_right"
-                    app:drawableTint="@color/colorAccent"/>
+                    app:drawableTint="?attr/colorAccent"/>
 
             </RelativeLayout>
 

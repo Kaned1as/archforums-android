@@ -32,7 +32,7 @@
                 android:layout_width="24dp"
                 android:padding="6dp"
                 android:src="@drawable/pin"
-                android:tint="@color/colorPrimary"
+                android:tint="?attr/colorPrimary"
                 android:visibility="invisible"
                 android:contentDescription="@string/topic_closed"/>
 
@@ -42,7 +42,7 @@
                 android:layout_width="24dp"
                 android:padding="6dp"
                 android:src="@drawable/lock"
-                android:tint="@color/colorPrimary"
+                android:tint="?attr/colorPrimary"
                 android:visibility="invisible"
                 android:contentDescription="@string/topic_pinned"/>
 
@@ -56,7 +56,7 @@
             android:layout_toEndOf="@+id/topic_marker_area"
             android:layout_alignTop="@+id/topic_marker_area"
             android:textAppearance="@android:style/TextAppearance.Material.Medium"
-            android:textColor="@color/colorAccent"
+            android:textColor="?attr/colorAccent"
             android:minEms="10"
             android:text="@string/placeholder_long"/>
 
@@ -125,14 +125,14 @@
             android:layout_below="@+id/topic_statistics_area"
             android:background="?attr/selectableItemBackground"
             android:textAppearance="@android:style/TextAppearance.Material.Small"
-            android:textColor="@color/colorAccent"
+            android:textColor="?attr/colorAccent"
             android:gravity="center_vertical"
             android:drawablePadding="8dp"
             android:maxEms="20"
             android:ellipsize="end"
             android:text="@string/placeholder_long"
             app:drawableEndCompat="@drawable/arrow_right"
-            app:drawableTint="@color/colorAccent"/>
+            app:drawableTint="?attr/colorAccent"/>
 
     </RelativeLayout>
 

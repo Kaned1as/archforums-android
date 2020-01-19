@@ -1,15 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="holywarsooMainHeader">#990000</color>
-    <color name="holywarsooMainHeaderDark">#770000</color>
-    <color name="holywarsooForumHeader">#ecebe7</color>
-    <color name="holywarsooForumContent">#fbfaf5</color>
-    <color name="holywarsooForumText">#333333</color>
-    <color name="holywarsooForumHintText">#665858</color>
+    <color name="holywarsooFireMainBg">#ffffff</color>
+    <color name="holywarsooFireMainHeader">#990000</color>
+    <color name="holywarsooFireMainHeaderDark">#770000</color>
+    <color name="holywarsooFireForumHeader">#ecebe7</color>
+    <color name="holywarsooFireForumContent">#fbfaf5</color>
+    <color name="holywarsooFireForumText">#333333</color>
+    <color name="holywarsooFireForumLinkText">#990000</color>
+    <color name="holywarsooFireForumHintText">#665858</color>
 
-    <color name="colorPrimary">@color/holywarsooMainHeader</color>
-    <color name="colorPrimaryDark">@color/holywarsooMainHeaderDark</color>
-    <color name="colorAccent">@color/holywarsooMainHeader</color>
+    <color name="holywarsooAirMainBg">#ffffff</color>
+    <color name="holywarsooAirMainHeader">#44699c</color>
+    <color name="holywarsooAirMainHeaderDark">#22477a</color>
+    <color name="holywarsooAirForumHeader">#ebf1f5</color>
+    <color name="holywarsooAirForumContent">#fcfdfe</color>
+    <color name="holywarsooAirForumText">#333333</color>
+    <color name="holywarsooAirForumLinkText">#2365b0</color>
+    <color name="holywarsooAirForumHintText">#566579</color>
+
+    <color name="holywarsooEarthMainBg">#ffffff</color>
+    <color name="holywarsooEarthMainHeader">#32671d</color>
+    <color name="holywarsooEarthMainHeaderDark">#21560c</color>
+    <color name="holywarsooEarthForumHeader">#ebf1f5</color>
+    <color name="holywarsooEarthForumContent">#fcfdfe</color>
+    <color name="holywarsooEarthForumText">#333333</color>
+    <color name="holywarsooEarthForumLink">#047e00</color>
+    <color name="holywarsooEarthForumHintText">#566579</color>
+
+    <color name="holywarsooWaterMainBg">#2a2a2a</color>
+    <color name="holywarsooWaterMainHeader">#383838</color>
+    <color name="holywarsooWaterMainHeaderDark">#252525</color>
+    <color name="holywarsooWaterForumHeader">#565656</color>
+    <color name="holywarsooWaterForumContent">#383838</color>
+    <color name="holywarsooWaterForumText">#d4d4d4</color>
+    <color name="holywarsooWaterForumLinkText">#60a0dc</color>
+    <color name="holywarsooWaterForumHintText">#d4d4d4</color>
 
     <!-- Material design color set -->
     <color name="md_amber_200">#ffe082</color>
@@ -174,6 +199,4 @@
     <color name="md_yellow_800">#f9a825</color>
     <color name="md_yellow_900">#f57f17</color>
     <color name="md_yellow_A400">#ffea00</color>
-
-    <integer name="tag_badge">1</integer>
 </resources>

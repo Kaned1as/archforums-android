@@ -1,6 +1,7 @@
 package com.kanedias.holywarsoo
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -22,6 +23,7 @@ import butterknife.ButterKnife
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.kanedias.holywarsoo.markdown.mdRendererFrom
+import com.kanedias.holywarsoo.misc.setupTheme
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
 import com.kanedias.holywarsoo.model.MainPageModel
 import com.kanedias.holywarsoo.service.Config
@@ -53,8 +55,24 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var donateHelper: DonateHelper
 
+    private lateinit var themeChangeListener: SharedPreferences.OnSharedPreferenceChangeListener
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // theming
+        setupTheme()
+        themeChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key != Config.APP_THEME)
+                return@OnSharedPreferenceChangeListener
+
+            lifecycleScope.launchWhenResumed {
+                setupTheme()
+                recreate()
+            }
+        }
+        Config.prefs.registerOnSharedPreferenceChangeListener(themeChangeListener)
+
         setContentView(R.layout.activity_main)
         ButterKnife.bind(this)
 

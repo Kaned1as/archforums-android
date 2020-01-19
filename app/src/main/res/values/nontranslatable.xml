@@ -23,4 +23,12 @@
     <string name="placeholder_number_short" translatable="false">1</string>
     <string name="placeholder_number_long" translatable="false">65536</string>
     <string name="placeholder_link" translatable="false">Link: www.example.com</string>
+
+    <!-- theme values -->
+    <string-array name="preference_themes_values" translatable="false">
+        <item>fire</item>
+        <item>water</item>
+        <item>air</item>
+        <item>earth</item>
+    </string-array>
 </resources>

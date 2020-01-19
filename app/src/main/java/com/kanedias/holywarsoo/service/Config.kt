@@ -15,6 +15,7 @@ object Config {
 
     const val LAST_VERSION = "last-version"
     const val HOME_URL = "home-url"
+    const val APP_THEME = "application-theme"
 
     lateinit var prefs: SharedPreferences
 
@@ -41,4 +42,8 @@ object Config {
     var homeUrl: String
         get() = prefs.getString(HOME_URL, "")!!
         set(homeUrl) = prefs.edit().putString(HOME_URL, homeUrl).apply()
+
+    var appTheme: String
+        get() = prefs.getString(APP_THEME, "fire")!!
+        set(theme) = prefs.edit().putString(APP_THEME, theme).apply()
 }

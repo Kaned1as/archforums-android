@@ -7,7 +7,7 @@
     android:clickable="true"
     android:focusable="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    android:background="@color/holywarsooForumContent">
+    android:background="@color/holywarsooFireForumContent">
 
     <LinearLayout
         android:orientation="vertical"
