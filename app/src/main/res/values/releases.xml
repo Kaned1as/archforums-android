@@ -12,4 +12,10 @@
         Fixed icon on old devices (Lollipop, Marshmallow)
     </string>
     <string name="release_9">Added saving of messages on accidental dialog close</string>
+    <string name="release_12">
+        Added ability to favorite topics\n
+        Added ability to share topics\n
+        Added settings page\n
+        Added themes
+    </string>
 </resources>

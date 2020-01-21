@@ -176,7 +176,8 @@ class MainActivity : AppCompatActivity() {
             6 to Release("1.1.4", R.string.release_6),
             7 to Release("1.1.5", R.string.release_7),
             8 to Release("1.2.0", R.string.release_8),
-            9 to Release("1.2.1", R.string.release_9)
+            9 to Release("1.2.1", R.string.release_9),
+            12 to Release("1.3.0", R.string.release_12)
         )
 
         if (Config.lastVersion == 0) {
