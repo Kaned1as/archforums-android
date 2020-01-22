@@ -34,10 +34,25 @@ class AddMessageFragment: EditorFragment() {
 
     companion object {
         const val DB_CONTEXT_PREFIX = "newmessage-topic"
+
+        /**
+         * Required, the topic to which reply should be posted
+         */
         const val TOPIC_ID_ARG = "TOPIC_ID_ARG"
+
+        /**
+         * Used when quoting whole text, already contains
+         * author and message id references
+         */
+        const val FULL_QUOTE_ARG = "QUOTE_ARG"
+
+        /**
+         * Used when quoting part of the text, author
+         * and message id should be set manually
+         */
+        const val PARTIAL_QUOTE_ARG = "PARTIAL_QUOTE_ARG"
         const val AUTHOR_ARG = "AUTHOR_ARG"
         const val MSGID_ARG = "MSGID_ARG"
-        const val QUOTE_ARG = "QUOTE_ARG"
     }
 
     @BindView(R.id.edit_area)
@@ -49,6 +64,7 @@ class AddMessageFragment: EditorFragment() {
 
         editor = EditorViews(this, editorArea)
         handleDraft()
+        handleQuote()
         handleMisc()
 
         return view
@@ -66,12 +82,22 @@ class AddMessageFragment: EditorFragment() {
 
         // delay saving text a bit so database won't be spammed with it
         editor.contentInput.addTextChangedListener { text ->
-            editor.contentInput.handler?.removeCallbacksAndMessages(contextKey)
-            editor.contentInput.handler?.postDelayed(1500, contextKey, action = {
+            val action = {
                 val draft = OfflineDraft(createdAt = Date(), ctxKey = contextKey, content = text.toString())
                 Database.draftDao().insertDraft(draft)
-            })
+            }
+            editor.contentInput.removeCallbacks(action)
+            editor.contentInput.postDelayed(action, 1500)
         }
+    }
+
+    private fun handleQuote() {
+        val quoteText = requireArguments().getString(FULL_QUOTE_ARG)
+        if (quoteText.isNullOrEmpty()) {
+            return
+        }
+
+        appendQuoted(quoteText + "\n\n")
     }
 
     /**
@@ -83,7 +109,7 @@ class AddMessageFragment: EditorFragment() {
     private fun handleMisc() {
         // handle click on reply in text selection menu
         val authorName = requireArguments().getString(AUTHOR_ARG)
-        val quotedText = requireArguments().getString(QUOTE_ARG)
+        val quotedText = requireArguments().getString(PARTIAL_QUOTE_ARG)
         val quotedId = requireArguments().getString(MSGID_ARG)
 
         if (authorName.isNullOrEmpty() || quotedText.isNullOrEmpty() || quotedId.isNullOrEmpty()) {
@@ -91,9 +117,15 @@ class AddMessageFragment: EditorFragment() {
             return
         }
 
-        var quoteText = "[quote=\"$authorName\", post=${quotedId}]\n" +
+        val partialQuoteText = "[quote=\"$authorName\", post=${quotedId}]\n" +
                 "$quotedText\n" +
                 "[/quote]\n\n"
+
+        appendQuoted(partialQuoteText)
+    }
+
+    private fun appendQuoted(quote: String) {
+        var quoteText = quote
 
         if (editor.contentInput.text.isNotEmpty()) {
             quoteText = "${editor.contentInput.text}\n" + quoteText
@@ -124,24 +156,20 @@ class AddMessageFragment: EditorFragment() {
         lifecycleScope.launch {
             waitDialog.show()
 
-            try {
-                val link = withContext(Dispatchers.IO) {
-                    Network.postMessage(topicId, editor.contentInput.text.toString())
-                }
+            Network.perform(context,
+                networkAction = { Network.postMessage(topicId, editor.contentInput.text.toString()) },
+                uiAction = { link ->
+                    // delete draft of this message, prevent reinsertion
+                    // should be race-free since it's in the same thread as this one (Main UI thread)
+                    editor.contentInput.handler?.removeCallbacksAndMessages(contextKey)
+                    Database.draftDao().deleteByKey(contextKey)
 
-                // delete draft of this message, prevent reinsertion
-                // should be race-free since it's in the same thread as this one (Main UI thread)
-                editor.contentInput.handler?.removeCallbacksAndMessages(contextKey)
-                Database.draftDao().deleteByKey(contextKey)
+                    // refresh parent fragment
+                    curFrg?.arguments?.putString(TopicContentFragment.URL_ARG, link.toString())
+                    curFrg?.refreshContent()
 
-                // refresh parent fragment
-                curFrg?.arguments?.putString(TopicContentFragment.URL_ARG, link.toString())
-                curFrg?.refreshContent()
-
-                dismiss()
-            } catch (ex: Exception) {
-                context?.let { Network.reportErrors(it, ex) }
-            }
+                    dismiss()
+                })
 
             waitDialog.dismiss()
         }

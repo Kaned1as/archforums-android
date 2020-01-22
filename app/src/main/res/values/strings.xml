@@ -1,5 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string tools:context="general" name="app_name">Holywarsoo</string>
+    <string tools:context="general" name="loading">Loading…</string>
 
     <string tools:context="'about this app' dialog" name="the_maker" translatable="false">Kanedias</string>
     <string tools:context="'about this app' dialog" name="house_of_maker" translatable="false">House of Maker</string>
@@ -103,6 +104,8 @@
     <string tools:context="settings activity" name="invalid_home_server_endpoint">Invalid homeserver API endpoint, reset to default</string>
     <string tools:context="settings activity" name="app_theme">Application theme</string>
     <string tools:context="settings activity" name="app_theme_summary">Applied fully after application restart</string>
+
+    <string tools:context="message overflow menu" name="quote">Quote</string>
 
     <string-array name="preference_themes_titles">
         <item>Fire</item>

@@ -21,6 +21,11 @@ data class ForumMessage(
     // info
 
     /**
+     * Permalink to this message
+     */
+    val link: String,
+
+    /**
      * Author of this message. Can be anonymous.
      */
     val author: String,

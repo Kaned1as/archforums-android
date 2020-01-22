@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
             if (key != Config.APP_THEME)
                 return@OnSharedPreferenceChangeListener
 
-            lifecycleScope.launchWhenResumed {
+            lifecycleScope.launch {
                 setupTheme()
                 recreate()
             }

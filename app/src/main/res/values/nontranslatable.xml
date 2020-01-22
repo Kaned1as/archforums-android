@@ -31,4 +31,6 @@
         <item>air</item>
         <item>earth</item>
     </string-array>
+
+    <string name="divider_dot" translatable="false" >·</string>
 </resources>

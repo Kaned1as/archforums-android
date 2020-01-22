@@ -57,7 +57,7 @@ class TopicContentFragment: FullscreenContentFragment() {
         super.setupUI(model)
 
         contentView.adapter = TopicContentsAdapter()
-        toolbar.inflateMenu(R.menu.topic_content_menu)
+        toolbar.inflateMenu(R.menu.topic_menu)
     }
 
     private fun manageTopicRelationStatus(action: String): Boolean {

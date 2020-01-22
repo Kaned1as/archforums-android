@@ -19,6 +19,7 @@ import com.kanedias.holywarsoo.misc.trySanitizeInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import okhttp3.*
 import org.json.JSONObject
 import org.jsoup.Jsoup
@@ -235,6 +236,20 @@ object Network {
         }
 
         return forums
+    }
+
+    fun loadQuote(threadId: Int, messageId: Int): String {
+        val replyWithQuoteUrl = resolve("post.php?tid=${threadId}&qid=${messageId}")!!
+
+        val req = Request.Builder().url(replyWithQuoteUrl).get().build()
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IOException("Can't load message quote: ${resp.message()}")
+
+        val html = resp.body()!!.string()
+        val doc = Jsoup.parse(html)
+
+        return doc.select("form#post textarea[name=req_message]").text()
     }
 
     /**
@@ -499,17 +514,21 @@ object Network {
                 val msgDateLink = message.select("h2 > span > a")
                 val msgIndex = message.select("h2 > span > span.conr").text()
                 val msgAuthor = message.select("div.postleft > dl > dt > strong:last-child").text()
+                val msgAuthorAvatar = message.select("div.postleft dd.postavatar > img")
                 val msgBody = message.select("div.postright > div.postmsg").first()
                 val msgDate = msgDateLink.text()
 
-                val msgUrl = MAIN_WEBSITE_URL.resolve(msgDateLink.attr("href"))!!
+                val msgUrl = resolve(msgDateLink.attr("href"))!!
+                val msgAvatarUrl = resolve(msgAuthorAvatar.attr("src"))
                 val msgId = msgUrl.queryParameter("pid")!!.toInt()
 
                 async(Dispatchers.IO) {
                     ForumMessage(
                         id = msgId,
+                        link = msgUrl.toString(),
                         index = msgIndex.replace("#", "").toInt(),
                         author = msgAuthor,
+                        authorAvatarUrl = msgAvatarUrl?.toString(),
                         createdDate = msgDate,
                         content = postProcessMessage(msgId, msgBody)
                     )
@@ -663,6 +682,17 @@ object Network {
             }
 
             else -> throw ex
+        }
+    }
+
+    suspend inline fun <T> perform(ctx: Context?,
+                                   crossinline networkAction: () -> T,
+                                   crossinline uiAction: (input: T) -> Unit) {
+        try {
+            val result = withContext(Dispatchers.IO) { networkAction() }
+            uiAction(result)
+        } catch (ex: Exception) {
+            reportErrors(ctx, ex)
         }
     }
 
