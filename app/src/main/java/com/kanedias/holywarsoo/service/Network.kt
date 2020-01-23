@@ -2,7 +2,6 @@ package com.kanedias.holywarsoo.service
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.text.Spanned
 import android.util.Log
 import android.widget.Toast
@@ -13,7 +12,6 @@ import com.kanedias.holywarsoo.BuildConfig
 import com.kanedias.holywarsoo.R
 import com.kanedias.holywarsoo.dto.*
 import com.kanedias.holywarsoo.markdown.toMarkdown
-import com.kanedias.holywarsoo.misc.resolveMetadataValue
 import com.kanedias.holywarsoo.misc.sanitizeInt
 import com.kanedias.holywarsoo.misc.trySanitizeInt
 import kotlinx.coroutines.Dispatchers
@@ -238,8 +236,20 @@ object Network {
         return forums
     }
 
-    fun loadQuote(threadId: Int, messageId: Int): String {
-        val replyWithQuoteUrl = resolve("post.php?tid=${threadId}&qid=${messageId}")!!
+    /**
+     * Loads quote for specified [topicId] from the [messageId].
+     *
+     * Both arguments must be present in order to get the quote,
+     * but the [topicId] can be any valid topic id of your choosing.
+     * It is required mainly because that's how forum API looks like.
+     *
+     *
+     * @param topicId topic id the message is intended to be quoted for
+     * @param messageId identifier of the message to be quoted
+     */
+    @Throws(IOException::class)
+    fun loadQuote(topicId: Int, messageId: Int): String {
+        val replyWithQuoteUrl = resolve("post.php?tid=${topicId}&qid=${messageId}")!!
 
         val req = Request.Builder().url(replyWithQuoteUrl).get().build()
         val resp = httpClient.newCall(req).execute()
@@ -685,14 +695,19 @@ object Network {
         }
     }
 
-    suspend inline fun <T> perform(ctx: Context?,
-                                   crossinline networkAction: () -> T,
-                                   crossinline uiAction: (input: T) -> Unit) {
+    /**
+     * Helper function to avoid long `try { ... } catch(...) { report }` blocks in code.
+     *
+     * @param ctx context, needed to show toast in case of errors
+     * @param networkAction action to be performed in background thread
+     * @param uiAction action to be performed after [networkAction], in UI thread
+     */
+    suspend fun <T> perform(networkAction: () -> T, uiAction: (input: T) -> Unit) {
         try {
             val result = withContext(Dispatchers.IO) { networkAction() }
             uiAction(result)
         } catch (ex: Exception) {
-            reportErrors(ctx, ex)
+            reportErrors(appCtx, ex)
         }
     }
 

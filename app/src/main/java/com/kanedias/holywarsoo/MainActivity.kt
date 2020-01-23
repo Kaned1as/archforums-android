@@ -38,7 +38,7 @@ import java.lang.IllegalStateException
  * Main activity of the application. Has toolbar and navigation drawer to allow login and search shortcuts.
  * All fragment transactions happen here.
  */
-class MainActivity : AppCompatActivity() {
+class MainActivity : ThemedActivity() {
 
     @BindView(R.id.main_drawer_area)
     lateinit var drawer: DrawerLayout
@@ -55,23 +55,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var donateHelper: DonateHelper
 
-    private lateinit var themeChangeListener: SharedPreferences.OnSharedPreferenceChangeListener
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // theming
-        setupTheme()
-        themeChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key != Config.APP_THEME)
-                return@OnSharedPreferenceChangeListener
-
-            lifecycleScope.launch {
-                setupTheme()
-                recreate()
-            }
-        }
-        Config.prefs.registerOnSharedPreferenceChangeListener(themeChangeListener)
 
         setContentView(R.layout.activity_main)
         ButterKnife.bind(this)
@@ -149,12 +134,7 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.menu_donate -> donateHelper.donate()
             R.id.menu_settings -> startActivity(Intent(this, SettingsActivity::class.java))
-            R.id.menu_about -> supportFragmentManager.beginTransaction()
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .addToBackStack("showing about fragment")
-                .replace(R.id.main_page_fragment, AboutFragment())
-                .commit()
-
+            R.id.menu_about -> startActivity(Intent(this, AboutActivity::class.java))
             else -> return super.onOptionsItemSelected(item)
         }
 

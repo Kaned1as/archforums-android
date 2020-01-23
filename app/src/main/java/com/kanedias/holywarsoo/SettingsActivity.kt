@@ -18,28 +18,13 @@ import com.kanedias.holywarsoo.service.Config
  *
  * Created on 26.04.18
  */
-class SettingsActivity: AppCompatActivity() {
+class SettingsActivity: ThemedActivity() {
 
     @BindView(R.id.pref_toolbar)
     lateinit var prefToolbar: Toolbar
 
-    private lateinit var themeChangeListener: SharedPreferences.OnSharedPreferenceChangeListener
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // theming
-        setupTheme()
-        themeChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key != Config.APP_THEME)
-                return@OnSharedPreferenceChangeListener
-
-            lifecycleScope.launchWhenResumed {
-                setupTheme()
-                recreate()
-            }
-        }
-        Config.prefs.registerOnSharedPreferenceChangeListener(themeChangeListener)
 
         setContentView(R.layout.activity_preferences)
         ButterKnife.bind(this)

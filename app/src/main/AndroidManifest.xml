@@ -39,6 +39,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity" />
+        <activity android:name=".AboutActivity" />
 
         <!-- file provider for sharing images from this app -->
         <provider

@@ -156,7 +156,7 @@ class AddMessageFragment: EditorFragment() {
         lifecycleScope.launch {
             waitDialog.show()
 
-            Network.perform(context,
+            Network.perform(
                 networkAction = { Network.postMessage(topicId, editor.contentInput.text.toString()) },
                 uiAction = { link ->
                     // delete draft of this message, prevent reinsertion

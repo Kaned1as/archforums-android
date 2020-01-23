@@ -131,7 +131,7 @@ class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
             GlobalScope.launch(Dispatchers.Main) {
                 waitDialog.show()
 
-                Network.perform(anchor.context,
+                Network.perform(
                     networkAction = { Network.loadQuote(topic.id, message.id) },
                     uiAction = { quote -> openQuotedReply(topic, mapOf(AddMessageFragment.FULL_QUOTE_ARG to quote)) }
                 )
