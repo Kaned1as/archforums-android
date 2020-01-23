@@ -12,7 +12,7 @@ import com.kanedias.holywarsoo.dto.Forum
  *
  * @author Kanedias
  *
- * Created on 21.12.19
+ * Created on 2019-12-21
  */
 class ForumContentsModel : PageableModel() {
     val forum = MutableLiveData<Forum>()

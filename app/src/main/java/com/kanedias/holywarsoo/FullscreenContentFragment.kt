@@ -17,7 +17,7 @@ import com.r0adkll.slidr.model.SlidrPosition
 /**
  * @author Kanedias
  *
- * Created on 14.01.20
+ * Created on 2020-01-14
  */
 abstract class FullscreenContentFragment: ContentFragment() {
 

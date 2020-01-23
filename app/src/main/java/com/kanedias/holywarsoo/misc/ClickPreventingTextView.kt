@@ -17,7 +17,7 @@ import com.google.android.material.textview.MaterialTextView
  *
  * @author Kanedias
  *
- * Created on 05.04.18
+ * Created on 2018-04-05
  */
 class ClickPreventingTextView : MaterialTextView {
 

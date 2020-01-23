@@ -8,7 +8,7 @@ import android.util.LruCache
  *
  * @author Kanedias
  *
- * Created on 11.01.20
+ * Created on 2020-01-11
  */
 object SpanCache {
 

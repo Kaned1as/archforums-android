@@ -15,9 +15,11 @@ import java.security.MessageDigest
 
 
 /**
+ * Glide store that scales up smilies
+ *
  * @author Kanedias
  *
- * Created on 07.01.20
+ * Created on 2020-01-07
  */
 class GlideGifSupportStore(ctx: Context): GlideImagesPlugin.GlideStore {
 

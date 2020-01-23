@@ -18,7 +18,7 @@ import com.kanedias.holywarsoo.service.Network
  *
  * @author Kanedias
  *
- * Created on 27.12.19
+ * Created on 2019-12-27
  */
 @AcraDialog(resIcon = R.drawable.ic_launcher_round, resText = R.string.app_crashed, resCommentPrompt = R.string.leave_crash_comment, resTheme = R.style.FireTheme)
 @AcraMailSender(mailTo = "kanedias@xaker.ru", resSubject = R.string.app_crash_report, reportFileName = "crash-report.json")

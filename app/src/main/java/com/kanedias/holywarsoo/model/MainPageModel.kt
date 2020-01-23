@@ -13,7 +13,7 @@ import com.kanedias.holywarsoo.MainPageContentFragment
  *
  * @author Kanedias
  *
- * Created on 21.12.19
+ * Created on 2019-12-21
  */
 class MainPageModel: ViewModel() {
     val header = MutableLiveData<List<ForumTopicDesc>>()

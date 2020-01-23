@@ -6,7 +6,7 @@ import com.kanedias.holywarsoo.database.entities.OfflineDraft
 /**
  * @author Kanedias
  *
- * Created on 12.01.20
+ * Created on 2020-01-12
  */
 @Dao
 interface DraftDao {

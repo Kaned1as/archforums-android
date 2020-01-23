@@ -24,7 +24,7 @@ import java.lang.Exception
  *
  * @author Kanedias
  *
- * Created on 19.12.19
+ * Created on 2019-12-19
  */
 class SearchTopicContentFragment: FullscreenContentFragment() {
 

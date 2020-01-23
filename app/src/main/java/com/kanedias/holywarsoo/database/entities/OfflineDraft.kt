@@ -12,7 +12,7 @@ import java.util.*
  *
  * @author Kanedias
  *
- * Created on 22.08.18
+ * Created on 2020-01-12
  */
 @Entity(tableName = "offline_draft", indices = [Index("ctx_key", unique = true)])
 data class OfflineDraft(

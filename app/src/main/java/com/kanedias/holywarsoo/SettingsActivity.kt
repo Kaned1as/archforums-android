@@ -16,7 +16,7 @@ import com.kanedias.holywarsoo.service.Config
  *
  * @author Kanedias
  *
- * Created on 26.04.18
+ * Created on 2018-04-26
  */
 class SettingsActivity: ThemedActivity() {
 

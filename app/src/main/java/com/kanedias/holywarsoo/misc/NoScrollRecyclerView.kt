@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
  *
  * @author Kanedias
  *
- * Created on 19.01.20
+ * Created on 19.01.20 2020-01-19
  */
 class NoScrollRecyclerView : RecyclerView {
 

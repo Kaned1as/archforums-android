@@ -9,7 +9,7 @@ import android.text.Spanned
  *
  * @author Kanedias
  *
- * Created on 22.12.19
+ * Created on 2019-12-22
  */
 data class ForumMessage(
     /**

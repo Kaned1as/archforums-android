@@ -18,9 +18,11 @@ import com.r0adkll.slidr.model.SlidrPosition
 
 
 /**
+ * Fragment for showing 'About this app' info
+ *
  * @author Kanedias
  *
- * Created on 05.03.19
+ * Created on 2019-03-05
  */
 class AboutFragment: EasyAboutFragment() {
 

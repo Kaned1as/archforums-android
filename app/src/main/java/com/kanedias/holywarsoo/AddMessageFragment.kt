@@ -28,7 +28,7 @@ import java.util.*
  *
  * @author Kanedias
  *
- * Created on 29.12.19
+ * Created on 2019-12-29
  */
 class AddMessageFragment: EditorFragment() {
 

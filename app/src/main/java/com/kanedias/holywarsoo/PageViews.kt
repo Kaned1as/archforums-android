@@ -15,11 +15,11 @@ import com.kanedias.holywarsoo.model.PageableModel
 import kotlinx.coroutines.delay
 
 /**
- * Helper fragment to hold all paging-related functions in all paged views where possible.
+ * Helper class to hold all paging-related functions in all paged views where possible.
  *
  * @author Kanedias
  *
- * Created on 07.04.18
+ * Created on 2020-01-02
  */
 class PageViews(parent: ContentFragment, model: PageableModel, iv: View) {
 

@@ -5,7 +5,7 @@ package com.kanedias.html2md
  *
  * @author Kanedias
  *
- * Created on 01.04.18
+ * Created on 2018-04-01
  */
 class Html2Markdown {
 

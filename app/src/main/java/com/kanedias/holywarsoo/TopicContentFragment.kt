@@ -29,7 +29,7 @@ import java.lang.Exception
  *
  * @author Kanedias
  *
- * Created on 22.12.19
+ * Created on 2019-12-22
  */
 class TopicContentFragment: FullscreenContentFragment() {
 

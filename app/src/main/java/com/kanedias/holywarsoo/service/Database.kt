@@ -7,7 +7,7 @@ import com.kanedias.holywarsoo.database.LocalDatabase
 /**
  * @author Kanedias
  *
- * Created on 12.01.20
+ * Created on 2020-01-12
  */
 object Database {
 

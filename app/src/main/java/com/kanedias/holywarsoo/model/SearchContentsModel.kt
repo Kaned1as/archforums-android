@@ -11,7 +11,7 @@ import com.kanedias.holywarsoo.SearchTopicContentFragment
  *
  * @author Kanedias
  *
- * Created on 21.12.19
+ * Created on 2019-12-21
  */
 class SearchContentsModel : PageableModel() {
     val results = MutableLiveData<SearchTopicResults>()

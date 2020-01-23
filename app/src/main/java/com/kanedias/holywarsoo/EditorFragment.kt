@@ -14,7 +14,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
  *
  * @author Kanedias
  *
- * Created on 29.12.19
+ * Created on 2019-12-29
  */
 open class EditorFragment: BottomSheetDialogFragment() {
 

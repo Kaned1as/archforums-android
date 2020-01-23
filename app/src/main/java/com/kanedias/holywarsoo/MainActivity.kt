@@ -37,6 +37,10 @@ import java.lang.IllegalStateException
 /**
  * Main activity of the application. Has toolbar and navigation drawer to allow login and search shortcuts.
  * All fragment transactions happen here.
+ *
+ * @author Kanedias
+ *
+ * Created on 2019-12-29
  */
 class MainActivity : ThemedActivity() {
 

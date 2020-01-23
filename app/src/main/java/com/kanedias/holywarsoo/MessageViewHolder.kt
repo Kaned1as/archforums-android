@@ -38,7 +38,7 @@ import java.util.*
  *
  * @author Kanedias
  *
- * Created on 22.12.19
+ * Created on 2019-12-22
  */
 class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 

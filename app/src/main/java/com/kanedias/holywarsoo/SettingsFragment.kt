@@ -12,7 +12,7 @@ import com.kanedias.holywarsoo.misc.resolveAttr
  *
  * @author Kanedias
  *
- * Created on 26.04.18
+ * Created on 2018-04-26
  */
 class SettingsFragment : PreferenceFragmentCompat() {
 

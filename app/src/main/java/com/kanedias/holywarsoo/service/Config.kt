@@ -4,12 +4,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import com.kanedias.holywarsoo.misc.resolveMetadataValue
-import com.kanedias.holywarsoo.service.Config.prefs
 
 /**
+ * Main shared configuration holder class
+ *
  * @author Kanedias
  *
- * Created on 05.01.20
+ * Created on 2020-01-05
  */
 object Config {
 

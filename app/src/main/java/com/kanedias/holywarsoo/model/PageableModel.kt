@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
  *
  * @author Kanedias
  *
- * Created on 02.01.20
+ * Created on 2020-01-02
  */
 abstract class PageableModel: ViewModel() {
     val currentPage = MutableLiveData(1)

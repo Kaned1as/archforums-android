@@ -22,7 +22,7 @@ import kotlinx.coroutines.*
  *
  * @author Kanedias
  *
- * Created on 11/11/2017
+ * Created on 2017-11-11
  */
 class LoginFragment : Fragment() {
 

@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit
  *
  * @author Kanedias
  *
- * Created on 17.12.19
+ * Created on 2019-12-17
  */
 object Network {
     private const val COOKIES_SHARED_PREFS = "cookies"

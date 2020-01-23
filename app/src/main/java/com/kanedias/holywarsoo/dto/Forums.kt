@@ -8,7 +8,7 @@ import java.io.Serializable
  *
  * @author Kanedias
  *
- * Created on 17.12.19
+ * Created on 2019-12-17
  */
 data class ForumDesc(
     // info
@@ -31,7 +31,7 @@ data class ForumDesc(
  *
  * @author Kanedias
  *
- * Created on 17.12.19
+ * Created on 2019-12-17
  */
 data class Forum(
     val id: Int,

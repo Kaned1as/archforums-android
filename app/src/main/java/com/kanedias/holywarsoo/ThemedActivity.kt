@@ -9,6 +9,8 @@ import com.kanedias.holywarsoo.service.Config
 import kotlinx.coroutines.launch
 
 /**
+ * Activity that's themed and tracks theme change
+ *
  * @author Kanedias
  *
  * Created on 2020-01-23

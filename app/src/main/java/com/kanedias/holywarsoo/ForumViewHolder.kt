@@ -22,7 +22,7 @@ import com.kanedias.holywarsoo.misc.visibilityBool
  *
  * @author Kanedias
  *
- * Created on 23.12.19
+ * Created on 2019-12-23
  */
 class ForumViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 

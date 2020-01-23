@@ -8,7 +8,7 @@ import java.io.Serializable
  *
  * @author Kanedias
  *
- * Created on 17.12.19
+ * Created on 2019-12-17
  */
 data class SearchTopicResults(
     // info

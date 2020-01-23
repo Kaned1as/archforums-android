@@ -10,7 +10,7 @@ import com.kanedias.holywarsoo.database.entities.OfflineDraft
  *
  * @author Kanedias
  *
- * Created on 12.01.20
+ * Created on 2020-01-12
  */
 @Database(entities = [OfflineDraft::class], version = 1)
 @TypeConverters(DateConverter::class)
