@@ -18,4 +18,8 @@
         Added settings page\n
         Added themes
     </string>
+    <string name="release_13">
+        Added avatars\n
+        Added message quote/share menu
+    </string>
 </resources>
