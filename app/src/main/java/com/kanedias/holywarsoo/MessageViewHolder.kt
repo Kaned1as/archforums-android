@@ -1,19 +1,23 @@
 package com.kanedias.holywarsoo
 
 import android.os.Bundle
+import android.text.InputType
 import android.text.format.DateUtils
-import android.view.ActionMode
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.LayoutInflaterCompat
 import androidx.core.view.iterator
+import androidx.core.view.marginStart
+import androidx.core.view.setPadding
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
@@ -138,6 +142,36 @@ class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 
                 waitDialog.dismiss()
             }
+            true
+        }
+
+        // report message to the administration
+        pmenu.menu.findItem(R.id.menu_message_report).setOnMenuItemClickListener {
+            MaterialAlertDialogBuilder(anchor.context)
+                .setTitle(R.string.report)
+                .setView(R.layout.view_report_dialog)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok) {dialog, _ ->
+                    val waitDialog = MaterialAlertDialogBuilder(anchor.context)
+                        .setTitle(R.string.please_wait)
+                        .setMessage(R.string.loading)
+                        .create()
+
+                    val input = (dialog as AlertDialog).findViewById<EditText>(R.id.report_dialog_input)!!
+
+                    GlobalScope.launch(Dispatchers.Main) {
+                        waitDialog.show()
+
+                        Network.perform(
+                            networkAction = { Network.postReport(message.id, input.text.toString()) },
+                            uiAction = { Toast.makeText(anchor.context, R.string.reported, Toast.LENGTH_SHORT).show() }
+                        )
+
+                        waitDialog.dismiss()
+                    }
+                }
+                .show()
+
             true
         }
 

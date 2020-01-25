@@ -107,6 +107,9 @@
     <string tools:context="settings activity" name="app_theme_summary">Applied fully after application restart</string>
 
     <string tools:context="message overflow menu" name="quote">Quote</string>
+    <string tools:context="message overflow menu" name="report">Report</string>
+    <string tools:context="message overflow menu" name="describe_why_reporting">Describe reason for reporting</string>
+    <string tools:context="message overflow menu" name="reported">Reported</string>
 
     <string-array name="preference_themes_titles">
         <item>Fire</item>

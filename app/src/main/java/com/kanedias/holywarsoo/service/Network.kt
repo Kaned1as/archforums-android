@@ -502,6 +502,40 @@ object Network {
         return resolve(link)!!
     }
 
+    @Throws(IOException::class)
+    fun postReport(messageId: Int, reason: String) {
+        val postUrl = resolve("misc.php")!!.newBuilder().addQueryParameter("report", messageId.toString()).build()
+
+        val req = Request.Builder().url(postUrl).get().build()
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IOException("Can't load report message page: ${resp.message()}")
+
+        val postPageHtml = resp.body()!!.string()
+        val postPageDoc = Jsoup.parse(postPageHtml)
+
+        val postPageInputs = postPageDoc.select("form#report input[type=hidden]")
+
+        val reqBody = FormBody.Builder()
+            .add("req_reason", reason)
+
+        for (input in postPageInputs) {
+            reqBody.add(input.attr("name"), input.attr("value"))
+        }
+
+        val reportReq = Request.Builder()
+            .url(postUrl)
+            .post(reqBody.build())
+            .build()
+
+        // if we send reply too quickly website decides we are robots, need to wait a bit
+        Thread.sleep(2000)
+
+        val reportResp = httpClient.newCall(reportReq).execute()
+        if (!reportResp.isSuccessful)
+            throw IOException("Unexpected failure")
+    }
+
     /**
      * Manage favorites for currently logged in user. Using this when [isLoggedIn] is false
      * is undefined behaviour.

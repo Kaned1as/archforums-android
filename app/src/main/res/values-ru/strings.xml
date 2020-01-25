@@ -90,6 +90,9 @@
     <string name="app_theme_summary">Применяется полностью после перезагрузки приложения</string>
 
     <string name="quote">Цитировать</string>
+    <string name="report">Пожаловаться</string>
+    <string name="describe_why_reporting">Кратко опишите причину</string>
+    <string name="reported">Отправлено</string>
 
     <string-array name="preference_themes_titles">
         <item>Огонь</item>

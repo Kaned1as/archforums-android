@@ -11,4 +11,9 @@
         android:title="@string/quote"
         android:icon="@drawable/reply"/>
 
+    <item
+        android:id="@+id/menu_message_report"
+        android:title="@string/report"
+        android:icon="@drawable/report"/>
+
 </menu>
