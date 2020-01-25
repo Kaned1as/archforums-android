@@ -85,13 +85,14 @@ fun mdThemeFrom(ctx: Context): MarkwonTheme {
 /**
  * Perform all necessary steps to view Markdown in this text view.
  * Parses input with html2md library and converts resulting markdown to spanned string.
- * @param html input markdown to show
+ * @param md input markdown to show
  */
 fun TextView.handleMarkdown(md: Spanned) {
     val label = this
     label.setSpannableFactory(NoCopySpannableFactory())
 
-    label.text = md
+    label.setText(md, TextView.BufferType.SPANNABLE)
+
 
     // FIXME: see https://github.com/noties/Markwon/issues/120
     label.addOnAttachStateChangeListener(object: View.OnAttachStateChangeListener {
@@ -448,6 +449,8 @@ class ImageShowOverlay(ctx: Context,
 /**
  * Custom tag handler that deals with `<details>` and `<summary>` tags. They are used to implement
  * spoilers in the text.
+ *
+ * This is highly specific to Visman's [modification](https://github.com/MioVisman/FluxBB_by_Visman) of FluxBB forum.
  */
 class DetailsTagHandler: TagHandler() {
 

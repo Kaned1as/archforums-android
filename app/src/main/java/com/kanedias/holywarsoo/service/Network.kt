@@ -331,13 +331,17 @@ object Network {
         val topics = parseTopics(doc, false)
 
         val forumRef = doc.select("head link[rel=canonical]").attr("href")
-        val forumId = resolve(forumRef)!!.queryParameter("id")!!
+        val forumId = resolve(forumRef)?.queryParameter("id")
+            ?: throw IOException("Invalid forum page: $forumRef")
+
         val forumName = doc.select("head title").text()
         val forumWritable = doc.select("div#brdmain div.linksb p.postlink a[href^=post.php]")
 
-        val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
+        val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink").first()
+            ?: throw IOException("Invalid forum page: $forumRef")
+
         val currentPage = pageLinks.select("strong").text()
-        val pageCount = pageLinks.first().children()
+        val pageCount = pageLinks.children()
             .mapNotNull { it.ownText().trySanitizeInt() }
             .max()
 
@@ -380,15 +384,19 @@ object Network {
         // topic link is in the page header, topic id can be derived from it
         // topic name is page title and writable bit is derived from the presence of answer button
         val topicRef = doc.select("head link[rel=canonical]").attr("href")
-        val topicId = resolve(topicRef)!!.queryParameter("id")!!
+        val topicId = resolve(topicRef)?.queryParameter("id")
+            ?: throw IOException("Invalid topic page: $topicRef")
+
         val topicName = doc.select("head title").text()
         val topicWritable = doc.select("div#brdmain div.postlinksb p.postlink a[href^=post.php]")
         val topicFavorite = doc.select("div#brdmain div.postlinksb p.subscribelink a[href*=favorite]")
         val topicSubscribe = doc.select("div#brdmain div.postlinksb p.subscribelink a[href*=subscribe]")
 
-        val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
+        val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink").first()
+            ?: throw IOException("Invalid topic page: $topicRef")
+
         val currentPage = pageLinks.select("strong").text()
-        val pageCount = pageLinks.first().children()
+        val pageCount = pageLinks.children()
             .mapNotNull { it.ownText().trySanitizeInt() }
             .max()
 
@@ -775,7 +783,6 @@ object Network {
     /**
      * Helper function to avoid long `try { ... } catch(...) { report }` blocks in code.
      *
-     * @param ctx context, needed to show toast in case of errors
      * @param networkAction action to be performed in background thread
      * @param uiAction action to be performed after [networkAction], in UI thread
      */
@@ -796,5 +803,15 @@ object Network {
     @Suppress("FunctionName", "unused", "NonAsciiCharacters")
     private fun украсть_пароли_с_холиварки_без_регистрации_и_смс() {
         // это мы, опилки
+    }
+
+    /**
+     * Русскоязычным пользователям: вам необязательно это понимать
+     *
+     * Easter egg for bbs.archlinux.org users ;)
+     */
+    @Suppress("FunctionName", "unused")
+    private fun btw_i_use_arch() {
+        // to my, trociny
     }
 }
