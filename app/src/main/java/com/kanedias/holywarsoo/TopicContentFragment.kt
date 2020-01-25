@@ -99,7 +99,6 @@ class TopicContentFragment: FullscreenContentFragment() {
         super.refreshViews()
 
         val topic = contents.topic.value ?: return
-        val activity = activity as? MainActivity ?: return
 
         // setup toolbar content and menu items
         toolbar.apply {

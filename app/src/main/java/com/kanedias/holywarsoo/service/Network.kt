@@ -345,7 +345,7 @@ object Network {
             id = forumId.sanitizeInt(),
             name = forumName,
             link = resolve(forumRef)!!.toString(),
-            writable = forumWritable.isNotEmpty(),
+            isWritable = forumWritable.isNotEmpty(),
             pageCount = pageCount!!,
             currentPage = currentPage.sanitizeInt(),
             subforums = subforums,
@@ -456,6 +456,49 @@ object Network {
 
         // we need to extract link from it
         val link = postMessageDoc.select("div#brdmain div.box a").attr("href")
+        return resolve(link)!!
+    }
+
+    @Throws(IOException::class)
+    fun postTopic(forumId: Int, subject: String, message: String): HttpUrl {
+        val postUrl = resolve("post.php")!!.newBuilder().addQueryParameter("fid", forumId.toString()).build()
+
+        val req = Request.Builder().url(postUrl).get().build()
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IOException("Can't load topic create page: ${resp.message()}")
+
+        val postPageHtml = resp.body()!!.string()
+        val postPageDoc = Jsoup.parse(postPageHtml)
+
+        val postPageInputs = postPageDoc.select("form#post input[type=hidden]")
+
+        val reqBody = FormBody.Builder()
+            .add("req_subject", subject)
+            .add("req_message", message)
+
+        for (input in postPageInputs) {
+            reqBody.add(input.attr("name"), input.attr("value"))
+        }
+
+        val postTopicReq = Request.Builder()
+            .url(postUrl)
+            .post(reqBody.build())
+            .build()
+
+        // if we send reply too quickly website decides we are robots, need to wait a bit
+        Thread.sleep(2000)
+
+        val postTopicResp = httpClient.newCall(postTopicReq).execute()
+        if (!postTopicResp.isSuccessful)
+            throw IOException("Unexpected failure")
+
+        // this is a redirect link page, such as "Message saved, please wait to be redirected"
+        val postTopicHtml = postTopicResp.body()!!.string()
+        val postTopicDoc = Jsoup.parse(postTopicHtml)
+
+        // we need to extract link from it
+        val link = postTopicDoc.select("div#brdmain div.box a").attr("href")
         return resolve(link)!!
     }
 

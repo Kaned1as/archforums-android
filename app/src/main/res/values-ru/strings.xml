@@ -29,6 +29,7 @@
     <string name="new_messages_topics">Новые</string>
     <string name="recent_topics">Активные</string>
     <string name="page">Страница</string>
+    <string name="subject">Тема</string>
     <string name="content">Содержимое</string>
     <string name="reply">Ответить</string>
     <string name="more_tag_default">Скрытый текст</string>

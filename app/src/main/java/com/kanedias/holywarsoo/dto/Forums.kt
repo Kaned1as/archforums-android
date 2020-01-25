@@ -43,7 +43,7 @@ data class Forum(
     /**
      * True if you can write topics to this forum
      */
-    val writable: Boolean,
+    val isWritable: Boolean,
 
     // counters
     val pageCount: Int,

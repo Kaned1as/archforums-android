@@ -4,7 +4,10 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.view.View
 import android.widget.Toast
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 /**
@@ -48,6 +51,17 @@ open class EditorFragment: BottomSheetDialogFragment() {
 
         when (requestCode) {
             EditorViews.ACTIVITY_REQUEST_IMAGE_UPLOAD -> editor.requestImageUpload(data)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        view?.apply {
+            val parent = parent as? View ?: return@apply
+            val params = parent.layoutParams as? CoordinatorLayout.LayoutParams ?: return@apply
+            val bottomSheetBehavior = params.behavior as? BottomSheetBehavior ?: return@apply
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
     }
 }

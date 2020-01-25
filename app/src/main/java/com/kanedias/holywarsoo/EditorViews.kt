@@ -47,8 +47,10 @@ class EditorViews(private val parent: Fragment, private val iv: View) {
     init {
         ButterKnife.bind(this, iv)
 
-        // start editing content right away
-        contentInput.requestFocus()
+        if (parent is AddMessageFragment) {
+            // start editing content right away
+            contentInput.requestFocus()
+        }
     }
 
     /**

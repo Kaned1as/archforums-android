@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.core.os.postDelayed
+import androidx.cardview.widget.CardView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -16,15 +16,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kanedias.holywarsoo.database.entities.OfflineDraft
 import com.kanedias.holywarsoo.service.Database
 import com.kanedias.holywarsoo.service.Network
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.lang.Exception
 import java.util.*
 
 /**
  * Fragment responsible for adding a new message to the specified topic.
- * Topic **must** be sent as an argument.
+ * Topic id **must** be sent as an argument.
  *
  * @author Kanedias
  *
@@ -33,7 +30,7 @@ import java.util.*
 class AddMessageFragment: EditorFragment() {
 
     companion object {
-        const val DB_CONTEXT_PREFIX = "newmessage-topic"
+        const val DB_CONTEXT_PREFIX = "newmessage"
 
         /**
          * Required, the topic to which reply should be posted
@@ -55,7 +52,7 @@ class AddMessageFragment: EditorFragment() {
         const val MSGID_ARG = "MSGID_ARG"
     }
 
-    @BindView(R.id.edit_area)
+    @BindView(R.id.main_post_area)
     lateinit var editorArea: LinearLayout
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

@@ -63,6 +63,18 @@ class ForumContentFragment: FullscreenContentFragment() {
             subtitle = "${getString(R.string.page)} ${forum.currentPage}"
         }
 
+        if (forum.isWritable) {
+            actionButton.show()
+            actionButton.setOnClickListener {
+                val frag = AddTopicFragment().apply {
+                    arguments = Bundle().apply { putSerializable(AddTopicFragment.FORUM_ID_ARG, forum.id) }
+                }
+                frag.show(fragmentManager!!, "topic create fragment")
+            }
+        } else {
+            actionButton.visibility = View.GONE
+        }
+
         when (forum.pageCount) {
             1 -> pageNavigation.visibility = View.GONE
             else -> pageNavigation.visibility = View.VISIBLE
