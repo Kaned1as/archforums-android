@@ -22,4 +22,8 @@
         Added avatars\n
         Added message quote/share menu
     </string>
+    <string name="release_14">
+        Added topic creation\n
+        Added ability to report the messages
+    </string>
 </resources>
