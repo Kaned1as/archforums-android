@@ -26,4 +26,8 @@
         Added topic creation\n
         Added ability to report the messages
     </string>
+    <string name="release_15">
+        Added profile links to the sidebar\n
+        Added search to toolbar
+    </string>
 </resources>

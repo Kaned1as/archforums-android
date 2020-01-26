@@ -21,6 +21,10 @@
     <string tools:context="message view elements" name="topic_closed">Topic closed</string>
     <string tools:context="message view elements" name="message_index">Message index</string>
 
+    <string tools:context="search message view elements" name="navigate_to_forum">To forum:</string>
+    <string tools:context="search message view elements" name="navigate_to_topic">To topic:</string>
+    <string tools:context="search message view elements" name="navigate_to_message">To message:</string>
+
     <string tools:context="fullscreen image viewer" name="share_link_using">Share link using…</string>
     <string tools:context="fullscreen image viewer" name="share_image_using">Share image using…</string>
     <string tools:context="fullscreen image viewer" name="downloading_image">Downloading image…</string>
@@ -39,6 +43,9 @@
     <string tools:context="sidebar panel" name="replies_topics">Replies</string>
     <string tools:context="sidebar panel" name="recent_topics">Recent</string>
     <string tools:context="sidebar panel" name="new_messages_topics">With new messages</string>
+    <string tools:context="sidebar panel" name="my_topics">My topics</string>
+    <string tools:context="sidebar panel" name="my_messages">My messages</string>
+    <string tools:context="sidebar panel" name="my_subscriptions">My subscriptions</string>
 
     <string tools:context="login procedure" name="username">Username</string>
     <string tools:context="login procedure" name="password">Password</string>
@@ -110,13 +117,6 @@
     <string tools:context="message overflow menu" name="report">Report</string>
     <string tools:context="message overflow menu" name="describe_why_reporting">Describe reason for reporting</string>
     <string tools:context="message overflow menu" name="reported">Reported</string>
-    <string name="my_posts">My posts</string>
-    <string name="my_topics">My topics</string>
-    <string name="my_messages">My messages</string>
-    <string name="my_subscriptions">My subscriptions</string>
-    <string name="navigate_to_forum">To forum:</string>
-    <string name="navigate_to_topic">To topic:</string>
-    <string name="navigate_to_message">To message:</string>
 
     <string-array name="preference_themes_titles">
         <item>Fire</item>

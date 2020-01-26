@@ -7,6 +7,9 @@
     <string name="views_prefix">Просмотров:</string>
     <string name="topic_pinned">Закреплённая тема</string>
     <string name="topic_closed">Закрытая тема</string>
+    <string name="navigate_to_forum">К форуму:</string>
+    <string name="navigate_to_topic">К теме:</string>
+    <string name="navigate_to_message">К сообщению:</string>
     <string name="message_index">Индекс сообщения</string>
     <string name="share_link_using">Поделиться ссылкой с помощью…</string>
     <string name="share_image_using">Поделиться изображением с помощью…</string>
@@ -27,6 +30,9 @@
     <string name="favorite_topics">Избранное</string>
     <string name="replies_topics">С вашим участием</string>
     <string name="new_messages_topics">Новые</string>
+    <string name="my_topics">Мои темы</string>
+    <string name="my_messages">Мои сообщения</string>
+    <string name="my_subscriptions">Мои подписки</string>
     <string name="recent_topics">Активные</string>
     <string name="page">Страница</string>
     <string name="subject">Тема</string>
