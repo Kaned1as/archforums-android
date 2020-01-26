@@ -60,6 +60,9 @@ object Network {
     lateinit var REPLIES_TOPICS_URL: String
     lateinit var NEW_MESSAGES_TOPICS_URL: String
     lateinit var RECENT_TOPICS_URL: String
+    lateinit var SUBSCRIBED_TOPICS_URL: String
+    lateinit var OWN_TOPICS_URL: String
+    lateinit var OWN_MESSAGES_URL: String
 
     private val userAgent = Interceptor { chain ->
         chain.proceed(chain
@@ -120,6 +123,9 @@ object Network {
         REPLIES_TOPICS_URL = resolve("search.php?action=show_replies")!!.toString()
         NEW_MESSAGES_TOPICS_URL = resolve("search.php?action=show_new")!!.toString()
         RECENT_TOPICS_URL = resolve("search.php?action=show_recent")!!.toString()
+        SUBSCRIBED_TOPICS_URL = resolve("search.php?action=show_subscriptions")!!.toString()
+        OWN_TOPICS_URL = resolve("search.php?action=show_user_topics")!!.toString()
+        OWN_MESSAGES_URL = resolve("search.php?action=show_user_posts")!!.toString()
     }
 
     private fun authCookie() = cookiePersistor.loadAll().firstOrNull { it.name().startsWith("pun_cookie") }
@@ -272,7 +278,7 @@ object Network {
      *         Topics have the same ordering as they had on the actual page.
      */
     @Throws(IOException::class)
-    fun loadSearchResults(searchLink: String, page: Int = 1): SearchTopicResults {
+    fun loadSearchTopicResults(searchLink: String, page: Int = 1): SearchResults<ForumTopicDesc> {
         val pageUrl = HttpUrl.parse(searchLink)!!.newBuilder().addQueryParameter("p", page.toString()).build()
 
         val req = Request.Builder().url(pageUrl).get().build()
@@ -283,22 +289,75 @@ object Network {
         val html = resp.body()!!.string()
         val doc = Jsoup.parse(html)
 
-        val searchPageName = doc.select("div#brdmain > div.linkst ul.crumbs > li:last-child strong").text()
+        val pageName = doc.select("head title").text()
 
         val topics = parseTopics(doc, true)
+        if (topics.isEmpty()) {
+            // no topics at all
+            return SearchResults(link = searchLink, name = pageName,
+                pageCount = 1, currentPage = 1, results = topics)
+        }
 
+        val searchPageName = doc.select("div#brdmain > div.linkst ul.crumbs > li:last-child strong").text()
         val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
         val currentPage = pageLinks.select("strong").text()
         val pageCount = pageLinks.first().children()
             .mapNotNull { it.ownText().trySanitizeInt() }
             .max()
 
-        return SearchTopicResults(
+        return SearchResults(
             link = searchLink,
             name = searchPageName,
             pageCount = pageCount!!,
             currentPage = currentPage.sanitizeInt(),
-            topics = topics
+            results = topics
+        )
+    }
+
+    @Throws(IOException::class)
+    fun loadSearchMessagesResults(searchLink: String? = null, searchKeyword: String? = null, page: Int = 1): SearchResults<ForumMessage> {
+        val pageUrl = searchLink?.let { HttpUrl.parse(it)!!.newBuilder()
+                .addQueryParameter("sort_dir", "DESC")
+                .addQueryParameter("p", page.toString())
+                .build() }
+            ?: searchKeyword?.let { resolve("search.php")!!.newBuilder()
+                .addQueryParameter("action", "search")
+                .addQueryParameter("keywords", it)
+                .addQueryParameter("sort_dir", "DESC")
+                .addQueryParameter("p", page.toString())
+                .build() }
+            ?: throw IllegalStateException("Both search link and keyword are null!")
+
+        val req = Request.Builder().url(pageUrl).get().build()
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IOException("Can't load search page contents: ${resp.message()}")
+
+        val html = resp.body()!!.string()
+        val doc = Jsoup.parse(html)
+
+        val pageName = doc.select("head title").text()
+
+        val messages = parseMessages(doc)
+        if (messages.isEmpty()) {
+            // no messages at all
+            return SearchResults(link = pageUrl.toString(), name = pageName,
+                pageCount = 1, currentPage = 1, results = messages)
+        }
+
+        val searchPageName = doc.select("div#brdmain > div.linkst ul.crumbs > li:last-child strong").text()
+        val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
+        val currentPage = pageLinks.select("strong").text()
+        val pageCount = pageLinks.first().children()
+            .mapNotNull { it.ownText().trySanitizeInt() }
+            .max()
+
+        return SearchResults(
+            link = pageUrl.toString(),
+            name = searchPageName,
+            pageCount = pageCount!!,
+            currentPage = currentPage.sanitizeInt(),
+            results = messages
         )
     }
 
@@ -605,8 +664,26 @@ object Network {
                 // detach message from the document, so it won't touch parent DOM concurrently
                 message.remove()
 
+                // extended info (present on the search page)
+                val navLinks = NavLinksMap()
+                val navBreadcrumbs = message.select("h2 > span > span > a")
+                if (navBreadcrumbs.size == 3) {
+                    // it's a search page, populate links
+                    navLinks[NavigationScope.FORUM] = Pair(
+                        navBreadcrumbs[0].text(),
+                        resolve(navBreadcrumbs[0].attr("href"))!!.toString()
+                    )
+                    navLinks[NavigationScope.TOPIC] = Pair(
+                        navBreadcrumbs[1].text(),
+                        resolve(navBreadcrumbs[1].attr("href"))!!.toString())
+                    navLinks[NavigationScope.MESSAGE] = Pair(
+                        navBreadcrumbs[2].text(),
+                        resolve(navBreadcrumbs[2].attr("href"))!!.toString())
+                }
+
+
                 // all message info is self-contained in the message box
-                val msgDateLink = message.select("h2 > span > a")
+                val msgDateLink = message.select("h2 > span a").last()
                 val msgIndex = message.select("h2 > span > span.conr").text()
                 val msgAuthor = message.select("div.postleft > dl > dt > strong:last-child").text()
                 val msgAuthorAvatar = message.select("div.postleft dd.postavatar > img")
@@ -621,6 +698,7 @@ object Network {
                     ForumMessage(
                         id = msgId,
                         link = msgUrl.toString(),
+                        navigationLinks = navLinks,
                         index = msgIndex.replace("#", "").toInt(),
                         author = msgAuthor,
                         authorAvatarUrl = msgAvatarUrl?.toString(),

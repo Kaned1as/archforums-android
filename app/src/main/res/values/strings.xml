@@ -110,6 +110,13 @@
     <string tools:context="message overflow menu" name="report">Report</string>
     <string tools:context="message overflow menu" name="describe_why_reporting">Describe reason for reporting</string>
     <string tools:context="message overflow menu" name="reported">Reported</string>
+    <string name="my_posts">My posts</string>
+    <string name="my_topics">My topics</string>
+    <string name="my_messages">My messages</string>
+    <string name="my_subscriptions">My subscriptions</string>
+    <string name="navigate_to_forum">To forum:</string>
+    <string name="navigate_to_topic">To topic:</string>
+    <string name="navigate_to_message">To message:</string>
 
     <string-array name="preference_themes_titles">
         <item>Fire</item>

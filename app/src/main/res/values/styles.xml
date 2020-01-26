@@ -57,7 +57,6 @@
         <item name="colorNonImportantText">@color/holywarsooWaterForumHintText</item>
         <item name="colorMainBackground">@color/holywarsooWaterMainBg</item>
         <item name="colorForumBackground">@color/holywarsooWaterForumHeader</item>
-        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
         <item name="toolbarOverrideStyle">@style/Theme.MaterialComponents.NoActionBar</item>
         <item name="toolbarPopupOverrideStyle">@style/Theme.MaterialComponents.NoActionBar</item>
     </style>

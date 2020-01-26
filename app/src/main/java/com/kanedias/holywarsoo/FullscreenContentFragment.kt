@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.kanedias.holywarsoo.misc.resolveAttr
 import com.kanedias.holywarsoo.model.PageableModel
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrConfig
@@ -42,6 +43,8 @@ abstract class FullscreenContentFragment: ContentFragment() {
     private lateinit var pageControls: PageViews
 
     open fun setupUI(model: PageableModel) {
+        viewRefresher.setColorSchemeColors(requireContext().resolveAttr(R.attr.colorSecondary))
+        viewRefresher.setProgressBackgroundColorSchemeColor(requireContext().resolveAttr(R.attr.colorPrimary))
         viewRefresher.setOnRefreshListener { refreshContent() }
         pageControls = PageViews(this, model, pageNavigation)
     }

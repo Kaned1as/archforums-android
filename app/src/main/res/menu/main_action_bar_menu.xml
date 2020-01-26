@@ -9,8 +9,7 @@
         android:title="@string/menu_search"
         android:icon="@drawable/search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
-        app:showAsAction="always"
-        android:visible="false"/>
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/menu_settings"

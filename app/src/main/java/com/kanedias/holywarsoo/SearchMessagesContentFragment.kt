@@ -10,37 +10,39 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.ButterKnife
-import com.kanedias.holywarsoo.dto.SearchTopicResults
-import com.kanedias.holywarsoo.model.SearchContentsModel
+import com.kanedias.holywarsoo.dto.ForumMessage
+import com.kanedias.holywarsoo.dto.SearchResults
+import com.kanedias.holywarsoo.model.SearchMessagesContentsModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.Exception
 
 /**
- * Fragment representing topic search content.
- * Shows a list of topics this search results contain.
+ * Fragment representing message search content.
+ * Shows a list of message this search results contain.
  * Can be navigated with paging controls.
  *
  * @author Kanedias
  *
  * Created on 2019-12-19
  */
-class SearchTopicContentFragment: FullscreenContentFragment() {
+class SearchMessagesContentFragment: FullscreenContentFragment() {
 
     companion object {
         const val URL_ARG = "URL_ARG"
+        const val KEYWORD_ARG = "KEYWORD_ARG"
     }
 
-    lateinit var contents: SearchContentsModel
+    lateinit var contents: SearchMessagesContentsModel
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, state: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_contents, parent, false)
         ButterKnife.bind(this, view)
 
-        contents = ViewModelProviders.of(this).get(SearchContentsModel::class.java)
-        contents.results.observe(this, Observer { contentView.adapter = SearchPageContentsAdapter(it) })
-        contents.results.observe(this, Observer { refreshViews() })
+        contents = ViewModelProviders.of(this).get(SearchMessagesContentsModel::class.java)
+        contents.search.observe(this, Observer { contentView.adapter = SearchPageContentsAdapter(it) })
+        contents.search.observe(this, Observer { refreshViews() })
 
         setupUI(contents)
         refreshContent()
@@ -49,18 +51,20 @@ class SearchTopicContentFragment: FullscreenContentFragment() {
     }
 
     override fun refreshContent() {
-        Log.d("SearchFrag", "Refreshing content, search ${contents.results.value?.name}, page ${contents.currentPage.value}")
+        Log.d("SearchFrag", "Refreshing content, search ${contents.search.value?.name}, page ${contents.currentPage.value}")
 
         lifecycleScope.launchWhenResumed {
             viewRefresher.isRefreshing = true
 
             try {
-                val url = requireArguments().getString(URL_ARG, "")
+                val url = requireArguments().getString(URL_ARG, null)
+                val keyword = requireArguments().getString(KEYWORD_ARG, null)
+
                 val loaded = withContext(Dispatchers.IO) {
-                    Network.loadSearchResults(url, page = contents.currentPage.value!!)
+                    Network.loadSearchMessagesResults(url, keyword, page = contents.currentPage.value!!)
                 }
 
-                contents.results.value = loaded
+                contents.search.value = loaded
                 contents.pageCount.value = loaded.pageCount
                 contents.currentPage.value = loaded.currentPage
 
@@ -75,7 +79,7 @@ class SearchTopicContentFragment: FullscreenContentFragment() {
     override fun refreshViews() {
         super.refreshViews()
 
-        val searchResults = contents.results.value ?: return
+        val searchResults = contents.search.value ?: return
 
         toolbar.apply {
             title = searchResults.name
@@ -88,21 +92,21 @@ class SearchTopicContentFragment: FullscreenContentFragment() {
         }
     }
 
-    class SearchPageContentsAdapter(results: SearchTopicResults) : RecyclerView.Adapter<TopicViewHolder>() {
+    class SearchPageContentsAdapter(search: SearchResults<ForumMessage>) : RecyclerView.Adapter<SearchMessageViewHolder>() {
 
-        val topics = results.topics
+        val messages = search.results
 
-        override fun getItemCount() = topics.size
+        override fun getItemCount() = messages.size
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TopicViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchMessageViewHolder {
             val inflater = LayoutInflater.from(parent.context)
-            val view = inflater.inflate(R.layout.fragment_topic_list_item, parent, false)
-            return TopicViewHolder(view)
+            val view = inflater.inflate(R.layout.fragment_search_message_list_item, parent, false)
+            return SearchMessageViewHolder(view)
         }
 
-        override fun onBindViewHolder(holder: TopicViewHolder, position: Int) {
-            val topic = topics[position]
-            holder.setup(topic)
+        override fun onBindViewHolder(holder: SearchMessageViewHolder, position: Int) {
+            val message = messages[position]
+            holder.setup(message)
         }
 
     }

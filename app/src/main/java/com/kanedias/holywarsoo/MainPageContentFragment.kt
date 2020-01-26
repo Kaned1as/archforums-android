@@ -13,6 +13,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.kanedias.holywarsoo.dto.ForumDesc
+import com.kanedias.holywarsoo.misc.resolveAttr
 import com.kanedias.holywarsoo.model.MainPageModel
 import com.kanedias.holywarsoo.service.Network
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,8 @@ class MainPageContentFragment: ContentFragment() {
         forumList.layoutManager = LinearLayoutManager(context)
 
         forumListRefresher.setOnRefreshListener { refreshContent() }
+        forumListRefresher.setColorSchemeColors(requireContext().resolveAttr(R.attr.colorSecondary))
+        forumListRefresher.setProgressBackgroundColorSchemeColor(requireContext().resolveAttr(R.attr.colorPrimary))
 
         contents = ViewModelProviders.of(requireActivity()).get(MainPageModel::class.java)
         contents.forums.observe(this, Observer { forumList.adapter = ForumListAdapter(it) })

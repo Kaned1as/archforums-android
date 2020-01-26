@@ -1,9 +1,7 @@
 package com.kanedias.holywarsoo
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -15,15 +13,12 @@ import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.forEach
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.*
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.kanedias.holywarsoo.markdown.mdRendererFrom
-import com.kanedias.holywarsoo.misc.setupTheme
 import com.kanedias.holywarsoo.misc.showFullscreenFragment
 import com.kanedias.holywarsoo.model.MainPageModel
 import com.kanedias.holywarsoo.service.Config
@@ -130,7 +125,7 @@ class MainActivity : ThemedActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        // setupTopSearch(menu)
+        setupTopSearch(menu)
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -150,6 +145,25 @@ class MainActivity : ThemedActivity() {
     private fun setupTopSearch(menu: Menu) {
         val searchItem = menu.findItem(R.id.menu_search)
         val searchView = searchItem.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if (query.isNullOrEmpty())
+                    return true
+
+                val frag = SearchMessagesContentFragment().apply {
+                    arguments = Bundle().apply { putString(SearchMessagesContentFragment.KEYWORD_ARG, query) }
+                }
+                showFullscreenFragment(frag)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return true
+            }
+
+        })
     }
 
     private fun checkWhatsNew() {
@@ -213,16 +227,26 @@ class MainActivity : ThemedActivity() {
 
     private fun onSidebarItemSelected(item: MenuItem): Boolean {
         val url = when (item.itemId) {
+            R.id.menu_item_my_messages -> {
+                // special case, that's a message search page, not a topic one
+                val frag = SearchMessagesContentFragment().apply {
+                    arguments = Bundle().apply { putString(SearchMessagesContentFragment.URL_ARG, Network.OWN_MESSAGES_URL) }
+                }
+                showFullscreenFragment(frag)
+                return true
+            }
+            R.id.menu_item_my_topics -> Network.OWN_TOPICS_URL
             R.id.menu_item_favorites -> Network.FAVORITE_TOPICS_URL
             R.id.menu_item_replies -> Network.REPLIES_TOPICS_URL
             R.id.menu_item_new_messages -> Network.NEW_MESSAGES_TOPICS_URL
             R.id.menu_item_recent -> Network.RECENT_TOPICS_URL
+            R.id.menu_item_my_subscriptions -> Network.SUBSCRIBED_TOPICS_URL
             else -> throw IllegalStateException("No such page!")
         }
         drawer.closeDrawers()
 
-        val frag = SearchTopicContentFragment().apply {
-            arguments = Bundle().apply { putString(SearchTopicContentFragment.URL_ARG, url) }
+        val frag = SearchTopicsContentFragment().apply {
+            arguments = Bundle().apply { putString(SearchTopicsContentFragment.URL_ARG, url) }
         }
         showFullscreenFragment(frag)
 

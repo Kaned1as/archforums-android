@@ -2,6 +2,12 @@ package com.kanedias.holywarsoo.dto
 
 import android.text.Spanned
 
+enum class NavigationScope {
+    FORUM,
+    TOPIC,
+    MESSAGE
+}
+
 /**
  * Entity representing forum message.
  * Forum messages form all topics, they can contain rich text, quotes, spoilers, images etc.
@@ -24,6 +30,12 @@ data class ForumMessage(
      * Permalink to this message
      */
     val link: String,
+
+    /**
+     * Navigation links. Used only when searching for messages.
+     * @see SearchMessagesResults
+     */
+    val navigationLinks: Map<NavigationScope, Pair<String, String>> = mapOf(),
 
     /**
      * Author of this message. Can be anonymous.
@@ -55,3 +67,5 @@ data class ForumMessage(
      */
     val index: Int = -1
 )
+
+typealias NavLinksMap = HashMap<NavigationScope, Pair<String, String>>

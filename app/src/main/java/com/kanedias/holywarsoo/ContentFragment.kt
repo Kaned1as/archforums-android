@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
  *
  * @see ForumContentFragment
  * @see TopicContentFragment
- * @see SearchTopicContentFragment
+ * @see SearchTopicsContentFragment
  *
  * @author Kanedias
  *

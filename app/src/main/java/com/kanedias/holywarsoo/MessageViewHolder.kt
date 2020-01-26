@@ -40,11 +40,13 @@ import java.util.*
 /**
  * View holder that shows topic message
  *
+ * @see TopicContentFragment
+ *
  * @author Kanedias
  *
  * Created on 2019-12-22
  */
-class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
+open class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 
     @BindView(R.id.message_area)
     lateinit var messageArea: MaterialCardView
@@ -71,7 +73,10 @@ class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
         ButterKnife.bind(this, iv)
     }
 
-    fun setup(message: ForumMessage, topic: ForumTopic) {
+    /**
+     * Message-specific setup
+     */
+    open fun setup(message: ForumMessage) {
         if (message.index == 1) {
             messageArea.cardElevation = dpToPixel(8f, messageArea.context)
         } else {
@@ -103,45 +108,29 @@ class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
         }
 
         messageBody.handleMarkdown(message.content)
-        messageBody.customSelectionActionModeCallback = SelectionEnhancer(message, topic)
 
         // make text selectable
         // XXX: this is MAGIC: see https://stackoverflow.com/a/56224791/1696844
         messageBody.setTextIsSelectable(false)
         messageBody.measure(-1, -1)
         messageBody.setTextIsSelectable(true)
+    }
+
+    /**
+     * Message-and-thread-specific setup.
+     */
+    fun setup(message: ForumMessage, topic: ForumTopic) {
+        this.setup(message)
+
+        messageBody.customSelectionActionModeCallback = SelectionEnhancer(message, topic)
 
         messageMenu.setOnClickListener { configureContextMenu(it, message, topic) }
     }
 
-    private fun configureContextMenu(anchor: View, message: ForumMessage, topic: ForumTopic) {
-        val pmenu = PopupMenu(anchor.context, anchor)
-        pmenu.inflate(R.menu.message_menu)
-        pmenu.menu.iterator().forEach { mi -> DrawableCompat.setTint(mi.icon, anchor.resolveAttr(R.attr.colorOnSecondary)) }
-
+    fun configureContextMenu(pmenu: PopupMenu, anchor: View, message: ForumMessage) {
         // share message permalink
         pmenu.menu.findItem(R.id.menu_message_share).setOnMenuItemClickListener {
             anchor.context.shareLink(message.link)
-            true
-        }
-
-        // insert full message quote
-        pmenu.menu.findItem(R.id.menu_message_quote).setOnMenuItemClickListener {
-            val waitDialog = MaterialAlertDialogBuilder(anchor.context)
-                .setTitle(R.string.please_wait)
-                .setMessage(R.string.loading)
-                .create()
-
-            GlobalScope.launch(Dispatchers.Main) {
-                waitDialog.show()
-
-                Network.perform(
-                    networkAction = { Network.loadQuote(topic.id, message.id) },
-                    uiAction = { quote -> openQuotedReply(topic, mapOf(AddMessageFragment.FULL_QUOTE_ARG to quote)) }
-                )
-
-                waitDialog.dismiss()
-            }
             true
         }
 
@@ -172,6 +161,34 @@ class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
                 }
                 .show()
 
+            true
+        }
+    }
+
+    private fun configureContextMenu(anchor: View, message: ForumMessage, topic: ForumTopic) {
+        val pmenu = PopupMenu(anchor.context, anchor)
+        pmenu.inflate(R.menu.message_menu)
+        pmenu.menu.iterator().forEach { mi -> DrawableCompat.setTint(mi.icon, anchor.resolveAttr(R.attr.colorOnSecondary)) }
+
+        this.configureContextMenu(pmenu, anchor, message)
+
+        // insert full message quote
+        pmenu.menu.findItem(R.id.menu_message_quote).setOnMenuItemClickListener {
+            val waitDialog = MaterialAlertDialogBuilder(anchor.context)
+                .setTitle(R.string.please_wait)
+                .setMessage(R.string.loading)
+                .create()
+
+            GlobalScope.launch(Dispatchers.Main) {
+                waitDialog.show()
+
+                Network.perform(
+                    networkAction = { Network.loadQuote(topic.id, message.id) },
+                    uiAction = { quote -> openQuotedReply(topic, mapOf(AddMessageFragment.FULL_QUOTE_ARG to quote)) }
+                )
+
+                waitDialog.dismiss()
+            }
             true
         }
 

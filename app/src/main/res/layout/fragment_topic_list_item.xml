@@ -131,7 +131,7 @@
             android:maxEms="20"
             android:ellipsize="end"
             android:text="@string/placeholder_long"
-            app:drawableEndCompat="@drawable/arrow_right"
+            app:drawableEndCompat="@drawable/menu_arrow_right"
             app:drawableTint="?attr/colorAccent"/>
 
     </RelativeLayout>
