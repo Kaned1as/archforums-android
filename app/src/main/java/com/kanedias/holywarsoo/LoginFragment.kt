@@ -63,19 +63,18 @@ class LoginFragment : Fragment() {
         lifecycleScope.launch {
             progressDialog.show()
 
-            try {
-                withContext(Dispatchers.IO) { Network.login(
-                    username = usernameInput.text.toString(),
-                    password = passwordInput.text.toString())
+            Network.perform(
+                networkAction = {
+                    Network.login(
+                        username = usernameInput.text.toString(),
+                        password = passwordInput.text.toString())
+                },
+                uiAction = {
+                    Toast.makeText(requireContext(), R.string.login_successful, Toast.LENGTH_SHORT).show()
+                    mainPageModel.account.value = Network.getUsername()
+                    fragmentManager?.popBackStack()
                 }
-
-                Toast.makeText(requireContext(), R.string.login_successful, Toast.LENGTH_SHORT).show()
-                mainPageModel.account.value = Network.getUsername()
-                fragmentManager?.popBackStack()
-
-            } catch (ex: Exception) {
-                Network.reportErrors(ctx = requireContext(), ex = ex)
-            }
+            )
 
             progressDialog.hide()
         }

@@ -23,9 +23,7 @@ import com.kanedias.holywarsoo.misc.showFullscreenFragment
 import com.kanedias.holywarsoo.model.MainPageModel
 import com.kanedias.holywarsoo.service.Config
 import com.kanedias.holywarsoo.service.Network
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.lang.Exception
 import java.lang.IllegalStateException
 
@@ -371,13 +369,7 @@ class MainActivity : ThemedActivity() {
 
             // re-login in background if needed
             if (Network.daysToAuthExpiration() < 3) {
-                lifecycleScope.launch {
-                    try {
-                        withContext(Dispatchers.IO) { Network.refreshLogin() }
-                    } catch (ex: Exception) {
-                        Network.reportErrors(this@MainActivity, ex)
-                    }
-                }
+                lifecycleScope.launch { Network.perform({ Network.refreshLogin() }) }
             }
         } else {
             // not logged in, show guest name

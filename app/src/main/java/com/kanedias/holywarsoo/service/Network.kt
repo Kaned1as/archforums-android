@@ -864,7 +864,7 @@ object Network {
      * @param networkAction action to be performed in background thread
      * @param uiAction action to be performed after [networkAction], in UI thread
      */
-    suspend fun <T> perform(networkAction: () -> T, uiAction: (input: T) -> Unit) {
+    suspend fun <T> perform(networkAction: () -> T, uiAction: (input: T) -> Unit = {}) {
         try {
             val result = withContext(Dispatchers.IO) { networkAction() }
             uiAction(result)

@@ -16,9 +16,6 @@ import com.kanedias.holywarsoo.dto.ForumDesc
 import com.kanedias.holywarsoo.misc.resolveAttr
 import com.kanedias.holywarsoo.model.MainPageModel
 import com.kanedias.holywarsoo.service.Network
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.lang.Exception
 
 /**
  * Fragment showing main page, i.e. list of forums with optional categories.
@@ -68,12 +65,11 @@ class MainPageContentFragment: ContentFragment() {
     override fun refreshContent() {
         lifecycleScope.launchWhenResumed {
             forumListRefresher.isRefreshing = true
-            try {
-                val loaded = withContext(Dispatchers.IO) { Network.loadForumList() }
-                contents.forums.value = loaded
-            } catch (ex: Exception) {
-                context?.let { Network.reportErrors(it, ex) }
-            }
+
+            Network.perform(
+                networkAction = { Network.loadForumList() },
+                uiAction = { loaded -> contents.forums.value = loaded }
+            )
 
             forumListRefresher.isRefreshing = false
         }

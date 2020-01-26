@@ -14,9 +14,6 @@ import com.kanedias.holywarsoo.dto.ForumTopicDesc
 import com.kanedias.holywarsoo.dto.SearchResults
 import com.kanedias.holywarsoo.model.SearchTopicsContentsModel
 import com.kanedias.holywarsoo.service.Network
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.lang.Exception
 
 /**
  * Fragment representing topic search content.
@@ -55,19 +52,16 @@ class SearchTopicsContentFragment: FullscreenContentFragment() {
         lifecycleScope.launchWhenResumed {
             viewRefresher.isRefreshing = true
 
-            try {
-                val url = requireArguments().getString(URL_ARG, "")
-                val loaded = withContext(Dispatchers.IO) {
-                    Network.loadSearchTopicResults(url, page = contents.currentPage.value!!)
+            val url = requireArguments().getString(URL_ARG, "")
+
+            Network.perform(
+                networkAction = { Network.loadSearchTopicResults(url, page = contents.currentPage.value!!) },
+                uiAction = { loaded ->
+                    contents.search.value = loaded
+                    contents.pageCount.value = loaded.pageCount
+                    contents.currentPage.value = loaded.currentPage
                 }
-
-                contents.search.value = loaded
-                contents.pageCount.value = loaded.pageCount
-                contents.currentPage.value = loaded.currentPage
-
-            } catch (ex: Exception) {
-                Network.reportErrors(context, ex)
-            }
+            )
 
             viewRefresher.isRefreshing = false
         }

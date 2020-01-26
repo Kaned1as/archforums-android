@@ -139,12 +139,10 @@ class EditorViews(private val parent: Fragment, private val iv: View) {
         GlobalScope.launch(Dispatchers.Main) {
             dialog.show()
 
-            try {
-                val link = withContext(Dispatchers.IO) { Network.uploadImage(stream.readBytes()) }
-                insertInCursorPosition("[img]", link, "[/img]")
-            } catch (ex: Exception) {
-                Network.reportErrors(iv.context, ex)
-            }
+            Network.perform(
+                networkAction = { Network.uploadImage(stream.readBytes()) },
+                uiAction = { link -> insertInCursorPosition("[img]", link, "[/img]") }
+            )
 
             dialog.dismiss()
         }

@@ -12,11 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import butterknife.ButterKnife
 import com.kanedias.holywarsoo.dto.Forum
 import com.kanedias.holywarsoo.model.ForumContentsModel
-import com.kanedias.holywarsoo.model.PageableModel
 import com.kanedias.holywarsoo.service.Network
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.lang.Exception
 
 /**
  * Fragment representing forum content.
@@ -47,10 +43,6 @@ class ForumContentFragment: FullscreenContentFragment() {
         refreshContent()
 
         return view
-    }
-
-    override fun setupUI(model: PageableModel) {
-        super.setupUI(model)
     }
 
     override fun refreshViews() {
@@ -87,21 +79,20 @@ class ForumContentFragment: FullscreenContentFragment() {
         lifecycleScope.launchWhenResumed {
             viewRefresher.isRefreshing = true
 
-            try {
-                val forumUrl =  contents.forum.value?.link
-                val customUrl = requireArguments().getString(URL_ARG, "")
+            val forumUrl =  contents.forum.value?.link
+            val customUrl = requireArguments().getString(URL_ARG, "")
 
-                val loaded = withContext(Dispatchers.IO) {
-                    Network.loadForumContents(forumUrl, customUrl, page = contents.currentPage.value!!)
+            Network.perform(
+                networkAction = { Network.loadForumContents(forumUrl, customUrl, page = contents.currentPage.value!!) },
+                uiAction = { loaded ->
+                    contents.forum.value = loaded
+                    contents.pageCount.value = loaded.pageCount
+                    contents.currentPage.value = loaded.currentPage
+
+                    // only load custom url once
+                    requireArguments().remove(URL_ARG)
                 }
-                contents.forum.value = loaded
-                contents.pageCount.value = loaded.pageCount
-                contents.currentPage.value = loaded.currentPage
-
-                requireArguments().remove(URL_ARG) // only load custom url once
-            } catch (ex: Exception) {
-                Network.reportErrors(context, ex)
-            }
+            )
 
             viewRefresher.isRefreshing = false
         }

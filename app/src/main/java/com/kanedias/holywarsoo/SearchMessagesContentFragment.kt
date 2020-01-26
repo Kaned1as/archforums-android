@@ -14,9 +14,6 @@ import com.kanedias.holywarsoo.dto.ForumMessage
 import com.kanedias.holywarsoo.dto.SearchResults
 import com.kanedias.holywarsoo.model.SearchMessagesContentsModel
 import com.kanedias.holywarsoo.service.Network
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.lang.Exception
 
 /**
  * Fragment representing message search content.
@@ -56,21 +53,17 @@ class SearchMessagesContentFragment: FullscreenContentFragment() {
         lifecycleScope.launchWhenResumed {
             viewRefresher.isRefreshing = true
 
-            try {
-                val url = requireArguments().getString(URL_ARG, null)
-                val keyword = requireArguments().getString(KEYWORD_ARG, null)
+            val url = requireArguments().getString(URL_ARG, null)
+            val keyword = requireArguments().getString(KEYWORD_ARG, null)
 
-                val loaded = withContext(Dispatchers.IO) {
-                    Network.loadSearchMessagesResults(url, keyword, page = contents.currentPage.value!!)
+            Network.perform(
+                networkAction = { Network.loadSearchMessagesResults(url, keyword, page = contents.currentPage.value!!) },
+                uiAction = { loaded ->
+                    contents.search.value = loaded
+                    contents.pageCount.value = loaded.pageCount
+                    contents.currentPage.value = loaded.currentPage
                 }
-
-                contents.search.value = loaded
-                contents.pageCount.value = loaded.pageCount
-                contents.currentPage.value = loaded.currentPage
-
-            } catch (ex: Exception) {
-                Network.reportErrors(context, ex)
-            }
+            )
 
             viewRefresher.isRefreshing = false
         }

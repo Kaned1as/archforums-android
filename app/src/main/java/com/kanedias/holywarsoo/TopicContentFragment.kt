@@ -15,12 +15,9 @@ import com.kanedias.holywarsoo.misc.shareLink
 import com.kanedias.holywarsoo.model.PageableModel
 import com.kanedias.holywarsoo.model.TopicContentsModel
 import com.kanedias.holywarsoo.service.Network
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
-import java.lang.Exception
 
 /**
  * Fragment for showing contents of the topic, i.e. list of messages it contains.
@@ -64,32 +61,30 @@ class TopicContentFragment: FullscreenContentFragment() {
         val topic = contents.topic.value ?: return false
 
         lifecycleScope.launch {
-            try {
-                withContext(Dispatchers.IO) { Network.manageFavorites(topic, action) }
-
-                // action completed successfully
-                when(action) {
-                    "subscribe" -> {
-                        contents.topic.value = topic.copy(isSubscribed = true)
-                        Toast.makeText(context, R.string.subscribed, Toast.LENGTH_SHORT).show()
+            Network.perform(
+                networkAction = { Network.manageFavorites(topic, action) },
+                uiAction = {
+                    when(action) {
+                        "subscribe" -> {
+                            contents.topic.value = topic.copy(isSubscribed = true)
+                            Toast.makeText(context, R.string.subscribed, Toast.LENGTH_SHORT).show()
+                        }
+                        "unsubscribe" -> {
+                            contents.topic.value = topic.copy(isSubscribed = false)
+                            Toast.makeText(context, R.string.unsubscribed, Toast.LENGTH_SHORT).show()
+                        }
+                        "favorite" -> {
+                            contents.topic.value = topic.copy(isFavorite = true)
+                            Toast.makeText(context, R.string.added_to_favorites, Toast.LENGTH_SHORT).show()
+                        }
+                        "unfavorite" -> {
+                            contents.topic.value = topic.copy(isFavorite = false)
+                            Toast.makeText(context, R.string.removed_from_favorites, Toast.LENGTH_SHORT).show()
+                        }
+                        else -> {}
                     }
-                    "unsubscribe" -> {
-                        contents.topic.value = topic.copy(isSubscribed = false)
-                        Toast.makeText(context, R.string.unsubscribed, Toast.LENGTH_SHORT).show()
-                    }
-                    "favorite" -> {
-                        contents.topic.value = topic.copy(isFavorite = true)
-                        Toast.makeText(context, R.string.added_to_favorites, Toast.LENGTH_SHORT).show()
-                    }
-                    "unfavorite" -> {
-                        contents.topic.value = topic.copy(isFavorite = false)
-                        Toast.makeText(context, R.string.removed_from_favorites, Toast.LENGTH_SHORT).show()
-                    }
-                    else -> {}
                 }
-            } catch (ex: Exception) {
-                context?.let { Network.reportErrors(it, ex) }
-            }
+            )
         }
 
         return true
@@ -162,25 +157,24 @@ class TopicContentFragment: FullscreenContentFragment() {
         lifecycleScope.launchWhenResumed {
             viewRefresher.isRefreshing = true
 
-            try {
-                val topicUrl =  contents.topic.value?.link
-                val customUrl = requireArguments().getString(URL_ARG, "")
-                val loaded = withContext(Dispatchers.IO) {
-                    Network.loadTopicContents(topicUrl, customUrl, page = contents.currentPage.value!!)
+            val topicUrl =  contents.topic.value?.link
+            val customUrl = requireArguments().getString(URL_ARG, "")
+
+            Network.perform(
+                networkAction = { Network.loadTopicContents(topicUrl, customUrl, page = contents.currentPage.value!!) },
+                uiAction = { loaded ->
+                    contents.topic.value = loaded
+                    contents.pageCount.value = loaded.pageCount
+                    contents.currentPage.value = loaded.currentPage
+
+                    // highlight custom message if original query mentioned it
+                    val messageId = HttpUrl.parse(loaded.refererLink)!!.queryParameter("pid")
+                    messageId?.let { highlightMessage(it.toInt()) }
+
+                    // only load custom url once
+                    requireArguments().remove(URL_ARG)
                 }
-                contents.topic.value = loaded
-                contents.pageCount.value = loaded.pageCount
-                contents.currentPage.value = loaded.currentPage
-
-                // highlight custom message if original query mentioned it
-                val messageId = HttpUrl.parse(loaded.refererLink)!!.queryParameter("pid")
-                messageId?.let { highlightMessage(it.toInt()) }
-
-                // only load custom url once
-                requireArguments().remove(URL_ARG)
-            } catch (ex: Exception) {
-                context?.let { Network.reportErrors(it, ex) }
-            }
+            )
 
             viewRefresher.isRefreshing = false
         }
