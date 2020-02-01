@@ -1,6 +1,7 @@
 package com.kanedias.holywarsoo
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Menu
@@ -52,8 +53,27 @@ class MainActivity : ThemedActivity() {
 
     private lateinit var donateHelper: DonateHelper
 
+    private lateinit var accountResetListener: SharedPreferences.OnSharedPreferenceChangeListener
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        accountResetListener = object: SharedPreferences.OnSharedPreferenceChangeListener {
+
+            private var savedHomeUrl = Config.homeUrl
+
+            override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+                if (key != Config.HOME_URL)
+                    return
+
+                if (savedHomeUrl == Config.homeUrl)
+                    return
+
+                savedHomeUrl = Config.homeUrl
+                mainPageModel.account.value = null
+            }
+        }
+        Config.prefs.registerOnSharedPreferenceChangeListener(accountResetListener)
 
         setContentView(R.layout.activity_main)
         ButterKnife.bind(this)
