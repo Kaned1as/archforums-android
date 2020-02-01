@@ -11,7 +11,7 @@ Prerequisites
 
 * Make sure you have [GitLab account](https://gitlab.com/users/sign_in#register-pane)
 
-* Submit an [issue](https://gitlab.com/Kanedias/holywarsoo-android/issues/new?issue) for your change. This step is not required, but I highly recommend it.
+* Submit an [issue](https://gitlab.com/Kanedias/archforums-android/issues/new?issue) for your change. This step is not required, but I highly recommend it.
   While this can seem redundant, there were numerous situations I hated myself for not
   doing it. This can be anything: the author of the project can reject patch for not
   following specific code guidelines that you never saw mentioned, or this can be scripts,
@@ -19,9 +19,9 @@ Prerequisites
   unfortunate for submitting your patch prior to big API change or version bump.
   So... just ask, if you need anything.
 
-* [Fork](https://gitlab.com/Kanedias/holywarsoo-android/forks/new) the repository on GitLab
+* [Fork](https://gitlab.com/Kanedias/archforums-android/forks/new) the repository on GitLab
 
-* Create a feature branch from `master` branch in Holywarsoo main repo. Avoid working
+* Create a feature branch from `master` branch in the main repo. Avoid working
   directly on `master` branch - conflicts may arise, you won't be able to update,
   I may `force push` commits while thinking nobody sees it... etc.
 
@@ -32,7 +32,7 @@ Prerequisites
   for GitHub to be able to link them together. You never know when this may be
   useful. Like this: `Implement basic UI. Fixes #1`
 
-* Create a merge-request from your fork against the main Holywarsoo repo. Wait for
+* Create a merge-request from your fork against the main repo. Wait for
   smoke-build to finish and make sure it passes. Then it's my turn, I'll keep an eye
   on merge-requests and check them on a regular basis. After some bouncing back and
   forth around my nitpicking style it will get merged and we all can sleep happily

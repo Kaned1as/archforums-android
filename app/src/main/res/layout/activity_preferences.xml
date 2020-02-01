@@ -30,7 +30,7 @@
         <fragment
             android:id="@+id/settings_fragment"
             android:tag="main preference content"
-            android:name="com.kanedias.holywarsoo.SettingsFragment"
+            android:name="com.kanedias.archforums.SettingsFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

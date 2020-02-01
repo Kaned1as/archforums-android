@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="holywarsooFireMainBg">#ffffff</color>
-    <color name="holywarsooFireMainHeader">#990000</color>
-    <color name="holywarsooFireMainHeaderDark">#770000</color>
-    <color name="holywarsooFireForumHeader">#ecebe7</color>
-    <color name="holywarsooFireForumContent">#fbfaf5</color>
-    <color name="holywarsooFireForumText">#333333</color>
-    <color name="holywarsooFireForumLinkText">#990000</color>
-    <color name="holywarsooFireForumHintText">#665858</color>
+    <color name="archforumsFireMainBg">#ffffff</color>
+    <color name="archforumsFireMainHeader">#990000</color>
+    <color name="archforumsFireMainHeaderDark">#770000</color>
+    <color name="archforumsFireForumHeader">#ecebe7</color>
+    <color name="archforumsFireForumContent">#fbfaf5</color>
+    <color name="archforumsFireForumText">#333333</color>
+    <color name="archforumsFireForumLinkText">#990000</color>
+    <color name="archforumsFireForumHintText">#665858</color>
 
-    <color name="holywarsooAirMainBg">#ffffff</color>
-    <color name="holywarsooAirMainHeader">#44699c</color>
-    <color name="holywarsooAirMainHeaderDark">#22477a</color>
-    <color name="holywarsooAirForumHeader">#ebf1f5</color>
-    <color name="holywarsooAirForumContent">#fcfdfe</color>
-    <color name="holywarsooAirForumText">#333333</color>
-    <color name="holywarsooAirForumLinkText">#2365b0</color>
-    <color name="holywarsooAirForumHintText">#566579</color>
+    <color name="archforumsAirMainBg">#ffffff</color>
+    <color name="archforumsAirMainHeader">#44699c</color>
+    <color name="archforumsAirMainHeaderDark">#22477a</color>
+    <color name="archforumsAirForumHeader">#ebf1f5</color>
+    <color name="archforumsAirForumContent">#fcfdfe</color>
+    <color name="archforumsAirForumText">#333333</color>
+    <color name="archforumsAirForumLinkText">#2365b0</color>
+    <color name="archforumsAirForumHintText">#566579</color>
 
-    <color name="holywarsooEarthMainBg">#ffffff</color>
-    <color name="holywarsooEarthMainHeader">#32671d</color>
-    <color name="holywarsooEarthMainHeaderDark">#21560c</color>
-    <color name="holywarsooEarthForumHeader">#ebf1f5</color>
-    <color name="holywarsooEarthForumContent">#fcfdfe</color>
-    <color name="holywarsooEarthForumText">#333333</color>
-    <color name="holywarsooEarthForumLink">#047e00</color>
-    <color name="holywarsooEarthForumHintText">#566579</color>
+    <color name="archforumsEarthMainBg">#ffffff</color>
+    <color name="archforumsEarthMainHeader">#32671d</color>
+    <color name="archforumsEarthMainHeaderDark">#21560c</color>
+    <color name="archforumsEarthForumHeader">#ebf1f5</color>
+    <color name="archforumsEarthForumContent">#fcfdfe</color>
+    <color name="archforumsEarthForumText">#333333</color>
+    <color name="archforumsEarthForumLink">#047e00</color>
+    <color name="archforumsEarthForumHintText">#566579</color>
 
-    <color name="holywarsooWaterMainBg">#2a2a2a</color>
-    <color name="holywarsooWaterMainHeader">#383838</color>
-    <color name="holywarsooWaterMainHeaderDark">#252525</color>
-    <color name="holywarsooWaterForumHeader">#565656</color>
-    <color name="holywarsooWaterForumContent">#383838</color>
-    <color name="holywarsooWaterForumText">#d4d4d4</color>
-    <color name="holywarsooWaterForumLinkText">#60a0dc</color>
-    <color name="holywarsooWaterForumHintText">#d4d4d4</color>
+    <color name="archforumsWaterMainBg">#2a2a2a</color>
+    <color name="archforumsWaterMainHeader">#383838</color>
+    <color name="archforumsWaterMainHeaderDark">#252525</color>
+    <color name="archforumsWaterForumHeader">#565656</color>
+    <color name="archforumsWaterForumContent">#383838</color>
+    <color name="archforumsWaterForumText">#d4d4d4</color>
+    <color name="archforumsWaterForumLinkText">#60a0dc</color>
+    <color name="archforumsWaterForumHintText">#d4d4d4</color>
 
     <!-- Material design color set -->
     <color name="md_amber_200">#ffe082</color>

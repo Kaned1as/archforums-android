@@ -31,12 +31,12 @@ android {
     compileSdkVersion(29)
 
     defaultConfig {
-        applicationId = "com.kanedias.holywarsoo"
-        manifestPlaceholders = mapOf("mainHost" to "holywarsoo.net")
+        applicationId = "com.kanedias.archforums"
+        manifestPlaceholders = mapOf("mainHost" to "bbs.archlinux.org")
         minSdkVersion(21)
         targetSdkVersion(29)
-        versionCode = 15
-        versionName = "1.3.3"
+        versionCode = 1
+        versionName = "1.0.0"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

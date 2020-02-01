@@ -61,7 +61,7 @@
         android:tint="?attr/colorNonImportantText"
         android:src="@drawable/overflow_menu"/>
 
-    <com.kanedias.holywarsoo.misc.ClickPreventingTextView
+    <com.kanedias.archforums.misc.ClickPreventingTextView
         android:id="@+id/message_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

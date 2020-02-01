@@ -44,7 +44,7 @@
                 android:layout_height="match_parent"
                 android:background="?attr/colorMainBackground">
 
-                <com.kanedias.holywarsoo.misc.NoScrollRecyclerView
+                <com.kanedias.archforums.misc.NoScrollRecyclerView
                     android:id="@+id/content_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -75,7 +75,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/add"
             android:visibility="gone"
-            app:layout_behavior="com.kanedias.holywarsoo.misc.ScrollAwareFabBehavior"/>
+            app:layout_behavior="com.kanedias.archforums.misc.ScrollAwareFabBehavior"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

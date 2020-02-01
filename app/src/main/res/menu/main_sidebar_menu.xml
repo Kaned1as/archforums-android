@@ -4,11 +4,6 @@
     <group android:id="@+id/menu_sidebar_topics">
 
         <item
-            android:id="@+id/menu_item_favorites"
-            android:title="@string/favorite_topics"
-            android:icon="@drawable/bookmark_list"/>
-
-        <item
             android:id="@+id/menu_item_replies"
             android:title="@string/replies_topics"
             android:icon="@drawable/community"/>

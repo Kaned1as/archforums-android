@@ -2,7 +2,7 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.kanedias.holywarsoo">
+    package="com.kanedias.archforums">
 
     <uses-permission android:name="com.android.vending.BILLING"/>
     <uses-permission android:name="android.permission.INTERNET" />
@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.READ_LOGS" />
 
     <application
-        android:name=".MainApplication"
+        android:name="com.kanedias.archforums.MainApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -24,7 +24,7 @@
         <meta-data android:name="mainWebsiteUrl" android:value="https://${mainHost}" />
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.kanedias.archforums.MainActivity"
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,8 +38,8 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".AboutActivity" />
+        <activity android:name="com.kanedias.archforums.SettingsActivity" />
+        <activity android:name="com.kanedias.archforums.AboutActivity" />
 
         <!-- file provider for sharing images from this app -->
         <provider

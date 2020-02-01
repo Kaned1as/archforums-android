@@ -1,3 +1,3 @@
 include(":app")
 
-rootProject.name="HolywarSoo"
+rootProject.name="archforums-android"

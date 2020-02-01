@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Холиварка</string>
+    <string name="app_name">Форумы Archlinux</string>
     <string name="loading">Загрузка…</string>
     <string name="open">Открыть</string>
     <string name="close">Закрыть</string>
@@ -16,7 +16,7 @@
     <string name="downloading_image">Изображение скачивается…</string>
     <string name="image_saved_as">Изображение сохранено как</string>
     <string name="app_crashed">К сожалению, приложение аварийно завершилось</string>
-    <string name="app_crash_report">Holywarsoo crash report</string>
+    <string name="app_crash_report">Archlinux Forums crash report</string>
     <string name="leave_crash_comment">Пожалуйста, опишите ваши последние действия до аварийного завершения</string>
     <string name="hello_plus_comma">Привет,</string>
     <string name="username">Имя пользователя</string>

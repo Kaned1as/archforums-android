@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string tools:context="general" name="app_name">Holywarsoo</string>
+    <string tools:context="general" name="app_name">Archlinux Forums</string>
     <string tools:context="general" name="loading">Loading…</string>
 
     <string tools:context="'about this app' dialog" name="the_maker" translatable="false">Kanedias</string>
@@ -31,7 +31,7 @@
     <string tools:context="fullscreen image viewer" name="image_saved_as">Image saved as</string>
 
     <string tools:context="ACRA dialog" name="app_crashed">Sorry, app just crashed</string>
-    <string tools:context="ACRA dialog" name="app_crash_report">Holywarsoo crash report</string>
+    <string tools:context="ACRA dialog" name="app_crash_report">Archlinux Forums crash report</string>
     <string tools:context="ACRA dialog" name="leave_crash_comment">Please describe your last performed action before the crash</string>
 
     <string tools:context="sidebar panel" name="open">Open</string>

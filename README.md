@@ -1,62 +1,49 @@
-Холиварка
-=========
+Archlinux Forums
+================
 
-Данный репозиторий содержит исходники и скрипты для сборки мобильного приложения для сайта
-holywarsoo.net.
+This is a satellite application for browsing Archlinux Forums from Android device.
 
-Возможности
------------
-
-* Логин
-* Просмотр списка форумов
-* Просмотр тем форума
-* Просмотр сообщений темы
-* Просмотр избранного/с вашим участием/активных тем
-* Создание нового сообщения
-* Ответ на сообщение
-* Загрузка изображений
-* Форматирование редактируемого текста
-* Цитирование по выделению
-* Автопрокрутка к новому сообщению
-* Добавление тем в избранное
-* Удаление тем из избранного
-* 4 темы оформления приложения на выбор
-* Создание темы
-* Отправка жалобы на сообщение
-* Поиск по сообщениям
-
-В планах
+Features
 --------
 
-* Редактирование сообщений
-* Личные сообщения
+* Logging in
+* Browsing forums
+* Browsing topics
+* Reading topic message
+* Browsing replies/recent topics/active
+* Creating new message
+* Replying to message
+* Images upload
+* Formatting of the message
+* Quoting by selection
+* Auto-scrolling to new message
+* Adding topics to subscriptions
+* Deleting topics from subscriptions
+* 4 application themes
+* Creating a topic
+* Reporting a message
+* Search
 
-FAQ
+WIP
 ---
 
-См. в отдельном документе: [FAQ](FAQ-ru.md)
+* Editing messages
+* Private messaging
 
-Дисклеймер
------------
-
-Я не являюсь сотрудником администрации сайта holywarsoo.net, и это приложение не является официальным.
-Если ваш вопрос касается контента данного сайта, обращайтесь напрямую на admin@holywarsoo.net.
-
-Лицензия
+License
 --------
 
-    Copyright (C) 2019-2020 Oleg `Kanedias` Chernovskiy
+    Copyright (C) 2020 Oleg `Kanedias` Chernovskiy
 
-    Это свободная программа: вы можете перераспространять ее и/или изменять
-    ее на условиях Стандартной общественной лицензии GNU в том виде, в каком
-    она была опубликована Фондом свободного программного обеспечения; либо
-    версии 3 лицензии, либо (по вашему выбору) любой более поздней версии.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-    Эта программа распространяется в надежде, что она будет полезной,
-    но БЕЗО ВСЯКИХ ГАРАНТИЙ; даже без неявной гарантии ТОВАРНОГО ВИДА
-    или ПРИГОДНОСТИ ДЛЯ ОПРЕДЕЛЕННЫХ ЦЕЛЕЙ. Подробнее см. в Стандартной
-    общественной лицензии GNU.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-    Вы должны были получить копию Стандартной общественной лицензии GNU
-    вместе с этой программой. Если это не так, см.
-    <https://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.

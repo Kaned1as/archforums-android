@@ -30,7 +30,7 @@
         <fragment
             android:id="@+id/about_fragment"
             android:tag="about fragment"
-            android:name="com.kanedias.holywarsoo.AboutFragment"
+            android:name="com.kanedias.archforums.AboutFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
