@@ -38,7 +38,7 @@ class AboutFragment: EasyAboutFragment() {
         val appDescItem = HeaderAboutItem.Builder(ctx)
                 .setTitle(R.string.app_name)
                 .setSubtitle("By ${ctx.getString(R.string.the_maker)}")
-                .setIcon(R.drawable.ic_launcher)
+                .setIcon(R.mipmap.ic_launcher)
                 .build()
 
         val versionItem = NormalAboutItem.Builder(context)
