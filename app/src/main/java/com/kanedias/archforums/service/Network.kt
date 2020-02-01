@@ -1,5 +1,6 @@
 package com.kanedias.archforums.service
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.text.Spanned
@@ -45,6 +46,7 @@ import java.util.concurrent.TimeUnit
  *
  * Created on 2019-12-17
  */
+@SuppressLint("StaticFieldLeak")
 object Network {
     private const val COOKIES_SHARED_PREFS = "cookies"
     private const val ACCOUNT_SHARED_PREFS = "account"
@@ -505,6 +507,7 @@ object Network {
 
         val postMessageReq = Request.Builder()
             .url(postUrl)
+            .header("Referer", postUrl.toString())
             .post(reqBody.build())
             .build()
 
@@ -548,6 +551,7 @@ object Network {
 
         val postTopicReq = Request.Builder()
             .url(postUrl)
+            .header("Referer", postUrl.toString())
             .post(reqBody.build())
             .build()
 
@@ -568,6 +572,7 @@ object Network {
     }
 
     @Throws(IOException::class)
+
     fun postReport(messageId: Int, reason: String) {
         val postUrl = resolve("misc.php")!!.newBuilder().addQueryParameter("report", messageId.toString()).build()
 
@@ -590,6 +595,7 @@ object Network {
 
         val reportReq = Request.Builder()
             .url(postUrl)
+            .header("Referer", postUrl.toString())
             .post(reqBody.build())
             .build()
 
