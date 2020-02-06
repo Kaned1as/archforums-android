@@ -6,4 +6,9 @@
         Fix opening links in app\n
         Better UX for pasting urls/spoilers
     </string>
+    <string name="release_4">
+        Fix smilies scaling\n
+        Scroll to to on page change
+    </string>
+
 </resources>
