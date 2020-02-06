@@ -50,6 +50,32 @@ class TopicContentFragment: FullscreenContentFragment() {
         return view
     }
 
+    /**
+     * Handle content view scroll after content has been loaded
+     */
+    private fun handleScroll() {
+        val topic = contents.topic.value ?: return
+
+        // highlight custom message if original query mentioned it
+        val messageId = HttpUrl.parse(topic.refererLink)!!.queryParameter("pid")
+        messageId?.let {
+            highlightMessage(it.toInt())
+            return
+        }
+
+        // scroll after page change
+        // if the top message is pinned, scroll to the second
+        val firstIdx = topic.messages.firstOrNull()?.index ?: return
+        val page = contents.currentPage.value ?: return
+        val scrollPos = when {
+            page == 1 -> 0 // scroll to the first message on first page in any case
+            firstIdx == 1 -> 1 // scroll to the second if first message is pinned
+            else -> 0 // to the first, it's not pinned
+        }
+
+        contentView.scrollToPosition(scrollPos)
+    }
+
     override fun setupUI(model: PageableModel) {
         super.setupUI(model)
 
@@ -167,9 +193,8 @@ class TopicContentFragment: FullscreenContentFragment() {
                     contents.pageCount.value = loaded.pageCount
                     contents.currentPage.value = loaded.currentPage
 
-                    // highlight custom message if original query mentioned it
-                    val messageId = HttpUrl.parse(loaded.refererLink)!!.queryParameter("pid")
-                    messageId?.let { highlightMessage(it.toInt()) }
+                    // scroll to top or specified message after content is loaded
+                    handleScroll()
 
                     // only load custom url once
                     requireArguments().remove(URL_ARG)
