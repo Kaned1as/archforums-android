@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="release_1">Initial release</string>
+    <string name="release_3">
+        Fix quoting by text selection\n
+        Fix opening links in app\n
+        Better UX for pasting urls/spoilers
+    </string>
 </resources>

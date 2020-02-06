@@ -195,7 +195,9 @@ class MainActivity : ThemedActivity() {
         data class Release(val versionName: String, val textId: Int)
 
         val releases = mapOf(
-            1 to Release("1.0.0", R.string.release_1))
+            1 to Release("1.0.0", R.string.release_1),
+            3 to Release("1.0.3", R.string.release_3)
+        )
 
         if (Config.lastVersion == 0) {
             // first time opening the app, don't show what's new at all

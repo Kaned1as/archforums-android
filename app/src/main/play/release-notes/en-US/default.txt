@@ -1,1 +1,3 @@
-Initial Google Play release
+- Fix quoting by text selection
+- Fix opening links in app
+- Better UX for pasting urls/spoilers

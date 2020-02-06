@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="release_1">Первый релиз</string>
+    <string name="release_3">
+        Исправлено цитирование по выделению\n
+        Исправлено открытие ссылок в приложении\n
+        Улучшен UX при вставке спойлеров/ссылок
+    </string>
 </resources>
