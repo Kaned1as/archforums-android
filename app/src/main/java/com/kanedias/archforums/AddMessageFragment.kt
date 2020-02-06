@@ -113,7 +113,7 @@ class AddMessageFragment: EditorFragment() {
             return
         }
 
-        val partialQuoteText = "[quote=\"$authorName\", post=${quotedId}]\n" +
+        val partialQuoteText = "[quote=$authorName]\n" +
                 "$quotedText\n" +
                 "[/quote]\n\n"
 
