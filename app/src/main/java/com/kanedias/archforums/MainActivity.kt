@@ -129,6 +129,13 @@ class MainActivity : ThemedActivity() {
         })
 
         refreshContent()
+
+        // if activity was started by clicking a link, handle it here
+        handleIntent(intent)
+
+        // clear intent data so use won't be redirected to old url
+        // in case activity is re-created
+        intent.data = null
     }
 
     override fun onStart() {
