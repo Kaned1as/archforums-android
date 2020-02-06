@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -37,6 +38,7 @@ import com.kanedias.html2md.Html2Markdown
 import com.stfalcon.imageviewer.StfalconImageViewer
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
+import io.noties.markwon.MarkwonConfiguration
 import io.noties.markwon.MarkwonVisitor
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.core.spans.BlockQuoteSpan
@@ -45,8 +47,7 @@ import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.html.HtmlTag
 import io.noties.markwon.html.MarkwonHtmlRenderer
 import io.noties.markwon.html.TagHandler
-import io.noties.markwon.image.AsyncDrawableScheduler
-import io.noties.markwon.image.AsyncDrawableSpan
+import io.noties.markwon.image.*
 import io.noties.markwon.image.glide.GlideImagesPlugin
 import io.noties.markwon.utils.NoCopySpannableFactory
 import java.io.File
@@ -67,6 +68,22 @@ fun mdRendererFrom(ctx: Context): Markwon {
         .usePlugin(object: AbstractMarkwonPlugin() {
             override fun configureTheme(builder: MarkwonTheme.Builder) {
                 builder.blockMargin(dpToPixel(16f, ctx).toInt())
+            }
+        })
+        .usePlugin(object: AbstractMarkwonPlugin() {
+            override fun configureConfiguration(builder: MarkwonConfiguration.Builder) {
+                // in arch forums smilies put width=15, height=15 in img tag
+                // so GlideGifSupportStore.ScaleToDensity is ineffective, need to override
+                builder.imageSizeResolver(object: ImageSizeResolver() {
+
+                    val fallback = ImageSizeResolverDef()
+
+                    override fun resolveImageSize(drawable: AsyncDrawable): Rect {
+                        return drawable.result?.bounds // prefer real image size
+                            ?: fallback.resolveImageSize(drawable)
+                    }
+
+                })
             }
         })
         .usePlugin(HtmlPlugin.create()
