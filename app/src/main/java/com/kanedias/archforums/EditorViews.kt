@@ -76,8 +76,6 @@ class EditorViews(private val parent: Fragment, private val iv: View) {
             contentInput.text.delete(contentInput.selectionStart, contentInput.selectionEnd)
         }
 
-        val moreTxt = iv.context.getString(R.string.more_tag_default)
-
         when (clicked.id) {
             R.id.edit_quick_bold -> insertInCursorPosition("[b]", paste, "[/b]")
             R.id.edit_quick_italic -> insertInCursorPosition( "[i]", paste, "[/i]")
@@ -87,9 +85,9 @@ class EditorViews(private val parent: Fragment, private val iv: View) {
             R.id.edit_quick_quote -> insertInCursorPosition("[quote]", paste, "[/quote]")
             R.id.edit_quick_number_list -> insertInCursorPosition("[list]", paste, "[/list]")
             R.id.edit_quick_bullet_list -> insertInCursorPosition("[*]", paste, "[/*]")
-            R.id.edit_quick_link -> insertInCursorPosition("[url]", paste, "[/url]")
+            R.id.edit_quick_link -> insertInCursorPosition("[url=$paste]", paste, "[/url]")
             R.id.edit_quick_image -> insertInCursorPosition("[img]", paste, "[/img]")
-            R.id.edit_quick_more -> insertInCursorPosition("[spoiler=$moreTxt]", paste, "[/spoiler]")
+            R.id.edit_quick_more -> insertInCursorPosition("[spoiler]", paste, "[/spoiler]")
         }
 
         clipboardSwitch.isChecked = false
