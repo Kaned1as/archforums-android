@@ -429,7 +429,7 @@ object Network {
     @Throws(IOException::class)
     fun loadTopicContents(topicLink: String? = null, customLink: String? = null, page: Int = 1): ForumTopic {
         val pageUrl = customLink?.let { HttpUrl.parse(it) }
-            ?: topicLink?.let {  HttpUrl.parse(it)!!.newBuilder().addQueryParameter("p", page.toString()).build() }
+            ?: topicLink?.let { HttpUrl.parse(it)!!.newBuilder().addQueryParameter("p", page.toString()).build() }
             ?: throw IllegalStateException("Both forum link and custom link are null!")
 
         val req = Request.Builder().url(pageUrl).get().build()
@@ -718,6 +718,9 @@ object Network {
      * Post-processes the message, replaces all JS-based spoiler tags with standard HTML
      * `<details>` + `<summary>` tags that were meant to be actual spoilers, without requiring JS.
      *
+     * Also replaces all CSS-based `<span class="bss">` strikethrough tags with standard HTML
+     * `<s>` tags, without requiring stylesheets.
+     *
      * @param msgId unique message identifier. Used to locate cached content
      * @param msgBody element representing message body, usually `div.postmsg` in the document
      * @return HTML string after postprocessing
@@ -736,6 +739,15 @@ object Network {
                 clearAttributes()          // clear all attributes it might have
                 html(this.ownText())       // we don't need a span with down/up arrow, just spoiler text
                 // select("span").remove() // remove ▼ symbol
+            }
+        }
+
+        // need to replace all custom span strikethrough tags with
+        // standard `s`
+        for (strikeTag in msgBody.select("span.bbs")) {
+            strikeTag.apply {
+                tagName("s")
+                clearAttributes()
             }
         }
 
