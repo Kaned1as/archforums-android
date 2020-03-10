@@ -130,6 +130,26 @@ open class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
             true
         }
 
+        // edit message
+        val editMenuItem = pmenu.menu.findItem(R.id.menu_message_edit)
+        if (message.isEditable) {
+            pmenu.menu.findItem(R.id.menu_message_edit).setOnMenuItemClickListener {
+                val messageEdit = EditMessageFragment().apply {
+                    arguments = Bundle().apply {
+                        putInt(EditMessageFragment.EDIT_MESSAGE_ID_ARG, message.id)
+                    }
+                }
+
+                val activity = itemView.context as AppCompatActivity
+                messageEdit.show(activity.supportFragmentManager, "showing edit message fragment")
+
+                true
+            }
+        } else {
+            editMenuItem.isVisible = false
+        }
+
+
         // report message to the administration
         pmenu.menu.findItem(R.id.menu_message_report).setOnMenuItemClickListener {
             MaterialAlertDialogBuilder(anchor.context)

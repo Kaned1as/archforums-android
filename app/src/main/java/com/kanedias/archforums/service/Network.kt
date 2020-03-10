@@ -483,6 +483,73 @@ object Network {
         )
     }
 
+    public data class EditMessageDesc(
+        val subject: String? = null,
+        val content: String
+    )
+
+    @Throws(IOException::class)
+    fun loadEditPost(messageId: Int): EditMessageDesc {
+        val editUrl = resolve("edit.php")!!.newBuilder().addQueryParameter("id", messageId.toString()).build()
+        val req = Request.Builder().url(editUrl).get().build()
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IOException("Can't load message edit page: ${resp.message()}")
+
+        val editPageHtml = resp.body()!!.string()
+        val editPageDoc = Jsoup.parse(editPageHtml)
+
+        val editSubject = editPageDoc.select("form#edit textarea[name=req_subject]").text()
+        val editContent = editPageDoc.select("form#edit textarea[name=req_message]").text()
+
+        return EditMessageDesc(editSubject, editContent)
+    }
+
+    @Throws(IOException::class)
+    fun editMessage(messageId: Int, messageDesc: EditMessageDesc): HttpUrl {
+        val editUrl = resolve("edit.php")!!.newBuilder().addQueryParameter("id", messageId.toString()).build()
+
+        val req = Request.Builder().url(editUrl).get().build()
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IOException("Can't load message edit page: ${resp.message()}")
+
+        val editPageHtml = resp.body()!!.string()
+        val editPageDoc = Jsoup.parse(editPageHtml)
+
+        val editPageInputs = editPageDoc.select("form#edit input[type=hidden]")
+
+        val reqBody = FormBody.Builder()
+            .add("req_message", messageDesc.content)
+
+        if (!messageDesc.subject.isNullOrEmpty()) {
+            reqBody.add("req_subject", messageDesc.subject)
+        }
+
+        for (input in editPageInputs) {
+            reqBody.add(input.attr("name"), input.attr("value"))
+        }
+
+        val editMessageReq = Request.Builder()
+            .url(editUrl.newBuilder().addQueryParameter("action", "edit").build())
+            .post(reqBody.build())
+            .build()
+
+        // if we send edit too quickly website decides we are robots, need to wait a bit
+        Thread.sleep(2000)
+
+        val editMessageResp = httpClient.newCall(editMessageReq).execute()
+        if (!editMessageResp.isSuccessful)
+            throw IOException("Unexpected failure")
+
+        // this is a redirect link page, such as "Message saved, please wait to be redirected"
+        val editMessageHtml = editMessageResp.body()!!.string()
+        val editMessageDoc = Jsoup.parse(editMessageHtml)
+
+        // we need to extract link from it
+        val link = editMessageDoc.select("div#brdmain div.box a").attr("href")
+        return resolve(link)!!
+    }
 
     @Throws(IOException::class)
     fun postMessage(topicId: Int, message: String): HttpUrl {
@@ -693,6 +760,7 @@ object Network {
                 val msgAuthorAvatar = message.select("div.postleft dd.postavatar > img")
                 val msgBody = message.select("div.postright > div.postmsg").first()
                 val msgDate = msgDateLink.text()
+                val msgEditable = message.select("div.postfoot li.postedit")
 
                 val msgUrl = resolve(msgDateLink.attr("href"))!!
                 val msgAvatarUrl = resolve(msgAuthorAvatar.attr("src"))
@@ -705,6 +773,7 @@ object Network {
                         navigationLinks = navLinks,
                         index = msgIndex.replace("#", "").toInt(),
                         author = msgAuthor,
+                        isEditable = msgEditable.isNotEmpty(),
                         authorAvatarUrl = msgAvatarUrl?.toString(),
                         createdDate = msgDate,
                         content = postProcessMessage(msgId, msgBody)
@@ -880,12 +949,15 @@ object Network {
      * @param networkAction action to be performed in background thread
      * @param uiAction action to be performed after [networkAction], in UI thread
      */
-    suspend fun <T> perform(networkAction: () -> T, uiAction: (input: T) -> Unit = {}) {
+    suspend fun <T> perform(
+        networkAction: () -> T,
+        uiAction: (input: T) -> Unit = {},
+        exceptionAction: (ex: Exception) -> Unit = { ex -> reportErrors(appCtx, ex) }) {
         try {
             val result = withContext(Dispatchers.IO) { networkAction() }
             uiAction(result)
         } catch (ex: Exception) {
-            reportErrors(appCtx, ex)
+            exceptionAction(ex)
         }
     }
 

@@ -33,7 +33,7 @@ data class ForumMessage(
 
     /**
      * Navigation links. Used only when searching for messages.
-     * @see SearchMessagesResults
+     * @see SearchResults
      */
     val navigationLinks: Map<NavigationScope, Pair<String, String>> = mapOf(),
 
@@ -41,6 +41,11 @@ data class ForumMessage(
      * Author of this message. Can be anonymous.
      */
     val author: String,
+
+    /**
+     * True if the message belongs to you and you can edit it
+     */
+    val isEditable: Boolean,
 
     /**
      * Avatar of the author. Null means author doesn't have one.

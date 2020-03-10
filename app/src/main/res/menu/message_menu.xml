@@ -12,6 +12,11 @@
         android:icon="@drawable/reply"/>
 
     <item
+        android:id="@+id/menu_message_edit"
+        android:title="@string/edit"
+        android:icon="@drawable/edit"/>
+
+    <item
         android:id="@+id/menu_message_report"
         android:title="@string/report"
         android:icon="@drawable/report"/>

@@ -14,6 +14,10 @@ object SpanCache {
 
     private val cache = MarkdownLruCache(1024 * 1024)
 
+    fun removeMessageId(msgId: Int) {
+        cache.remove(msgId)
+    }
+
     fun forMessageId(msgId: Int): Spanned? {
         return cache[msgId]
     }
