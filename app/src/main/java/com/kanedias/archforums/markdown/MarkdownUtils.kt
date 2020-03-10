@@ -2,6 +2,7 @@ package com.kanedias.archforums.markdown
 
 import android.Manifest
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,13 +11,13 @@ import android.graphics.Rect
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.text.*
 import android.text.style.CharacterStyle
 import android.text.style.ClickableSpan
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
-import android.webkit.MimeTypeMap
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -395,37 +396,33 @@ class ImageShowOverlay(ctx: Context,
             Glide.with(it).asFile().load(resolved.toString()).into(object: SimpleTarget<File>() {
 
                 override fun onResourceReady(resource: File, transition: Transition<in File>?) {
-                    val downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                    val ext = MimeTypeMap.getSingleton().getExtensionFromMimeType(getMimeTypeOfFile(resource))
-                    var name = resolved.pathSegments().last()
-                    if (ext!= null && !name.endsWith(ext)) {
-                        name += ".$ext"
-                    }
-                    val downloadedFile = File(downloads, name)
-                    downloadedFile.writeBytes(resource.readBytes())
+                    val downloadDir = Environment.DIRECTORY_DOWNLOADS
+                    val filename = resolved.pathSegments().last()
 
-                    val report = context.getString(R.string.image_saved_as) + " ${downloadedFile.absolutePath}"
+                    // on API >= 29 we must use media store API, direct access to SD-card is no longer available
+                    val ostream = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        val resolver = context.contentResolver
+                        val contentValues = ContentValues().apply {
+                            put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                            put(MediaStore.MediaColumns.MIME_TYPE, "image/*")
+                            put(MediaStore.MediaColumns.RELATIVE_PATH, downloadDir)
+                        }
+                        val imageUri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)!!
+                        resolver.openOutputStream(imageUri)!!
+                    } else {
+                        @Suppress("DEPRECATION") // should work on API < 29
+                        val downloads = Environment.getExternalStoragePublicDirectory(downloadDir)
+                        File(downloads, filename).outputStream()
+                    }
+
+                    ostream.write(resource.readBytes())
+
+                    val report = context.getString(R.string.image_saved_as) + " $downloadDir/$filename"
                     Toast.makeText(context, report, Toast.LENGTH_SHORT).show()
                 }
 
             })
         }
-    }
-
-    /**
-     * Decode the file as bitmap and retrieve its mime type, if it's an image
-     * @param file input file to parse
-     * @return string-represented mime type of this file
-     */
-    private fun getMimeTypeOfFile(file: File): String? {
-        val opt = BitmapFactory.Options()
-        opt.inJustDecodeBounds = true
-
-        FileInputStream(file).use {
-            BitmapFactory.decodeStream(it, null, opt)
-        }
-
-        return opt.outMimeType
     }
 
     /**
