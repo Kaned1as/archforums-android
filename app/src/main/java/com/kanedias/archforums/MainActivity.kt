@@ -197,7 +197,8 @@ class MainActivity : ThemedActivity() {
         val releases = mapOf(
             1 to Release("1.0.0", R.string.release_1),
             3 to Release("1.0.3", R.string.release_3),
-            4 to Release("1.0.4", R.string.release_4)
+            4 to Release("1.0.4", R.string.release_4),
+            5 to Release("1.1.0", R.string.release_5)
         )
 
         if (Config.lastVersion == 0) {

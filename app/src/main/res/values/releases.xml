@@ -11,4 +11,12 @@
         Scroll to to on page change
     </string>
 
+    <string name="release_5">
+        Message editing\n
+        Message deletion\n
+        Fixes for image loading\n
+        Fixes for image saving for Android 10\n
+        Fixes for strikethrough text
+    </string>
+
 </resources>

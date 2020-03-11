@@ -1,3 +1,5 @@
-- Fix quoting by text selection
-- Fix opening links in app
-- Better UX for pasting urls/spoilers
+- Message editing
+- Message deletion
+- Fixes for image loading
+- Fixes for image saving
+- Fix strikethrough text

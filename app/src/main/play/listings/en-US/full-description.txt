@@ -12,6 +12,8 @@ Features
 * Reading topic message
 * Browsing replies/recent topics/active
 * Creating new message
+* Editing messages
+* Deleting messages
 * Replying to message
 * Images upload
 * Formatting of the message
@@ -26,8 +28,6 @@ Features
 
 WIP
 ---
-
-* Editing messages
 * Private messaging
 
 Links
