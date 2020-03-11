@@ -314,6 +314,18 @@ object Network {
         )
     }
 
+    /**
+     * Loads search messages page completely, with messages content and permanent links to forums, topics and messages.
+     * This function differs from [loadSearchTopicResults] as it returns not the topics but messages that matched
+     * the [searchKeyword].
+     *
+     * @param searchLink canonical link to the the search page, in form of `https://<website>/search.php?action=<action>`
+     * @param searchKeyword keyword to use with [searchLink] to know what to search for, exactly
+     * @param page page number that is used in conjunction with [searchLink] to produce paged link
+     *
+     * @return fully enriched search results instance.
+     *         Messages have the same ordering as they had on the actual page.
+     */
     @Throws(IOException::class)
     fun loadSearchMessagesResults(searchLink: String? = null, searchKeyword: String? = null, page: Int = 1): SearchResults<ForumMessage> {
         val pageUrl = searchLink?.let { HttpUrl.parse(it)!!.newBuilder()
@@ -483,11 +495,26 @@ object Network {
         )
     }
 
-    public data class EditMessageDesc(
+    /**
+     * Helper class that contains message contents.
+     *
+     * If the message being edited is a starting post of the topic,
+     * this will also contain non-null subject of this topic.
+     *
+     * Polls and other options are currently not implemented.
+     */
+    data class EditMessageDesc(
         val subject: String? = null,
         val content: String
     )
 
+    /**
+     * Loads message contents that should be edited. We can't take text of the message as-is as it
+     * contains various forum-specific BB-codes that we can't replicate precisely.
+     *
+     * @param messageId unique message identifier that points to message which needs editing
+     * @return helper class containing current message info
+     */
     @Throws(IOException::class)
     fun loadEditPost(messageId: Int): EditMessageDesc {
         val editUrl = resolve("edit.php")!!.newBuilder().addQueryParameter("id", messageId.toString()).build()
@@ -505,6 +532,12 @@ object Network {
         return EditMessageDesc(editSubject, editContent)
     }
 
+    /**
+     * Updates the message with specified [messageId] to contain info from [messageDesc].
+     * @param messageId unique message identifier that points to message which needs editing
+     * @param messageDesc helper class containing info to be edited
+     * @return redirection link that forum returned in response
+     */
     @Throws(IOException::class)
     fun editMessage(messageId: Int, messageDesc: EditMessageDesc): HttpUrl {
         val editUrl = resolve("edit.php")!!.newBuilder().addQueryParameter("id", messageId.toString()).build()
@@ -551,6 +584,12 @@ object Network {
         return resolve(link)!!
     }
 
+    /**
+     * Deletes message with the specified unique message identifier.
+     *
+     * @param messageId message identifier
+     * @return redirection link that forum returned in response
+     */
     @Throws(IOException::class)
     fun deleteMessage(messageId: Int): HttpUrl {
         val deleteUrl = resolve("delete.php")!!.newBuilder().addQueryParameter("id", messageId.toString()).build()
