@@ -14,6 +14,7 @@ import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.iterator
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
@@ -26,8 +27,7 @@ import com.kanedias.archforums.dto.ForumTopic
 import com.kanedias.archforums.markdown.handleMarkdown
 import com.kanedias.archforums.misc.*
 import com.kanedias.archforums.service.Network
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import com.kanedias.archforums.service.SpanCache
 import kotlinx.coroutines.launch
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -42,7 +42,7 @@ import java.util.*
  *
  * Created on 2019-12-22
  */
-open class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
+open class MessageViewHolder(private val parent: FullscreenContentFragment, iv: View) : RecyclerView.ViewHolder(iv) {
 
     @BindView(R.id.message_area)
     lateinit var messageArea: MaterialCardView
@@ -130,10 +130,27 @@ open class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
             true
         }
 
+        // delete message
+        val deleteMenuItem = pmenu.menu.findItem(R.id.menu_message_delete)
+        if (message.isDeletable) {
+            deleteMenuItem.setOnMenuItemClickListener {
+                MaterialAlertDialogBuilder(anchor.context)
+                    .setTitle(R.string.confirm_action)
+                    .setMessage(R.string.delete_message_question)
+                    .setNegativeButton(android.R.string.no, null)
+                    .setPositiveButton(android.R.string.yes) { _, _ -> deleteMessage(message.id) }
+                    .show()
+
+                true
+            }
+        } else {
+            deleteMenuItem.isVisible = false
+        }
+
         // edit message
         val editMenuItem = pmenu.menu.findItem(R.id.menu_message_edit)
         if (message.isEditable) {
-            pmenu.menu.findItem(R.id.menu_message_edit).setOnMenuItemClickListener {
+            editMenuItem.setOnMenuItemClickListener {
                 val messageEdit = EditMessageFragment().apply {
                     arguments = Bundle().apply {
                         putInt(EditMessageFragment.EDIT_MESSAGE_ID_ARG, message.id)
@@ -164,7 +181,7 @@ open class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
 
                     val input = (dialog as AlertDialog).findViewById<EditText>(R.id.report_dialog_input)!!
 
-                    GlobalScope.launch(Dispatchers.Main) {
+                    parent.lifecycleScope.launch {
                         waitDialog.show()
 
                         Network.perform(
@@ -195,7 +212,7 @@ open class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
                 .setMessage(R.string.loading)
                 .create()
 
-            GlobalScope.launch(Dispatchers.Main) {
+            parent.lifecycleScope.launch {
                 waitDialog.show()
 
                 Network.perform(
@@ -211,6 +228,31 @@ open class MessageViewHolder(iv: View) : RecyclerView.ViewHolder(iv) {
         val helper = MenuPopupHelper(anchor.context, pmenu.menu as MenuBuilder, anchor)
         helper.setForceShowIcon(true)
         helper.show()
+    }
+
+    private fun deleteMessage(messageId: Int) {
+        val waitDialog = MaterialAlertDialogBuilder(itemView.context)
+            .setTitle(R.string.please_wait)
+            .setMessage(R.string.loading)
+            .create()
+
+        parent.lifecycleScope.launch {
+            waitDialog.show()
+
+            Network.perform(
+                networkAction = { Network.deleteMessage(messageId) },
+                uiAction = { link ->
+                    // delete this message from cache
+                    SpanCache.removeMessageId(messageId)
+
+                    // refresh parent fragment
+                    parent.arguments?.putString(TopicContentFragment.URL_ARG, link.toString())
+                    parent.refreshContent()
+                }
+            )
+
+            waitDialog.dismiss()
+        }
     }
 
     /**

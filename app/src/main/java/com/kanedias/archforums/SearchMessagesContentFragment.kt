@@ -85,7 +85,7 @@ class SearchMessagesContentFragment: FullscreenContentFragment() {
         }
     }
 
-    class SearchPageContentsAdapter(search: SearchResults<ForumMessage>) : RecyclerView.Adapter<SearchMessageViewHolder>() {
+    inner class SearchPageContentsAdapter(search: SearchResults<ForumMessage>) : RecyclerView.Adapter<SearchMessageViewHolder>() {
 
         val messages = search.results
 
@@ -94,7 +94,7 @@ class SearchMessagesContentFragment: FullscreenContentFragment() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchMessageViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val view = inflater.inflate(R.layout.fragment_search_message_list_item, parent, false)
-            return SearchMessageViewHolder(view)
+            return SearchMessageViewHolder(this@SearchMessagesContentFragment, view)
         }
 
         override fun onBindViewHolder(holder: SearchMessageViewHolder, position: Int) {

@@ -269,7 +269,7 @@ class TopicContentFragment: FullscreenContentFragment() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val view = inflater.inflate(R.layout.fragment_topic_message_list_item, parent, false)
-            return MessageViewHolder(view)
+            return MessageViewHolder(this@TopicContentFragment, view)
         }
 
         override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {

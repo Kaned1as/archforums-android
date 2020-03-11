@@ -48,6 +48,11 @@ data class ForumMessage(
     val isEditable: Boolean,
 
     /**
+     * True if the message belongs to you and you can delete it
+     */
+    val isDeletable: Boolean,
+
+    /**
      * Avatar of the author. Null means author doesn't have one.
      */
     val authorAvatarUrl: String? = null,

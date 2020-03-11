@@ -96,10 +96,14 @@
     <string name="app_theme_summary">Применяется полностью после перезагрузки приложения</string>
 
     <string name="edit">Редактировать</string>
+    <string name="delete">Удалить</string>
     <string name="quote">Цитировать</string>
     <string name="report">Пожаловаться</string>
     <string name="describe_why_reporting">Кратко опишите причину</string>
     <string name="reported">Отправлено</string>
+
+    <string name="confirm_action">Подтвердите действие</string>
+    <string name="delete_message_question">Удалить это сообщение?</string>
 
     <string-array name="preference_themes_titles">
         <item>Огонь</item>

@@ -552,6 +552,46 @@ object Network {
     }
 
     @Throws(IOException::class)
+    fun deleteMessage(messageId: Int): HttpUrl {
+        val deleteUrl = resolve("delete.php")!!.newBuilder().addQueryParameter("id", messageId.toString()).build()
+
+        val req = Request.Builder().url(deleteUrl).get().build()
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IOException("Can't load message edit page: ${resp.message()}")
+
+        val deletePageHtml = resp.body()!!.string()
+        val deletePageDoc = Jsoup.parse(deletePageHtml)
+
+        val deletePageInputs = deletePageDoc.select("form[action^=delete] input")
+
+        val reqBody = FormBody.Builder()
+        for (input in deletePageInputs) {
+            reqBody.add(input.attr("name"), input.attr("value"))
+        }
+
+        val deleteMessageReq = Request.Builder()
+            .url(deleteUrl)
+            .post(reqBody.build())
+            .build()
+
+        // if we send edit too quickly website decides we are robots, need to wait a bit
+        Thread.sleep(2000)
+
+        val deleteMessageResp = httpClient.newCall(deleteMessageReq).execute()
+        if (!deleteMessageResp.isSuccessful)
+            throw IOException("Unexpected failure")
+
+        // this is a redirect link page, such as "Message saved, please wait to be redirected"
+        val deleteMessageHtml = deleteMessageResp.body()!!.string()
+        val deleteMessageDoc = Jsoup.parse(deleteMessageHtml)
+
+        // we need to extract link from it
+        val link = deleteMessageDoc.select("div#brdmain div.box a").attr("href")
+        return resolve(link)!!
+    }
+
+    @Throws(IOException::class)
     fun postMessage(topicId: Int, message: String): HttpUrl {
         val postUrl = resolve("post.php")!!.newBuilder().addQueryParameter("tid", topicId.toString()).build()
 
@@ -761,6 +801,7 @@ object Network {
                 val msgBody = message.select("div.postright > div.postmsg").first()
                 val msgDate = msgDateLink.text()
                 val msgEditable = message.select("div.postfoot li.postedit")
+                val msgDeletable = message.select("div.postfoot li.postdelete")
 
                 val msgUrl = resolve(msgDateLink.attr("href"))!!
                 val msgAvatarUrl = resolve(msgAuthorAvatar.attr("src"))
@@ -774,6 +815,7 @@ object Network {
                         index = msgIndex.replace("#", "").toInt(),
                         author = msgAuthor,
                         isEditable = msgEditable.isNotEmpty(),
+                        isDeletable = msgDeletable.isNotEmpty(),
                         authorAvatarUrl = msgAvatarUrl?.toString(),
                         createdDate = msgDate,
                         content = postProcessMessage(msgId, msgBody)

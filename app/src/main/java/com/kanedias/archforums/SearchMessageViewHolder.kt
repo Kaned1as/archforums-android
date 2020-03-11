@@ -24,7 +24,7 @@ import com.kanedias.archforums.misc.resolveAttr
  *
  * Created on 20-01-26
  */
-class SearchMessageViewHolder(iv: View): MessageViewHolder(iv) {
+class SearchMessageViewHolder(parent: SearchMessagesContentFragment, iv: View): MessageViewHolder(parent, iv) {
 
     @BindView(R.id.message_navlink_to_forum)
     lateinit var navlinkToForum: TextView
