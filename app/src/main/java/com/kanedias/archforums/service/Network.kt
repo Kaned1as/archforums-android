@@ -565,6 +565,7 @@ object Network {
 
         val editMessageReq = Request.Builder()
             .url(editUrl.newBuilder().addQueryParameter("action", "edit").build())
+            .header("Referer", editUrl.toString())
             .post(reqBody.build())
             .build()
 
@@ -611,6 +612,7 @@ object Network {
 
         val deleteMessageReq = Request.Builder()
             .url(deleteUrl)
+            .header("Referer", deleteUrl.toString())
             .post(reqBody.build())
             .build()
 
