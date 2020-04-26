@@ -5,6 +5,7 @@ variables:
   ANDROID_TEST_SDK: "21"
   ANDROID_SDK_TOOLS: "4333796" # 26.1.1
   GIT_STRATEGY: fetch
+  GIT_SUBMODULE_STRATEGY: recursive
   GOOGLE_PUBLISH_JSON: app/misc/android-publisher-account.json
 
 before_script:
@@ -15,24 +16,53 @@ before_script:
   - echo y | android-sdk-linux/tools/bin/sdkmanager --install "platform-tools" &> /dev/null
   - echo y | android-sdk-linux/tools/bin/sdkmanager --install "extras;android;m2repository" &> /dev/null
   - echo y | android-sdk-linux/tools/bin/sdkmanager --install "extras;google;m2repository" &> /dev/null
-  - export ANDROID_HOME=$PWD/android-sdk-linux/
-  - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
+  - echo y | android-sdk-linux/tools/bin/sdkmanager --install "ndk-bundle" &> /dev/null
+  - export ANDROID_HOME=$PWD/android-sdk-linux
+  - export NDK_HOME=$ANDROID_HOME/ndk-bundle
+  - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools
   - export GRADLE_USER_HOME=$PWD/.gradle
-  - chmod +x ./gradlew
+
+
+cache:
+  paths:
+    # gradle cache
+    - .gradle/caches/
+    - .gradle/wrapper/
+    # rust compiled deps
+    - html2md/target
+
+
+.install_rust_toolchain: &install_rust_toolchain |
+  apt-get --quiet install gcc --yes
+  curl -sSf https://sh.rustup.rs | sh -s -- -y
+  source $HOME/.cargo/env
+  rustup target add armv7-linux-androideabi
+  rustup target add aarch64-linux-android
+  rustup target add i686-linux-android
+  rustup target add x86_64-linux-android
+
+.compile_html2md: &compile_html2md |
+  cd $CI_PROJECT_DIR
+  ./html2md-build.sh
 
 .decrypt_release_account: &decrypt_publish_json |
   apt-get --quiet install gnupg2 --yes
   gpg --batch --decrypt --output ${GOOGLE_PUBLISH_JSON} --passphrase ${GOOGLE_ACCOUNT_DECRYPTION_KEY} ${GOOGLE_PUBLISH_JSON}.gpg
+
 
 stages:
   - build
   - test
   - release
 
+
 smoke-build:
   stage: build
   script:
+    - *install_rust_toolchain
+    - *compile_html2md
     - ./gradlew assembleRelease
+
 
 functional-tests:
   stage: test
@@ -52,6 +82,7 @@ functional-tests:
     - adb shell input keyevent 82
     - ./gradlew cAT
 
+
 release-alpha:
   stage: release
   except:
@@ -59,12 +90,15 @@ release-alpha:
     - tags
   script:
     - *decrypt_publish_json
+    - *install_rust_toolchain
+    - *compile_html2md
     - ./gradlew app:publishGoogleplayRelease
   after_script:
     - rm -f ${GOOGLE_PUBLISH_JSON}
   artifacts:
     paths:
       - app/build/outputs/apk
+
 
 release-gold:
   stage: release
@@ -74,14 +108,11 @@ release-gold:
     - tags
   script:
     - *decrypt_publish_json
+    - *install_rust_toolchain
+    - *compile_html2md
     - ./gradlew publishGoogleplayRelease -PreleaseType=production
   after_script:
     - rm -f ${GOOGLE_PUBLISH_JSON}
   artifacts:
     paths:
       - app/build/outputs/apk
-
-cache:
-  paths:
-    - .gradle/caches/
-    - .gradle/wrapper/
