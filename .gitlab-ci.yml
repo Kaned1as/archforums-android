@@ -2,35 +2,32 @@ image: openjdk:8-jdk
 
 variables:
   ANDROID_COMPILE_SDK: "29"
+  ANDROID_COMPILE_NDK: "21.3.6528147"
   ANDROID_TEST_SDK: "21"
-  ANDROID_SDK_TOOLS: "4333796" # 26.1.1
+  ANDROID_SDK_TOOLS: "6514223"
   GIT_STRATEGY: fetch
   GIT_SUBMODULE_STRATEGY: recursive
   GOOGLE_PUBLISH_JSON: app/misc/android-publisher-account.json
 
-before_script:
-  - apt-get --quiet update --yes
-  - wget --quiet --output-document=android-sdk-linux.zip https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_TOOLS}.zip
-  - unzip -q android-sdk-linux.zip -d android-sdk-linux
-  - echo y | android-sdk-linux/tools/bin/sdkmanager --install "platforms;android-${ANDROID_COMPILE_SDK}" &> /dev/null
-  - echo y | android-sdk-linux/tools/bin/sdkmanager --install "platform-tools" &> /dev/null
-  - echo y | android-sdk-linux/tools/bin/sdkmanager --install "extras;android;m2repository" &> /dev/null
-  - echo y | android-sdk-linux/tools/bin/sdkmanager --install "extras;google;m2repository" &> /dev/null
-  - echo y | android-sdk-linux/tools/bin/sdkmanager --install "ndk-bundle" &> /dev/null
-  - export ANDROID_HOME=$PWD/android-sdk-linux
-  - export NDK_HOME=$ANDROID_HOME/ndk-bundle
-  - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools
+.configure_android_sdk: &configure_android_sdk
+  # download android cmdline tools
+  - mkdir -pv android-sdk-linux
+  - wget --quiet --output-document=android-cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
+  - unzip -q android-cmdline-tools.zip -d android-sdk-linux/cmdline-tools && rm -v android-cmdline-tools.zip
+  # set environment variables
+  - export ANDROID_HOME="$PWD/android-sdk-linux"
+  - export PATH="$PATH:$ANDROID_HOME/cmdline-tools/tools/bin:$ANDROID_HOME/platform-tools"
+  - export NDK_HOME=$ANDROID_HOME/ndk/$ANDROID_COMPILE_NDK
+  # install required components
+  - echo y | sdkmanager --install "platforms;android-${ANDROID_COMPILE_SDK}" > /dev/null
+  - echo y | sdkmanager --install "platform-tools" > /dev/null
+  - echo y | sdkmanager --install "extras;android;m2repository" > /dev/null
+  - echo y | sdkmanager --install "extras;google;m2repository" > /dev/null
+  - echo y | sdkmanager --install "ndk;${ANDROID_COMPILE_NDK}" > /dev/null
+
+.configure_gradle: &configure_gradle
   - export GRADLE_USER_HOME=$PWD/.gradle
-
-
-cache:
-  paths:
-    # gradle cache
-    - .gradle/caches/
-    - .gradle/wrapper/
-    # rust compiled deps
-    - html2md/target
-
+  - chmod +x ./gradlew
 
 .install_rust_toolchain: &install_rust_toolchain |
   apt-get --quiet install gcc --yes
@@ -41,13 +38,30 @@ cache:
   rustup target add i686-linux-android
   rustup target add x86_64-linux-android
 
+
 .compile_html2md: &compile_html2md |
   cd $CI_PROJECT_DIR
   ./html2md-build.sh
 
+
 .decrypt_release_account: &decrypt_publish_json |
   apt-get --quiet install gnupg2 --yes
   gpg --batch --decrypt --output ${GOOGLE_PUBLISH_JSON} --passphrase ${GOOGLE_ACCOUNT_DECRYPTION_KEY} ${GOOGLE_PUBLISH_JSON}.gpg
+
+
+before_script:
+  - apt-get --quiet update --yes
+  - *configure_android_sdk
+  - *configure_gradle
+
+
+cache:
+  paths:
+    # gradle cache
+    - .gradle/caches/
+    - .gradle/wrapper/
+    # rust compiled deps
+    - html2md/target
 
 
 stages:
@@ -62,25 +76,6 @@ smoke-build:
     - *install_rust_toolchain
     - *compile_html2md
     - ./gradlew assembleRelease
-
-
-functional-tests:
-  stage: test
-  only:
-    - web
-  script:
-    - wget --quiet --output-document=android-wait-for-emulator https://raw.githubusercontent.com/travis-ci/travis-cookbooks/0f497eb71291b52a703143c5cd63a217c8766dc9/community-cookbooks/android-sdk/files/default/android-wait-for-emulator
-    - chmod +x android-wait-for-emulator
-    - echo y | android-sdk-linux/tools/bin/sdkmanager --install "system-images;android-${ANDROID_TEST_SDK};default;x86" &> /dev/null
-    - echo y | android-sdk-linux/tools/bin/sdkmanager --install "emulator" &> /dev/null
-    - echo no | android-sdk-linux/tools/bin/avdmanager create avd --name test --package "system-images;android-${ANDROID_TEST_SDK};default;x86"
-    - android-sdk-linux/tools/emulator -avd test -no-window -no-audio &
-    - ./android-wait-for-emulator
-    - adb shell settings put global window_animation_scale 0
-    - adb shell settings put global transition_animation_scale 0
-    - adb shell settings put global animator_duration_scale 0
-    - adb shell input keyevent 82
-    - ./gradlew cAT
 
 
 release-alpha:
