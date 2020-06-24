@@ -10,6 +10,7 @@ import org.acra.annotation.AcraDialog
 import org.acra.annotation.AcraMailSender
 import org.acra.data.StringFormat
 import com.kanedias.archforums.service.Network
+import com.kanedias.archforums.service.SmiliesCache
 
 
 /**
@@ -38,5 +39,6 @@ class MainApplication : Application() {
         Config.init(this)
         Network.init(this)
         Database.init(this)
+        SmiliesCache.init(this)
     }
 }

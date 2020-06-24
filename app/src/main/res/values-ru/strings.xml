@@ -55,6 +55,7 @@
     <string name="insert_image">Вставить изображение</string>
     <string name="insert_from_clipboard">Вставить из буфера обмена</string>
     <string name="insert_spoiler_tag">Вставить скрытый текст</string>
+    <string name="insert_smilie">Вставить смайлик</string>
     <string name="submit">Отправить</string>
     <string name="submitting">Отправка…</string>
     <string name="to_first_page">К первой странице</string>

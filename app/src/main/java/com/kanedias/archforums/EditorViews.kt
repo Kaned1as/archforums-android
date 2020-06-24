@@ -7,15 +7,23 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.util.TypedValue
+import android.view.Gravity
 import androidx.core.content.ContextCompat
 import android.view.View
+import android.view.WindowManager
 import android.widget.*
 import androidx.fragment.app.Fragment
 import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
+import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.kanedias.archforums.misc.resolveAttr
 import com.kanedias.archforums.service.Network
+import com.kanedias.archforums.service.SmiliesCache
 import kotlinx.coroutines.*
 
 /**
@@ -40,6 +48,9 @@ class EditorViews(private val parent: Fragment, private val iv: View) {
 
     @BindView(R.id.edit_quick_image)
     lateinit var imageUpload: ImageView
+
+    @BindView(R.id.edit_quick_smilies)
+    lateinit var addSmilie: ImageView
 
     @BindView(R.id.edit_quick_button_area)
     lateinit var buttonArea: GridLayout
@@ -91,6 +102,34 @@ class EditorViews(private val parent: Fragment, private val iv: View) {
         }
 
         clipboardSwitch.isChecked = false
+    }
+
+    @OnClick(R.id.edit_quick_smilies)
+    fun insertSmilie(clicked: View) {
+        val smilieTypes = SmiliesCache.getAllSmilies()
+
+        val smiliesView = View.inflate(clicked.context, R.layout.view_smilies_panel, null)
+        val smiliesTable = smiliesView.findViewById<GridLayout>(R.id.smilies_table)
+        val pw = PopupWindow().apply {
+            height = WindowManager.LayoutParams.WRAP_CONTENT
+            width = WindowManager.LayoutParams.WRAP_CONTENT
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            contentView = smiliesView
+            isOutsideTouchable = true
+        }
+
+        for (smilie in smilieTypes) {
+            smiliesTable.addView(ImageView(clicked.context).apply {
+                setImageDrawable(smilie.value)
+                if (smilie.value is GifDrawable)
+                    (smilie.value as GifDrawable).start()
+                setOnClickListener {
+                    insertInCursorPosition("", smilie.key)
+                    pw.dismiss()
+                }
+            })
+        }
+        pw.showAsDropDown(clicked, 0, 0, Gravity.TOP)
     }
 
     /**

@@ -78,6 +78,7 @@
     <string tools:context="text editor" name="insert_image">Insert image</string>
     <string tools:context="text editor" name="insert_from_clipboard">Insert from clipboard</string>
     <string tools:context="text editor" name="insert_spoiler_tag">Insert spoiler tag</string>
+    <string tools:context="text editor" name="insert_smilie">Insert smilie</string>
     <string tools:context="text editor" name="submit">Submit</string>
     <string tools:context="text editor" name="submitting">Submitting…</string>
 
