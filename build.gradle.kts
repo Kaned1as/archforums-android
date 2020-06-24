@@ -7,7 +7,7 @@ buildscript {
 
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.5.3")
+        classpath("com.android.tools.build:gradle:4.0.0")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
     }
 }
@@ -17,7 +17,7 @@ allprojects {
     dependencies {
         val kotlinVersion: String by extra("1.3.61")
         val acraVersion: String by extra("5.5.0")
-        val markwonVersion: String by extra("4.3.0-SNAPSHOT")
+        val markwonVersion: String by extra("4.4.0")
         val roomVersion: String by extra("2.2.3")
     }
 
