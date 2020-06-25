@@ -19,4 +19,6 @@
         Fixes for strikethrough text
     </string>
 
+    <string name="release_8">Added ability to add smilies to the message</string>
+
 </resources>

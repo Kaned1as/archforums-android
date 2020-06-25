@@ -1,5 +1,1 @@
-- Message editing
-- Message deletion
-- Fixes for image loading
-- Fixes for image saving
-- Fix strikethrough text
+- Added ability to add smilies to the message

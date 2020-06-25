@@ -9,7 +9,7 @@ plugins {
     id("com.android.application")
 
     id("com.palantir.git-version").version("0.11.0")
-    id("com.github.triplet.play").version("2.6.1")
+    id("com.github.triplet.play").version("2.6.2")
 
     id("kotlin-android")
     id("kotlin-android-extensions")
@@ -29,14 +29,15 @@ fun gitVersion() = (extra["gitVersion"] as groovy.lang.Closure<*>)() as String
 
 android {
     compileSdkVersion(29)
+    ndkVersion = "21.3.6528147"
 
     defaultConfig {
         applicationId = "com.kanedias.archforums"
         manifestPlaceholders = mapOf("mainHost" to "bbs.archlinux.org")
         minSdkVersion(21)
         targetSdkVersion(29)
-        versionCode = 7
-        versionName = "1.1.2"
+        versionCode = 8
+        versionName = "1.2.0"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -123,6 +124,7 @@ android {
                 else -> 3
             }
 
+            buildConfigField("int", "VANILLA_VERSION_CODE", versionCode.toString())
             outputApk.versionCodeOverride = versionCode * 10000 + playVersionCode * 1000 + gitVersionCode * 10 + abiVersionCode
             outputApk.versionNameOverride = gitVersion().replace(".dirty", "")
         }

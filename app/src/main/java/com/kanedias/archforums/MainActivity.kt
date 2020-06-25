@@ -198,16 +198,17 @@ class MainActivity : ThemedActivity() {
             1 to Release("1.0.0", R.string.release_1),
             3 to Release("1.0.3", R.string.release_3),
             4 to Release("1.0.4", R.string.release_4),
-            5 to Release("1.1.0", R.string.release_5)
+            5 to Release("1.1.0", R.string.release_5),
+            8 to Release("1.2.0", R.string.release_8)
         )
 
+        val currVersion = BuildConfig.VANILLA_VERSION_CODE
         if (Config.lastVersion == 0) {
             // first time opening the app, don't show what's new at all
-            Config.lastVersion = BuildConfig.VERSION_CODE
+            Config.lastVersion = currVersion
         }
 
         // check how many releases we missed
-        val currVersion = BuildConfig.VERSION_CODE
         if (Config.lastVersion < currVersion) {
             val whatsNew = StringBuilder(150)
             for(missedRelease in currVersion downTo Config.lastVersion + 1) {
@@ -229,21 +230,18 @@ class MainActivity : ThemedActivity() {
                 whatsNew.append("\n\n")
             }
 
-            if (whatsNew.isEmpty()) {
-                // no info of new releases, skip showing dialog
-                return
+            if (whatsNew.isNotEmpty()) {
+                MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.whats_new)
+                    .setMessage(mdRendererFrom(this).toMarkdown(whatsNew.toString()))
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setNeutralButton(R.string.help_the_project) { _, _ -> donateHelper.donate() }
+                    .show()
             }
-
-            MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.whats_new)
-                .setMessage(mdRendererFrom(this).toMarkdown(whatsNew.toString()))
-                .setPositiveButton(android.R.string.ok, null)
-                .setNeutralButton(R.string.help_the_project) { _, _ -> donateHelper.donate() }
-                .show()
-
-            Config.lastVersion = currVersion
-            return
         }
+
+        // set last version anyway. Protects from big version code jumps
+        Config.lastVersion = currVersion
     }
 
     private fun onSidebarItemSelected(item: MenuItem): Boolean {
