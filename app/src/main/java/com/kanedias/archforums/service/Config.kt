@@ -45,6 +45,6 @@ object Config {
         set(homeUrl) = prefs.edit().putString(HOME_URL, homeUrl).apply()
 
     var appTheme: String
-        get() = prefs.getString(APP_THEME, "air")!!
+        get() = prefs.getString(APP_THEME, "default")!!
         set(theme) = prefs.edit().putString(APP_THEME, theme).apply()
 }

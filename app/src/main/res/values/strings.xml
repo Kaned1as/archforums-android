@@ -126,6 +126,7 @@
 
 
     <string-array name="preference_themes_titles">
+        <item>Default</item>
         <item>Fire</item>
         <item>Water (Dark)</item>
         <item>Air</item>

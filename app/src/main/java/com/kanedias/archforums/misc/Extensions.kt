@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -96,10 +97,18 @@ fun FragmentActivity.showFullscreenFragment(frag: Fragment) {
 
 fun FragmentActivity.setupTheme() {
     when (Config.appTheme) {
+        // select theme that user chose in settings
         "fire" -> setTheme(R.style.FireTheme)
         "water" -> setTheme(R.style.WaterTheme)
         "air" -> setTheme(R.style.AirTheme)
         "earth" -> setTheme(R.style.EarthTheme)
+        else -> { // "default"
+            // select theme based on system UI mode
+            when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+                Configuration.UI_MODE_NIGHT_NO -> setTheme(R.style.FireTheme)
+                Configuration.UI_MODE_NIGHT_YES -> setTheme(R.style.WaterTheme)
+            }
+        }
     }
 }
 

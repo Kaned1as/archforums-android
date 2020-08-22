@@ -107,6 +107,7 @@
     <string name="delete_message_question">Удалить это сообщение?</string>
 
     <string-array name="preference_themes_titles">
+        <item>По умолчанию</item>
         <item>Огонь</item>
         <item>Вода (Тёмная)</item>
         <item>Воздух</item>

@@ -13,7 +13,7 @@
         android:entries="@array/preference_themes_titles"
         android:entryValues="@array/preference_themes_values"
         android:key="application-theme"
-        android:defaultValue="air"
+        android:defaultValue="default"
         android:summary="@string/app_theme_summary"
         android:title="@string/app_theme"/>
 

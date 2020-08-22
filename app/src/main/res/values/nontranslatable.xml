@@ -26,6 +26,7 @@
 
     <!-- theme values -->
     <string-array name="preference_themes_values" translatable="false">
+        <item>default</item>
         <item>fire</item>
         <item>water</item>
         <item>air</item>
