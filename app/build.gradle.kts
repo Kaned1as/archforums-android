@@ -121,12 +121,14 @@ android {
             // code based on track
             val gitVersionCode = versionDetails().commitDistance
 
+            // production code should be higher than alpha so it can substitute it on release publish
+            // (google play requirement)
             val playVersionCode = when (play.track) {
-                "internal" -> 0
-                "alpha" -> 1
-                "beta" -> 2
+                "internal" -> 1
+                "alpha" -> 2
+                "beta" -> 3
                 "production" -> 4
-                else -> 3
+                else -> 0
             }
 
             buildConfigField("int", "VANILLA_VERSION_CODE", versionCode.toString())
