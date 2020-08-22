@@ -60,8 +60,9 @@ cache:
     # gradle cache
     - .gradle/caches/
     - .gradle/wrapper/
-    # rust compiled deps
+    # rust downloaded/compiled deps
     - html2md/target
+    - html2md/.cargo/registry
 
 
 stages:
