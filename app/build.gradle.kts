@@ -36,8 +36,8 @@ android {
         manifestPlaceholders = mapOf("mainHost" to "bbs.archlinux.org")
         minSdkVersion(21)
         targetSdkVersion(29)
-        versionCode = 8
-        versionName = "1.2.0"
+        versionCode = 9
+        versionName = "1.2.1"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -80,7 +80,12 @@ android {
             setEnable(true)
             reset()
             include("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
-            setUniversalApk(false)
+
+            // don't produce universal apk if publishing to google play
+            // as all architectures are covered by existing splits
+            val gplayPublishing = project.hasProperty("gplayReleaseType")
+            setUniversalApk(!gplayPublishing)
+
         }
     }
 
@@ -138,10 +143,7 @@ kapt {
 
 play {
     serviceAccountCredentials = file("misc/android-publisher-account.json")
-    track = when (project.hasProperty("releaseType")) {
-        true -> project.property("releaseType").toString()
-        false -> "alpha"
-    }
+    track = project.findProperty("gplayReleaseType").toString()
 }
 
 dependencies {

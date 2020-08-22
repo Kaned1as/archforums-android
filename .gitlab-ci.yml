@@ -87,7 +87,7 @@ release-alpha:
     - *decrypt_publish_json
     - *install_rust_toolchain
     - *compile_html2md
-    - ./gradlew app:publishGoogleplayRelease
+    - ./gradlew app:publishGoogleplayRelease -PgplayReleaseType=alpha
   after_script:
     - rm -f ${GOOGLE_PUBLISH_JSON}
   artifacts:
@@ -105,7 +105,7 @@ release-gold:
     - *decrypt_publish_json
     - *install_rust_toolchain
     - *compile_html2md
-    - ./gradlew publishGoogleplayRelease -PreleaseType=production
+    - ./gradlew publishGoogleplayRelease -PgplayReleaseType=production
   after_script:
     - rm -f ${GOOGLE_PUBLISH_JSON}
   artifacts:
