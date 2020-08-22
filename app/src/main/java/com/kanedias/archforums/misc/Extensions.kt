@@ -105,7 +105,7 @@ fun FragmentActivity.setupTheme() {
         else -> { // "default"
             // select theme based on system UI mode
             when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-                Configuration.UI_MODE_NIGHT_NO -> setTheme(R.style.FireTheme)
+                Configuration.UI_MODE_NIGHT_NO -> setTheme(R.style.AirTheme)
                 Configuration.UI_MODE_NIGHT_YES -> setTheme(R.style.WaterTheme)
             }
         }
