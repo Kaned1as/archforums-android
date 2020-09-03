@@ -35,6 +35,7 @@
     <string name="my_subscriptions">Мои подписки</string>
     <string name="recent_topics">Активные</string>
     <string name="page">Страница</string>
+    <string name="page_n_of_k">Страница %d из %d</string>
     <string name="subject">Тема</string>
     <string name="content">Содержимое</string>
     <string name="reply">Ответить</string>

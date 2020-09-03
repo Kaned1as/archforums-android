@@ -125,7 +125,7 @@ class TopicContentFragment: FullscreenContentFragment() {
         // setup toolbar content and menu items
         toolbar.apply {
             title = topic.name
-            subtitle = "${getString(R.string.page)} ${topic.currentPage}"
+            subtitle = getString(R.string.page_n_of_k, topic.currentPage, topic.pageCount)
 
             if(topic.favoriteLink != null) {
                 val favMi = menu.findItem(R.id.menu_topic_favorite)
