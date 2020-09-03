@@ -38,6 +38,7 @@ class ForumContentFragment: FullscreenContentFragment() {
         contents = ViewModelProviders.of(this).get(ForumContentsModel::class.java)
         contents.forum.observe(this, Observer { contentView.adapter = ForumContentsAdapter(it) })
         contents.forum.observe(this, Observer { refreshViews() })
+        contents.refreshed.value = false
 
         setupUI(contents)
         refreshContent()
@@ -80,7 +81,11 @@ class ForumContentFragment: FullscreenContentFragment() {
             viewRefresher.isRefreshing = true
 
             val forumUrl =  contents.forum.value?.link
-            val customUrl = requireArguments().getString(URL_ARG, "")
+            val customUrl = when(contents.refreshed.value) {
+                // only load custom url once
+                false -> requireArguments().getString(URL_ARG, null)
+                else -> null
+            }
 
             Network.perform(
                 networkAction = { Network.loadForumContents(forumUrl, customUrl, page = contents.currentPage.value!!) },
@@ -88,9 +93,7 @@ class ForumContentFragment: FullscreenContentFragment() {
                     contents.forum.value = loaded
                     contents.pageCount.value = loaded.pageCount
                     contents.currentPage.value = loaded.currentPage
-
-                    // only load custom url once
-                    requireArguments().remove(URL_ARG)
+                    contents.refreshed.value = true
                 }
             )
 

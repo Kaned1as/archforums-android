@@ -43,6 +43,7 @@ class TopicContentFragment: FullscreenContentFragment() {
         contents = ViewModelProviders.of(this).get(TopicContentsModel::class.java)
         contents.topic.observe(this, Observer { contentView.adapter!!.notifyDataSetChanged() })
         contents.topic.observe(this, Observer { refreshViews() })
+        contents.refreshed.value = false
 
         setupUI(contents)
         refreshContent()
@@ -184,7 +185,11 @@ class TopicContentFragment: FullscreenContentFragment() {
             viewRefresher.isRefreshing = true
 
             val topicUrl =  contents.topic.value?.link
-            val customUrl = requireArguments().getString(URL_ARG, "")
+            val customUrl = when(contents.refreshed.value) {
+                // only load custom url once
+                false -> requireArguments().getString(URL_ARG, null)
+                else -> null
+            }
 
             Network.perform(
                 networkAction = { Network.loadTopicContents(topicUrl, customUrl, page = contents.currentPage.value!!) },
@@ -192,12 +197,10 @@ class TopicContentFragment: FullscreenContentFragment() {
                     contents.topic.value = loaded
                     contents.pageCount.value = loaded.pageCount
                     contents.currentPage.value = loaded.currentPage
+                    contents.refreshed.value = true
 
                     // scroll to top or specified message after content is loaded
                     handleScroll()
-
-                    // only load custom url once
-                    requireArguments().remove(URL_ARG)
                 }
             )
 
