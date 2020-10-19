@@ -161,8 +161,14 @@ class AddMessageFragment: EditorFragment() {
                     Database.draftDao().deleteByKey(contextKey)
 
                     // refresh parent fragment
-                    curFrg?.arguments?.putString(TopicContentFragment.URL_ARG, link.toString())
-                    curFrg?.refreshContent()
+                    curFrg?.apply {
+                        // make it scroll to newly added message
+                        requireArguments().putString(TopicContentFragment.URL_ARG, link.toString())
+                        contents.refreshed.value = false
+
+                        refreshContent()
+                    }
+
 
                     dismiss()
                 })
