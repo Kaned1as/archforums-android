@@ -9,7 +9,6 @@ import android.net.Uri
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.util.TypedValue
 import android.view.Gravity
 import androidx.core.content.ContextCompat
 import android.view.View
@@ -21,10 +20,10 @@ import butterknife.ButterKnife
 import butterknife.OnClick
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.kanedias.archforums.misc.resolveAttr
 import com.kanedias.archforums.service.Network
 import com.kanedias.archforums.service.SmiliesCache
 import kotlinx.coroutines.*
+import okhttp3.HttpUrl
 
 /**
  * Fragment to hold all editing-related functions in all edit views where possible.
@@ -178,11 +177,37 @@ class EditorViews(private val parent: Fragment, private val iv: View) {
 
             Network.perform(
                 networkAction = { Network.uploadImage(stream.readBytes()) },
-                uiAction = { link -> insertInCursorPosition("[img]", link, "[/img]") }
+                uiAction = { link -> showSelectDimensionsDialog(link) }
             )
 
             dialog.dismiss()
         }
+    }
+
+    private fun showSelectDimensionsDialog(link: String) {
+        val imgUrl = HttpUrl.parse(link)!! // will be https://i.imgur.com/12345.png
+        val fileNamePos = imgUrl.pathSegments().size - 1
+        val fileNameFull = imgUrl.pathSegments().last() // get 12345.png
+        if (!fileNameFull.contains('.')) {
+            // imgur API changed? just insert as-is
+            insertInCursorPosition("[img]", link, "[/img]")
+            return
+        }
+
+        val fileName = fileNameFull.substring(0, fileNameFull.lastIndexOf('.')) // 12345
+        val fileExt = fileNameFull.substring(fileNameFull.lastIndexOf('.') + 1) // png
+
+        MaterialAlertDialogBuilder(iv.context)
+            .setTitle(R.string.select_image_size)
+            .setItems(R.array.image_sizes) { _, idx ->
+                val marker = iv.context.resources.getStringArray(R.array.image_sizes_values)[idx]
+                val updatedLink = imgUrl.newBuilder() // replace with e.g. https://i.imgur.com/12345h.png
+                    .setPathSegment(fileNamePos, "${fileName}${marker}.${fileExt}")
+                    .toString()
+
+                insertInCursorPosition("[img]", updatedLink, "[/img]")
+            }
+            .show()
     }
 
     /**

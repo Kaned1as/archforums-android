@@ -44,6 +44,7 @@
     <string name="select_image_to_upload">Выберите изображение для загрузки</string>
     <string name="no_file_manager_found">Файловый менеджер не найден</string>
     <string name="uploading">Загрузка…</string>
+    <string name="select_image_size">Выберите размер изображения для вставки</string>
     <string name="bold_font">Жирный</string>
     <string name="italic_font">Курсив</string>
     <string name="underlined_font">Подчёркнутый</string>
@@ -106,6 +107,14 @@
 
     <string name="confirm_action">Подтвердите действие</string>
     <string name="delete_message_question">Удалить это сообщение?</string>
+
+    <string-array name="image_sizes">
+        <item>Маленький (160px)</item>
+        <item>Средний (320px)</item>
+        <item>Большой (640px)</item>
+        <item>Огромный (1024px)</item>
+        <item>Как есть</item>
+    </string-array>
 
     <string-array name="preference_themes_titles">
         <item>По умолчанию</item>

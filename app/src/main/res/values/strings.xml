@@ -63,6 +63,7 @@
     <string tools:context="image upload" name="select_image_to_upload">Select image to upload</string>
     <string tools:context="image upload" name="no_file_manager_found">No file manager found</string>
     <string tools:context="image upload" name="uploading">Uploading…</string>
+    <string tools:context="image upload" name="select_image_size">Select image size to insert</string>
 
     <string tools:context="text editor" name="subject">Subject</string>
     <string tools:context="text editor" name="content">Content</string>
@@ -125,6 +126,13 @@
     <string tools:context="delete message dialog" name="confirm_action">Confirm action</string>
     <string tools:context="delete message dialog" name="delete_message_question">Delete this message?</string>
 
+    <string-array tools:context="image upload" name="image_sizes">
+        <item>Small (160px)</item>
+        <item>Medium (320px)</item>
+        <item>Large (640px)</item>
+        <item>Huge (1024px)</item>
+        <item>As is</item>
+    </string-array>
 
     <string-array name="preference_themes_titles">
         <item>Default</item>
