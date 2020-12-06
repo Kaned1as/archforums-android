@@ -94,6 +94,10 @@ class ForumContentFragment: FullscreenContentFragment() {
                     contents.pageCount.value = loaded.pageCount
                     contents.currentPage.value = loaded.currentPage
                     contents.refreshed.value = true
+                },
+                exceptionAction = { ex ->
+                    Network.reportErrors(context, ex)
+                    contentView.adapter = ErrorAdapter()
                 }
             )
 

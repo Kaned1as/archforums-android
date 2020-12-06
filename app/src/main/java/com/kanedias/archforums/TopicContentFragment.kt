@@ -203,6 +203,10 @@ class TopicContentFragment: FullscreenContentFragment() {
 
                     // scroll to top or specified message after content is loaded
                     handleScroll()
+                },
+                exceptionAction = { ex ->
+                    Network.reportErrors(context, ex)
+                    contentView.adapter = ErrorAdapter()
                 }
             )
 

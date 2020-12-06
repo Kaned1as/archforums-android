@@ -62,6 +62,10 @@ class SearchMessagesContentFragment: FullscreenContentFragment() {
                     contents.search.value = loaded
                     contents.pageCount.value = loaded.pageCount
                     contents.currentPage.value = loaded.currentPage
+                },
+                exceptionAction = { ex ->
+                    Network.reportErrors(context, ex)
+                    contentView.adapter = ErrorAdapter()
                 }
             )
 

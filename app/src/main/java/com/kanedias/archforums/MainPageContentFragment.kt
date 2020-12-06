@@ -68,7 +68,11 @@ class MainPageContentFragment: ContentFragment() {
 
             Network.perform(
                 networkAction = { Network.loadForumList() },
-                uiAction = { loaded -> contents.forums.value = loaded }
+                uiAction = { loaded -> contents.forums.value = loaded },
+                exceptionAction = { ex ->
+                    Network.reportErrors(context, ex)
+                    forumList.adapter = ErrorAdapter()
+                }
             )
 
             forumListRefresher.isRefreshing = false
