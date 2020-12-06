@@ -199,7 +199,8 @@ class MainActivity : ThemedActivity() {
             3 to Release("1.0.3", R.string.release_3),
             4 to Release("1.0.4", R.string.release_4),
             5 to Release("1.1.0", R.string.release_5),
-            8 to Release("1.2.0", R.string.release_8)
+            8 to Release("1.2.0", R.string.release_8),
+            15 to Release("1.2.7", R.string.release_15)
         )
 
         val currVersion = BuildConfig.VANILLA_VERSION_CODE

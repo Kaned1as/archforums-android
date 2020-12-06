@@ -10,7 +10,6 @@
         Fix smilies scaling\n
         Scroll to to on page change
     </string>
-
     <string name="release_5">
         Message editing\n
         Message deletion\n
@@ -18,7 +17,11 @@
         Fixes for image saving for Android 10\n
         Fixes for strikethrough text
     </string>
-
     <string name="release_8">Added ability to add smilies to the message</string>
+    <string name="release_15">
+        Fix/rework subscribe to topics button\n
+        Add mark all new topics read button\n
+        Show sad cloud on no network
+    </string>
 
 </resources>

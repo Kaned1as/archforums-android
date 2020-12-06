@@ -36,8 +36,8 @@ android {
         manifestPlaceholders = mapOf("mainHost" to "bbs.archlinux.org")
         minSdkVersion(21)
         targetSdkVersion(29)
-        versionCode = 14
-        versionName = "1.2.6"
+        versionCode = 15
+        versionName = "1.2.7"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
