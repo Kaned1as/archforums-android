@@ -24,6 +24,12 @@ data class SearchResults<T>(
      */
     val link: String,
 
+    /**
+     * "Mark all read" link with possible CSRF token
+     * not visible for non-logged in users
+     */
+    val markAllReadLink: String? = null,
+
     // counters
     val pageCount: Int,
     val currentPage: Int,

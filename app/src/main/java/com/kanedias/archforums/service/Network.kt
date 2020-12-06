@@ -298,6 +298,7 @@ object Network {
                 pageCount = 1, currentPage = 1, results = topics)
         }
 
+        val markReadAllLink = doc.select("div#brdmain div.linksb p.subscribelink a[href*=markread]").attr("href")
         val searchPageName = doc.select("div#brdmain > div.linkst ul.crumbs > li:last-child strong").text()
         val pageLinks = doc.select("div#brdmain > div.linkst p.pagelink")
         val currentPage = pageLinks.select("strong").text()
@@ -310,6 +311,7 @@ object Network {
             name = searchPageName,
             pageCount = pageCount!!,
             currentPage = currentPage.sanitizeInt(),
+            markAllReadLink = resolve(markReadAllLink)?.toString(),
             results = topics
         )
     }
@@ -779,6 +781,30 @@ object Network {
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
             throw IOException("Can't $action: ${resp.message()}")
+    }
+
+    /**
+     * Mark all new topics read. Only usable by logged in user,
+     * anonymous browsing doesn't even show the button.
+     *
+     * @param searchPage search page which results should be marked as read
+     */
+    fun markAllNewTopicsRead(searchPage: SearchResults<*>) {
+        if (searchPage.markAllReadLink.isNullOrEmpty()) {
+            // shouldn't happen
+            throw IllegalStateException("New topics can't be marked read, no button visible")
+        }
+
+        val csrfToken = HttpUrl.parse(searchPage.markAllReadLink)!!.queryParameter("csrf_token")
+        val url = resolve("misc.php")!!.newBuilder()
+            .addQueryParameter("action", "markread")
+            .addQueryParameter("csrf_token", csrfToken)
+            .build()
+
+        val req = Request.Builder().url(url).header("Referer", searchPage.link).get().build()
+        val resp = httpClient.newCall(req).execute()
+        if (!resp.isSuccessful)
+            throw IOException("Can't mark all topics read: ${resp.message()}")
     }
 
     /**

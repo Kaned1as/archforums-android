@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import butterknife.ButterKnife
 import com.kanedias.archforums.dto.ForumTopicDesc
 import com.kanedias.archforums.dto.SearchResults
+import com.kanedias.archforums.misc.visibilityBool
 import com.kanedias.archforums.model.SearchTopicsContentsModel
 import com.kanedias.archforums.service.Network
 
@@ -77,9 +79,32 @@ class SearchTopicsContentFragment: FullscreenContentFragment() {
             subtitle = "${getString(R.string.page)} ${searchResults.currentPage}"
         }
 
+        if (!searchResults.markAllReadLink.isNullOrEmpty()) {
+            // show "mark all topics read" button
+            actionButton.visibilityBool = true
+            actionButton.setImageDrawable(requireContext().getDrawable(R.drawable.mark_all_read))
+            actionButton.setOnClickListener { markAllTopicsRead() }
+        }
+
         when (searchResults.pageCount) {
             1 -> pageNavigation.visibility = View.GONE
             else -> pageNavigation.visibility = View.VISIBLE
+        }
+    }
+
+    private fun markAllTopicsRead() {
+        lifecycleScope.launchWhenResumed {
+            viewRefresher.isRefreshing = true
+
+            Network.perform(
+                networkAction = { Network.markAllNewTopicsRead(contents.search.value!!) },
+                uiAction = {
+                    Toast.makeText(requireContext(), R.string.loading, Toast.LENGTH_SHORT).show()
+                    refreshContent()
+                }
+            )
+
+            viewRefresher.isRefreshing = false
         }
     }
 
