@@ -23,5 +23,6 @@
         Add mark all new topics read button\n
         Show sad cloud on no network
     </string>
+    <string name="release_16">Fix markdown escaping inside code</string>
 
 </resources>
