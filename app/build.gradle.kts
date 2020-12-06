@@ -36,8 +36,8 @@ android {
         manifestPlaceholders = mapOf("mainHost" to "bbs.archlinux.org")
         minSdkVersion(21)
         targetSdkVersion(29)
-        versionCode = 12
-        versionName = "1.2.4"
+        versionCode = 13
+        versionName = "1.2.5"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -161,7 +161,7 @@ dependencies {
     implementation("androidx.room:room-runtime:${extra["roomVersion"]}")         // SQLite ORM lib
 
     implementation("com.jakewharton:butterknife:10.2.0")                         // Annotation processor
-    implementation("com.squareup.okhttp3:okhttp:3.14.0")                         // android http client
+    implementation("com.squareup.okhttp3:okhttp:3.14.2")                         // android http client
     implementation("com.github.franmontiel:PersistentCookieJar:v1.0.1")          // cookie support
     implementation("com.github.stfalcon:stfalcon-imageviewer:0.1.0")             // embedded image viewer
     implementation("com.r0adkll:slidableactivity:2.1.0")                         // fragment swipe right to go back action
