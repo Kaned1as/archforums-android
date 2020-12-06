@@ -147,9 +147,11 @@ class TopicContentFragment: FullscreenContentFragment() {
 
                 when (topic.isSubscribed) {
                     true -> subMi // in subscriptions
+                        .setIcon(R.drawable.subscription_filled)
                         .setTitle(R.string.unsubscribe)
                         .setOnMenuItemClickListener { manageTopicRelationStatus(action = "unsubscribe") }
                     false -> subMi // not in subscriptions
+                        .setIcon(R.drawable.subscription_add)
                         .setTitle(R.string.subscribe)
                         .setOnMenuItemClickListener { manageTopicRelationStatus(action = "subscribe") }
                 }

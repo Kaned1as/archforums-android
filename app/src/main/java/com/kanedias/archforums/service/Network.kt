@@ -763,12 +763,19 @@ object Network {
      * @param action what to do. Possible values: `favorite`, `unfavorite`, `subscribe`, `unsubscribe`
      */
     fun manageFavorites(topic: ForumTopic, action: String = "favorite") {
+        if (topic.subscriptionLink == null) {
+            // shouldn't happen
+            throw IllegalStateException("Topic ${topic.id} can't be subscribed to, no button visible")
+        }
+
+        val csrfToken = HttpUrl.parse(topic.subscriptionLink)!!.queryParameter("csrf_token")
         val url = resolve("misc.php")!!.newBuilder()
             .addQueryParameter("action", action)
             .addQueryParameter("tid", topic.id.toString())
+            .addQueryParameter("csrf_token", csrfToken)
             .build()
 
-        val req = Request.Builder().url(url).get().build()
+        val req = Request.Builder().url(url).header("Referer", topic.refererLink).get().build()
         val resp = httpClient.newCall(req).execute()
         if (!resp.isSuccessful)
             throw IOException("Can't $action: ${resp.message()}")
